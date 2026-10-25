@@ -102,6 +102,14 @@ copied verbatim (CI fails if a page drifts — change the template, then propaga
 - Printable: a print stylesheet that shows the current language only and expands all
   collapsible sections.
 
+## Writing style (all page text, all four languages)
+- No typography that reads as machine-generated: **no em dash (—), no en dash (–) as a
+  separator, no middle dot (·) as a separator, no decorative arrows (→ ↗) in buttons or
+  headings.** Use a colon, a comma, parentheses or a new sentence instead
+  (French: space before the colon). Page titles use "Page | Network Protocols Expert".
+- Arrows stay where they are notation: packet flows (`R1 → R2`), state transitions.
+  ✓ / ✗ stay where they pair with colour (accessibility rule).
+
 ## Multilingual rules
 - **One source page, a language switch FR | EN | NL | DE** in the header. The four language
   versions are all inside the page as `data-l="fr|en|nl|de"` blocks (plus the template's

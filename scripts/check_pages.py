@@ -9,6 +9,7 @@
   layout change is always made in the template first and then propagated.
 - Every <figure class="diagram"> has a title (figcaption) and a legend.
 - Sample packets: every data-packet JSON block equals tools/packet-builder.py output.
+- Landing topology: the embedded scene equals tools/landing-topology.py output (icons unaltered).
 - Published protocol pages contain no TEMPLATE placeholder.
 Exit code 1 if any page fails.
 """
@@ -45,6 +46,25 @@ LIBRARY = re.compile(r"<script>\n/\* ===== Page library.*?</script>", re.S)
 META = re.compile(r'<script type="application/json" id="page-meta">\s*(.*?)\s*</script>', re.S)
 PACKET = re.compile(r'<script type="application/json" data-packet="([a-z0-9-]+)">(.*?)</script>', re.S)
 FIGURE = re.compile(r'<figure class="diagram[^"]*"[^>]*>(.*?)</figure>', re.S)
+
+
+def topology():
+    spec = importlib.util.spec_from_file_location("landing_topology", ROOT / "tools" / "landing-topology.py")
+    mod = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+    return mod
+
+
+def check_topology(text: str, path: pathlib.Path) -> list:
+    """The landing scene (and the Cisco icons in it) must be exactly the generator's output."""
+    if "<!--TOPOLOGY-->" not in text:
+        return []
+    topo, flows = topology().block()
+    if topo not in text or flows not in text:
+        return [
+            f"topology differs from tools/landing-topology.py (run it with --update {path.relative_to(ROOT)})"
+        ]
+    return []
 
 
 def builder():
@@ -135,6 +155,7 @@ def check(path: pathlib.Path, tpl: str, pb) -> list:
     text = path.read_text(encoding="utf-8")
     errs = [msg for rx, msg in EXTERNAL if rx.search(text)]
     errs += check_languages(text) + check_meta(text) + check_figures(text) + check_packets(text, path, pb)
+    errs += check_topology(text, path)
     if path != TEMPLATE:
         errs += check_shared(text, tpl)
     if path.parent.parent == ROOT / "protocols" and ("data-tpl" in text or "⟨" in text):

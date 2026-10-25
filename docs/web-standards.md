@@ -120,6 +120,13 @@ Component patterns:
 | Cut extraneous load | Multimedia/cognitive-load principles: remove what does not serve the goal, put words next to the graphic they describe [L4] | One precise sentence beside each diagram, ≤ 5–7 elements per diagram, details on demand (field panel). |
 | Pages that stand alone | Readers arrive anywhere and leave anytime [L6] | Each section is self-contained; the TOC and stable anchors (`#packets`, `#quiz`…) support deep links. |
 
+## 8b. Writing style
+
+Page text avoids the typography readers associate with generated text: no em dash,
+no en dash or middle dot used as a separator, no decorative arrows on buttons. Colons,
+commas, parentheses and short sentences instead. Arrows remain only as notation
+(`R1 → R2`, state transitions); ✓ / ✗ remain where they back up colour (WCAG 1.4.1).
+
 ## 9. Print
 
 `@media print`: light colours, only the current language, header/TOC/controls hidden,

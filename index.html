@@ -7,12 +7,12 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="color-scheme" content="light dark">
-<title>Network Protocols Expert — CCIE-level network protocol library</title>
+<title>Network Protocols Expert | CCIE-level network protocol library</title>
 <meta name="description" content="Expert-level network protocol library: RFC bit diagrams next to Wireshark trees, animated state machines, sourced configuration for six vendors and CCIE-level quizzes.">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%231a5fb4'/%3E%3Cpath d='M7 10h18M7 16h12M7 22h15' stroke='%23fff' stroke-width='3' stroke-linecap='round'/%3E%3C/svg%3E">
 <script type="application/json" id="page-meta">
 {"slug":"","name":"Network Protocols Expert","kind":"home",
- "title":{"fr":"Network Protocols Expert — protocoles réseau niveau CCIE","en":"Network Protocols Expert — CCIE-level network protocol library","nl":"Network Protocols Expert — netwerkprotocollen op CCIE-niveau","de":"Network Protocols Expert — Netzwerkprotokolle auf CCIE-Niveau"},
+ "title":{"fr":"Network Protocols Expert | protocoles réseau niveau CCIE","en":"Network Protocols Expert | CCIE-level network protocol library","nl":"Network Protocols Expert | netwerkprotocollen op CCIE-niveau","de":"Network Protocols Expert | Netzwerkprotokolle auf CCIE-Niveau"},
  "description":{"fr":"Bibliothèque de protocoles réseau niveau expert : diagrammes RFC et arbres Wireshark, machines à états animées, configuration sourcée pour six vendeurs et quiz CCIE.","en":"Expert-level network protocol library: RFC bit diagrams next to Wireshark trees, animated state machines, sourced configuration for six vendors and CCIE-level quizzes.","nl":"Bibliotheek over netwerkprotocollen op expertniveau: RFC-bitdiagrammen naast Wireshark-bomen, geanimeerde state machines, configuratie met bronnen voor zes vendors en quizzen op CCIE-niveau.","de":"Bibliothek zu Netzwerkprotokollen auf Expertenniveau: RFC-Bitdiagramme neben Wireshark-Bäumen, animierte Zustandsautomaten, belegte Konfiguration für sechs Hersteller und Quiz auf CCIE-Niveau."}}
 </script>
 <script>
@@ -152,7 +152,7 @@ button { font: inherit; color: inherit; }
 .sec > details > summary h2::after { content: "▾"; margin-left: auto; font-size: 0.7em; color: var(--muted); transition: transform 0.2s; }
 .sec > details:not([open]) > summary h2::after { transform: rotate(-90deg); }
 .tpl { border: 2px dashed var(--orange); background: var(--orange-bg); border-radius: var(--radius); padding: 0.75rem 1rem; font-size: 0.9375rem; margin: 1rem 0; }
-.tpl strong { color: var(--fg); letter-spacing: 0.04em; }
+.tpl strong { display: inline-block; margin-right: 0.5rem; padding: 0.05rem 0.5rem; border-radius: 5px; background: var(--orange); color: var(--surface); font-size: 0.75rem; letter-spacing: 0.06em; }
 .card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 1.25rem; }
 .terms { display: grid; gap: 0.75rem; margin: 1rem 0; }
 .terms div { border-left: 3px solid var(--blue); padding-left: 0.9rem; }
@@ -379,10 +379,16 @@ th { background: var(--surface-2); font-weight: 650; white-space: nowrap; }
   background: radial-gradient(closest-side, color-mix(in srgb, var(--accent) 16%, transparent), transparent);
   pointer-events: none;
 }
-@media (min-width: 64rem) { .hero-l { grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.2fr); } }
-.hero-copy h1 { font-size: clamp(2.3rem, 1.4rem + 2.6vw, 3.5rem); line-height: 1.05; letter-spacing: -0.03em; margin-bottom: 1.25rem; }
+@media (min-width: 64rem) {
+  .hero-copy { display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr); grid-template-areas: "eyebrow ." "title lede" "title ctas"; column-gap: 3.5rem; align-items: end; }
+  .hero-copy .eyebrow { grid-area: eyebrow; }
+  .hero-copy h1 { grid-area: title; margin-bottom: 0; }
+  .hero-copy .lede { grid-area: lede; }
+  .hero-copy .ctas { grid-area: ctas; }
+}
+.hero-copy h1 { font-size: clamp(2.3rem, 1.4rem + 3vw, 4rem); line-height: 1.05; letter-spacing: -0.03em; margin-bottom: 1.25rem; }
 .hero-copy h1 em { font-style: normal; color: var(--accent); }
-.hero-copy .lede { max-width: 56ch; margin-bottom: 2rem; }
+.hero-copy .lede { max-width: 56ch; margin-bottom: 1.5rem; }
 .ctas { display: flex; flex-wrap: wrap; gap: 0.75rem; }
 .cta {
   display: inline-flex; align-items: center; gap: 0.45rem; min-height: 3rem; padding: 0 1.2rem; border-radius: 999px; font-size: 0.95rem;
@@ -399,28 +405,26 @@ th { background: var(--surface-2); font-weight: 650; white-space: nowrap; }
   box-shadow: 0 40px 90px -45px color-mix(in srgb, var(--accent) 55%, transparent); backdrop-filter: blur(4px); overflow: hidden;
 }
 .net-canvas { overflow-x: auto; }
-.net-canvas > svg { display: block; width: 100%; min-width: 34rem; height: auto; padding: 0.75rem 0.75rem 0; }
-.net .zone { fill: color-mix(in srgb, var(--surface-2) 70%, transparent); stroke: var(--line); stroke-width: 1.5; stroke-dasharray: 6 5; }
-.net .core-z { fill: color-mix(in srgb, var(--blue-bg) 45%, transparent); }
-.net .dc-z { fill: color-mix(in srgb, var(--teal-bg) 35%, transparent); }
-.net .zl { font: 700 12px var(--font); fill: var(--muted); letter-spacing: 0.03em; text-transform: uppercase; }
-.net .dci { stroke-dasharray: 3 5; }
-.net .dci-l { font: 600 11px var(--mono); fill: var(--muted); text-anchor: start; }
-.net .sub { font: 600 12px var(--mono); fill: var(--muted); }
-.net .node.srv rect { fill: var(--surface); stroke: var(--teal); stroke-width: 2; }
-.net .node.srv text { font: 700 11px var(--mono); }
-.net .node * { transition: stroke-width 0.2s, fill 0.2s; }
-.net .node.hit circle, .net .node.hit rect, .net .node.hit > path:first-of-type { stroke-width: 4.5; }
-.net .node.srv.hit rect { fill: var(--teal-bg); }
-.lg-zone { display: inline-block; width: 1.4rem; height: 0.95rem; border: 1.5px dashed var(--muted); border-radius: 4px; }
-.net .links line { stroke: color-mix(in srgb, var(--fg) 22%, transparent); stroke-width: 2; stroke-linecap: round; }
-.net .node circle, .net .node rect, .net .node > path:first-of-type { fill: var(--surface); stroke: var(--accent); stroke-width: 2.5; }
-.net .node.core circle { fill: var(--blue-bg); }
-.net .node.fw path:nth-of-type(1) { fill: none; stroke: var(--accent); stroke-width: 1.2; opacity: 0.7; }
-.net .node.fw rect { fill: var(--surface); }
-.net .node.lb path { fill: var(--surface); }
-.net text { fill: var(--fg); font: 700 14px var(--mono); text-anchor: middle; }
-.net .pkt, .net-legend svg { stroke-width: 2; }
+.net-canvas > svg { display: block; width: 100%; min-width: 44rem; height: auto; padding: 1.25rem 1rem 0.5rem; }
+/* Isometric slabs: lit top, darker sides (one tint per zone) */
+.net .zone { --z: light-dark(#e9e6df, #2a2926); }
+.net .z-core { --z: light-dark(#d9e6f8, #1f3350); }
+.net .z-dc { --z: light-dark(#d4efe9, #173c37); }
+.net .zone .f-top { fill: var(--z); stroke: color-mix(in srgb, var(--z) 70%, var(--fg)); stroke-width: 1; }
+.net .zone .f-l { fill: color-mix(in srgb, var(--z) 45%, #2b3440); }
+.net .zone .f-r { fill: color-mix(in srgb, var(--z) 35%, #1d242d); }
+.net .zl { font: 800 10.5px var(--font); fill: light-dark(#ffffff, #e9e7e1); letter-spacing: 0.08em; text-transform: uppercase; }
+.net .links line { stroke: color-mix(in srgb, var(--fg) 35%, transparent); stroke-width: 2; stroke-linecap: round; }
+.net .links .dci { stroke-dasharray: 4 5; }
+.net .dci-l { font: 700 11px var(--mono); fill: var(--muted); }
+.net .shadow { fill: #000; opacity: 0.16; transition: fill 0.2s, opacity 0.2s; }
+.net .node.hit .shadow { fill: var(--accent); opacity: 0.55; }
+.net .nl { font: 700 11px var(--mono); fill: var(--fg); text-anchor: middle; paint-order: stroke; stroke: var(--surface); stroke-width: 3px; }
+.net .sub { font: 600 11px var(--mono); fill: var(--muted); text-anchor: middle; paint-order: stroke; stroke: var(--surface); stroke-width: 3px; }
+.lg-ico { display: block; }
+.lg-zone { display: inline-block; width: 1.4rem; height: 0.95rem; border-radius: 3px; background: light-dark(#d9e6f8, #1f3350); box-shadow: 0 3px 0 color-mix(in srgb, light-dark(#d9e6f8, #1f3350) 70%, #000); }
+.credit { margin: 0; padding: 0 1.1rem 0.9rem; font-size: 0.75rem; color: var(--muted); }
+.net .pkt, .net-legend svg[class^="k-"] { stroke-width: 2; }
 .k-ospf { fill: var(--blue-bg); stroke: var(--blue); }
 .k-bgp { fill: var(--purple-bg); stroke: var(--purple); }
 .k-tcp { fill: var(--teal-bg); stroke: var(--teal); }
@@ -430,7 +434,6 @@ th { background: var(--surface-2); font-weight: 650; white-space: nowrap; }
 .net figcaption .t { font-weight: 650; font-size: 0.9375rem; }
 .net .ticker { font-size: 0.8125rem; color: var(--muted); min-height: 1.3em; }
 .net-legend { border-top: 0; background: transparent; padding-top: 0.6rem; }
-.lg-node { font-size: 1rem; line-height: 1; color: var(--accent); width: 1.1rem; text-align: center; }
 .net-toggle {
   flex: none; width: 2.5rem; height: 2.5rem; display: grid; place-items: center; margin-left: auto;
   border-radius: 999px; border: 1px solid var(--line); background: var(--surface); color: var(--fg); cursor: pointer;
@@ -468,6 +471,7 @@ th { background: var(--surface-2); font-weight: 650; white-space: nowrap; }
 .pcard .tags { display: flex; flex-wrap: wrap; gap: 0.35rem; margin-top: auto; padding-top: 0.5rem; }
 .pcard .tags span { font: 600 0.75rem var(--mono); padding: 0.1rem 0.5rem; border-radius: 6px; background: var(--surface-2); color: var(--muted); }
 .pcards:has(.empty) { display: block; }
+.pcards .empty, .features li, .how li, .vendors li { max-width: none; }
 .empty { grid-column: 1 / -1; border: 1px dashed var(--line); border-radius: var(--radius); padding: 2.5rem 1.5rem; text-align: center; color: var(--muted); }
 
 /* Platforms */
@@ -490,10 +494,10 @@ window.NPE = (function () {
   "use strict";
   var LANGS = ["fr", "en", "nl", "de"];
   var UI = {
-    fr: { name: "Nom", offset: "Offset", size: "Taille", value: "Valeur", filter: "Filtre Wireshark", ref: "Référence", role: "Rôle", bits: "bits", bytes: "octets", hint: "Survolez ou sélectionnez un champ (diagramme ou arbre) pour afficher son détail.", cont: "suite", repeat: "répété", step: "Étape", start: "État initial : aucun paquet échangé.", play: "Lecture", pause: "Pause", prev: "Étape précédente", next: "Étape suivante", reset: "Recommencer", copy: "Copier", copied: "Copié ✓", correct: "✓ Correct.", wrong: "✗ Incorrect — la bonne réponse est :", choose: "Choisissez d'abord une réponse.", score: "Score :", crumbs: "Fil d'Ariane", langs: "Langue", vendors: "Vendeurs", bitdiag: "Diagramme de bits RFC", wstree: "Arbre Wireshark", theme: "Thème sombre", toc: "Sur cette page", set: "Activé", notset: "Non activé" },
-    en: { name: "Name", offset: "Offset", size: "Size", value: "Value", filter: "Wireshark filter", ref: "Reference", role: "Role", bits: "bits", bytes: "bytes", hint: "Hover or select a field (diagram or tree) to see its details.", cont: "cont.", repeat: "repeated", step: "Step", start: "Initial state: no packet exchanged yet.", play: "Play", pause: "Pause", prev: "Previous step", next: "Next step", reset: "Restart", copy: "Copy", copied: "Copied ✓", correct: "✓ Correct.", wrong: "✗ Incorrect — the correct answer is:", choose: "Choose an answer first.", score: "Score:", crumbs: "Breadcrumb", langs: "Language", vendors: "Vendors", bitdiag: "RFC bit diagram", wstree: "Wireshark tree", theme: "Dark theme", toc: "On this page", set: "Set", notset: "Not set" },
-    nl: { name: "Naam", offset: "Offset", size: "Grootte", value: "Waarde", filter: "Wireshark-filter", ref: "Referentie", role: "Rol", bits: "bits", bytes: "bytes", hint: "Beweeg over een veld of selecteer het (diagram of boom) om de details te zien.", cont: "vervolg", repeat: "herhaald", step: "Stap", start: "Beginsituatie: nog geen pakket uitgewisseld.", play: "Afspelen", pause: "Pauzeren", prev: "Vorige stap", next: "Volgende stap", reset: "Opnieuw beginnen", copy: "Kopiëren", copied: "Gekopieerd ✓", correct: "✓ Juist.", wrong: "✗ Onjuist — het juiste antwoord is:", choose: "Kies eerst een antwoord.", score: "Score:", crumbs: "Kruimelpad", langs: "Taal", vendors: "Vendors", bitdiag: "RFC-bitdiagram", wstree: "Wireshark-boom", theme: "Donker thema", toc: "Op deze pagina", set: "Ingesteld", notset: "Niet ingesteld" },
-    de: { name: "Name", offset: "Offset", size: "Größe", value: "Wert", filter: "Wireshark-Filter", ref: "Referenz", role: "Funktion", bits: "Bit", bytes: "Byte", hint: "Bewegen Sie den Zeiger über ein Feld oder wählen Sie es aus (Diagramm oder Baum), um Details zu sehen.", cont: "Forts.", repeat: "wiederholt", step: "Schritt", start: "Ausgangszustand: noch kein Paket ausgetauscht.", play: "Abspielen", pause: "Pause", prev: "Vorheriger Schritt", next: "Nächster Schritt", reset: "Neu starten", copy: "Kopieren", copied: "Kopiert ✓", correct: "✓ Richtig.", wrong: "✗ Falsch — richtig ist:", choose: "Wählen Sie zuerst eine Antwort.", score: "Punkte:", crumbs: "Brotkrumennavigation", langs: "Sprache", vendors: "Hersteller", bitdiag: "RFC-Bitdiagramm", wstree: "Wireshark-Baum", theme: "Dunkles Design", toc: "Auf dieser Seite", set: "Gesetzt", notset: "Nicht gesetzt" }
+    fr: { name: "Nom", offset: "Offset", size: "Taille", value: "Valeur", filter: "Filtre Wireshark", ref: "Référence", role: "Rôle", bits: "bits", bytes: "octets", hint: "Survolez ou sélectionnez un champ (diagramme ou arbre) pour afficher son détail.", cont: "suite", repeat: "répété", step: "Étape", start: "État initial : aucun paquet échangé.", play: "Lecture", pause: "Pause", prev: "Étape précédente", next: "Étape suivante", reset: "Recommencer", copy: "Copier", copied: "Copié ✓", correct: "✓ Correct.", wrong: "✗ Incorrect. La bonne réponse est :", choose: "Choisissez d'abord une réponse.", score: "Score :", crumbs: "Fil d'Ariane", langs: "Langue", vendors: "Vendeurs", bitdiag: "Diagramme de bits RFC", wstree: "Arbre Wireshark", theme: "Thème sombre", toc: "Sur cette page", set: "Activé", notset: "Non activé" },
+    en: { name: "Name", offset: "Offset", size: "Size", value: "Value", filter: "Wireshark filter", ref: "Reference", role: "Role", bits: "bits", bytes: "bytes", hint: "Hover or select a field (diagram or tree) to see its details.", cont: "cont.", repeat: "repeated", step: "Step", start: "Initial state: no packet exchanged yet.", play: "Play", pause: "Pause", prev: "Previous step", next: "Next step", reset: "Restart", copy: "Copy", copied: "Copied ✓", correct: "✓ Correct.", wrong: "✗ Incorrect. The correct answer is:", choose: "Choose an answer first.", score: "Score:", crumbs: "Breadcrumb", langs: "Language", vendors: "Vendors", bitdiag: "RFC bit diagram", wstree: "Wireshark tree", theme: "Dark theme", toc: "On this page", set: "Set", notset: "Not set" },
+    nl: { name: "Naam", offset: "Offset", size: "Grootte", value: "Waarde", filter: "Wireshark-filter", ref: "Referentie", role: "Rol", bits: "bits", bytes: "bytes", hint: "Beweeg over een veld of selecteer het (diagram of boom) om de details te zien.", cont: "vervolg", repeat: "herhaald", step: "Stap", start: "Beginsituatie: nog geen pakket uitgewisseld.", play: "Afspelen", pause: "Pauzeren", prev: "Vorige stap", next: "Volgende stap", reset: "Opnieuw beginnen", copy: "Kopiëren", copied: "Gekopieerd ✓", correct: "✓ Juist.", wrong: "✗ Onjuist. Het juiste antwoord is:", choose: "Kies eerst een antwoord.", score: "Score:", crumbs: "Kruimelpad", langs: "Taal", vendors: "Vendors", bitdiag: "RFC-bitdiagram", wstree: "Wireshark-boom", theme: "Donker thema", toc: "Op deze pagina", set: "Ingesteld", notset: "Niet ingesteld" },
+    de: { name: "Name", offset: "Offset", size: "Größe", value: "Wert", filter: "Wireshark-Filter", ref: "Referenz", role: "Funktion", bits: "Bit", bytes: "Byte", hint: "Bewegen Sie den Zeiger über ein Feld oder wählen Sie es aus (Diagramm oder Baum), um Details zu sehen.", cont: "Forts.", repeat: "wiederholt", step: "Schritt", start: "Ausgangszustand: noch kein Paket ausgetauscht.", play: "Abspielen", pause: "Pause", prev: "Vorheriger Schritt", next: "Nächster Schritt", reset: "Neu starten", copy: "Kopieren", copied: "Kopiert ✓", correct: "✓ Richtig.", wrong: "✗ Falsch. Richtig ist:", choose: "Wählen Sie zuerst eine Antwort.", score: "Punkte:", crumbs: "Brotkrumennavigation", langs: "Sprache", vendors: "Hersteller", bitdiag: "RFC-Bitdiagramm", wstree: "Wireshark-Baum", theme: "Dunkles Design", toc: "Auf dieser Seite", set: "Gesetzt", notset: "Nicht gesetzt" }
   };
   var root = document.documentElement;
   function lang() { return LANGS.indexOf(root.lang) < 0 ? "en" : root.lang; }
@@ -617,10 +621,10 @@ window.NPE = (function () {
       if (!f) { panel.innerHTML = '<p class="hint">' + esc(ui("hint")) + "</p>"; return; }
       var d = docs[fid.replace(/\d+$/, "")] || {};
       panel.innerHTML = "<h4>" + esc(f.name) + "</h4><dl>" +
-        "<dt>" + ui("value") + "</dt><dd><code>" + esc(f.value) + "</code> · <code>" + esc(f.hex) + "</code></dd>" +
+        "<dt>" + ui("value") + "</dt><dd><code>" + esc(f.value) + "</code> (<code>" + esc(f.hex) + "</code>)</dd>" +
         "<dt>" + ui("offset") + "</dt><dd>" + f.offset + " " + ui("bits") + " (" + f.offset / 8 + " " + ui("bytes") + ")</dd>" +
-        "<dt>" + ui("size") + "</dt><dd>" + f.bits + " " + ui("bits") + " (" + f.bits / 8 + " " + ui("bytes") + ")" + (f.repeat ? " · " + ui("repeat") : "") + "</dd>" +
-        "<dt>" + ui("role") + "</dt><dd>" + esc(d[lang()] || "—") + "</dd>" +
+        "<dt>" + ui("size") + "</dt><dd>" + f.bits + " " + ui("bits") + " (" + f.bits / 8 + " " + ui("bytes") + ")" + (f.repeat ? ", " + ui("repeat") : "") + "</dd>" +
+        "<dt>" + ui("role") + "</dt><dd>" + esc(d[lang()] || "") + "</dd>" +
         "<dt>" + ui("filter") + "</dt><dd><code>" + esc(f.ws) + "</code></dd>" +
         "<dt>" + ui("ref") + "</dt><dd>" + esc(f.ref) + "</dd></dl>";
     }
@@ -673,7 +677,7 @@ window.NPE = (function () {
         li.classList.toggle("past", k < i - 1);
         if (k === i - 1) li.setAttribute("aria-current", "step"); else li.removeAttribute("aria-current");
       });
-      now.textContent = i === 0 ? ui("start") : ui("step") + " " + i + "/" + n + " — " + visibleText(steps[i - 1].querySelector(".txt"));
+      now.textContent = i === 0 ? ui("start") : ui("step") + " " + i + "/" + n + ". " + visibleText(steps[i - 1].querySelector(".txt"));
       btn.prev.disabled = i === 0; btn.reset.disabled = i === 0; btn.next.disabled = i === n;
       label();
     }
@@ -853,7 +857,7 @@ window.NPE = (function () {
       document.querySelectorAll("button[data-lang]").forEach(function (b) { b.setAttribute("aria-pressed", b.dataset.lang === l ? "true" : "false"); });
       document.querySelectorAll("[data-aria]").forEach(function (n) { n.setAttribute("aria-label", ui(n.dataset.aria)); });
       if (meta) {
-        document.title = meta.title[l] + (meta.kind === "home" ? "" : " · Network Protocols Expert");
+        document.title = meta.title[l] + (meta.kind === "home" ? "" : " | Network Protocols Expert");
         var d = document.querySelector('meta[name="description"]');
         if (d) d.setAttribute("content", meta.description[l]);
       }
@@ -953,65 +957,363 @@ window.NPE = (function () {
 <main id="main" class="home" tabindex="-1">
   <section class="hero-l" aria-labelledby="h-home">
     <div class="hero-copy">
-      <p class="eyebrow"><span data-l="fr">Niveau expert · CCIE</span><span data-l="en">Expert level · CCIE</span><span data-l="nl">Expertniveau · CCIE</span><span data-l="de">Expertenniveau · CCIE</span></p>
+      <p class="eyebrow"><span data-l="fr">Niveau expert CCIE</span><span data-l="en">CCIE expert level</span><span data-l="nl">CCIE-expertniveau</span><span data-l="de">CCIE-Expertenniveau</span></p>
       <h1 id="h-home"><span data-l="fr">Comprendre les protocoles réseau <em>au bit près</em></span><span data-l="en">Understand network protocols <em>down to the bit</em></span><span data-l="nl">Netwerkprotocollen begrijpen <em>tot op de bit</em></span><span data-l="de">Netzwerkprotokolle verstehen, <em>bis aufs Bit</em></span></h1>
       <p class="lede"><span data-l="fr">Une page par protocole, construite depuis les RFC et la documentation officielle des vendeurs : chaque paquet décodé champ par champ, chaque échange animé pas à pas, chaque commande sourcée sur six plateformes.</span><span data-l="en">One page per protocol, built from the RFCs and official vendor documentation: every packet decoded field by field, every exchange animated step by step, every command sourced on six platforms.</span><span data-l="nl">Eén pagina per protocol, opgebouwd uit de RFC’s en de officiële documentatie van de vendors: elk pakket veld voor veld ontleed, elke uitwisseling stap voor stap geanimeerd, elk commando met bron op zes platformen.</span><span data-l="de">Eine Seite pro Protokoll, erstellt aus den RFCs und der offiziellen Herstellerdokumentation: jedes Paket Feld für Feld zerlegt, jeder Ablauf Schritt für Schritt animiert, jeder Befehl auf sechs Plattformen belegt.</span></p>
       <div class="ctas">
-        <a class="cta primary" href="#protocols"><span data-l="fr">Explorer les protocoles</span><span data-l="en">Explore the protocols</span><span data-l="nl">Protocollen verkennen</span><span data-l="de">Protokolle entdecken</span> <span aria-hidden="true">→</span></a>
+        <a class="cta primary" href="#protocols"><span data-l="fr">Explorer les protocoles</span><span data-l="en">Explore the protocols</span><span data-l="nl">Protocollen verkennen</span><span data-l="de">Protokolle entdecken</span></a>
         <a class="cta" href="#how"><span data-l="fr">Comment ça marche</span><span data-l="en">How it works</span><span data-l="nl">Hoe het werkt</span><span data-l="de">So funktioniert’s</span></a>
       </div>
     </div>
 
     <figure class="net" id="net-hero" aria-labelledby="net-t">
       <div class="net-canvas" tabindex="0">
-      <svg viewBox="0 0 720 440" role="img" aria-labelledby="net-t net-d">
-        <title id="net-d">Site A, Site B (CE-A, CE-B) — core P1–P4 — DC1 (FW-1, LB-1, S1–S3), DC2 (FW-2, LB-2, S4–S6)</title>
-        <g class="zones">
-          <rect class="zone" x="12" y="28" width="130" height="384" rx="16"/>
-          <rect class="zone core-z" x="172" y="28" width="262" height="384" rx="16"/>
-          <rect class="zone dc-z" x="464" y="28" width="244" height="180" rx="16"/>
-          <rect class="zone dc-z" x="464" y="232" width="244" height="180" rx="16"/>
-          <text class="zl" data-l="fr" x="77" y="52">Sites distants</text><text class="zl" data-l="en" x="77" y="52">Remote sites</text><text class="zl" data-l="nl" x="77" y="52">Externe sites</text><text class="zl" data-l="de" x="77" y="52">Außenstandorte</text>
-          <text class="zl" data-l="fr" x="303" y="52">Cœur de réseau</text><text class="zl" data-l="en" x="303" y="52">Core backbone</text><text class="zl" data-l="nl" x="303" y="52">Core-backbone</text><text class="zl" data-l="de" x="303" y="52">Core-Backbone</text>
-          <text class="zl" x="586" y="52">DC1</text>
-          <text class="zl" x="586" y="256">DC2</text>
-        </g>
-        <g class="links">
-          <line x1="77" y1="140" x2="232" y2="130"/><line x1="77" y1="310" x2="232" y2="320"/>
-          <line x1="77" y1="140" x2="232" y2="320"/><line x1="77" y1="310" x2="232" y2="130"/>
-          <line x1="232" y1="130" x2="374" y2="130"/><line x1="374" y1="130" x2="374" y2="320"/>
-          <line x1="374" y1="320" x2="232" y2="320"/><line x1="232" y1="320" x2="232" y2="130"/>
-          <line x1="232" y1="130" x2="374" y2="320"/>
-          <line x1="374" y1="130" x2="512" y2="118"/><line x1="374" y1="320" x2="512" y2="322"/>
-          <line class="dci" x1="512" y1="118" x2="512" y2="322"/>
-          <line x1="512" y1="118" x2="592" y2="118"/><line x1="512" y1="322" x2="592" y2="322"/>
-          <line x1="592" y1="118" x2="668" y2="72"/><line x1="592" y1="118" x2="668" y2="118"/><line x1="592" y1="118" x2="668" y2="164"/>
-          <line x1="592" y1="322" x2="668" y2="276"/><line x1="592" y1="322" x2="668" y2="322"/><line x1="592" y1="322" x2="668" y2="368"/>
-        </g>
-        <text class="dci-l" x="520" y="224">DCI</text>
-        <g class="pkts"></g>
-        <g class="nodes">
-          <g class="node router" data-node="CE-A" data-x="77" data-y="140"><circle cx="77" cy="140" r="22"/><text x="77" y="145">CE-A</text><text class="sub" x="77" y="185">Site A</text></g>
-          <g class="node router" data-node="CE-B" data-x="77" data-y="310"><circle cx="77" cy="310" r="22"/><text x="77" y="315">CE-B</text><text class="sub" x="77" y="355">Site B</text></g>
-          <g class="node router core" data-node="P1" data-x="232" data-y="130"><circle cx="232" cy="130" r="22"/><text x="232" y="135">P1</text></g>
-          <g class="node router core" data-node="P2" data-x="374" data-y="130"><circle cx="374" cy="130" r="22"/><text x="374" y="135">P2</text></g>
-          <g class="node router core" data-node="P3" data-x="374" data-y="320"><circle cx="374" cy="320" r="22"/><text x="374" y="325">P3</text></g>
-          <g class="node router core" data-node="P4" data-x="232" data-y="320"><circle cx="232" cy="320" r="22"/><text x="232" y="325">P4</text></g>
-          <g class="node fw" data-node="FW-1" data-x="512" data-y="118"><rect x="486" y="103" width="52" height="30" rx="5"/><path d="M486 113h52M486 123h52M499 103v10M525 103v10M512 113v10M499 123v10M525 123v10"/><text class="sub" x="512" y="152">FW-1</text></g>
-          <g class="node fw" data-node="FW-2" data-x="512" data-y="322"><rect x="486" y="307" width="52" height="30" rx="5"/><path d="M486 317h52M486 327h52M499 307v10M525 307v10M512 317v10M499 327v10M525 327v10"/><text class="sub" x="512" y="356">FW-2</text></g>
-          <g class="node lb" data-node="LB-1" data-x="592" data-y="118"><path d="M570 118l11-19h22l11 19-11 19h-22z"/><text x="592" y="123">LB</text><text class="sub" x="592" y="156">LB-1</text></g>
-          <g class="node lb" data-node="LB-2" data-x="592" data-y="322"><path d="M570 322l11-19h22l11 19-11 19h-22z"/><text x="592" y="327">LB</text><text class="sub" x="592" y="360">LB-2</text></g>
-          <g class="node srv" data-node="S1" data-x="668" data-y="72"><rect x="650" y="60" width="36" height="24" rx="4"/><text x="668" y="77">S1</text></g>
-          <g class="node srv" data-node="S2" data-x="668" data-y="118"><rect x="650" y="106" width="36" height="24" rx="4"/><text x="668" y="123">S2</text></g>
-          <g class="node srv" data-node="S3" data-x="668" data-y="164"><rect x="650" y="152" width="36" height="24" rx="4"/><text x="668" y="169">S3</text></g>
-          <g class="node srv" data-node="S4" data-x="668" data-y="276"><rect x="650" y="264" width="36" height="24" rx="4"/><text x="668" y="281">S4</text></g>
-          <g class="node srv" data-node="S5" data-x="668" data-y="322"><rect x="650" y="310" width="36" height="24" rx="4"/><text x="668" y="327">S5</text></g>
-          <g class="node srv" data-node="S6" data-x="668" data-y="368"><rect x="650" y="356" width="36" height="24" rx="4"/><text x="668" y="373">S6</text></g>
-        </g>
-      </svg>
+<!--TOPOLOGY-->
+<svg viewBox="-159 143 1067 298" role="img" aria-labelledby="net-t net-d">
+<title id="net-d">Site A, Site B (CE-A, CE-B); core P1 to P4; DC1 (FW-1, LB-1, S1 to S3); DC2 (FW-2, LB-2, S4 to S6)</title>
+<defs><symbol id="ic-branch-office" viewBox="0 0 25.54 36.85"><defs>
+<clipPath id="ic-branch-office-clip1">
+  <path d="M 18 0.253906 L 25 0.253906 L 25 36 L 18 36 Z M 18 0.253906 "/>
+</clipPath>
+<clipPath id="ic-branch-office-clip2">
+  <path d="M 15 0.253906 L 25.089844 0.253906 L 25.089844 36.449219 L 15 36.449219 Z M 15 0.253906 "/>
+</clipPath>
+<clipPath id="ic-branch-office-clip3">
+  <path d="M 0 7 L 19 7 L 19 36.449219 L 0 36.449219 Z M 0 7 "/>
+</clipPath>
+<clipPath id="ic-branch-office-clip4">
+  <path d="M 0 0.253906 L 25 0.253906 L 25 8 L 0 8 Z M 0 0.253906 "/>
+</clipPath>
+<clipPath id="ic-branch-office-clip5">
+  <path d="M 0 0.253906 L 25.089844 0.253906 L 25.089844 10 L 0 10 Z M 0 0.253906 "/>
+</clipPath>
+</defs>
+<g id="ic-branch-office-surface1">
+<g clip-path="url(#ic-branch-office-clip1)" clip-rule="nonzero">
+<path style=" stroke:none;fill-rule:nonzero;fill:rgb(0.784302%,43.920898%,62.350464%);fill-opacity:1;" d="M 24.613281 28.160156 L 24.613281 0.726562 L 18.015625 7.335938 L 18.015625 35.914062 L 24.613281 28.160156 "/>
+</g>
+<g clip-path="url(#ic-branch-office-clip2)" clip-rule="nonzero">
+<path style="fill:none;stroke-width:3.99994;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(100%,100%,100%);stroke-opacity:1;stroke-miterlimit:4;" d="M 250.565902 84.395042 L 250.565902 363.672034 L 183.401038 296.387872 L 183.401038 5.459426 Z M 250.565902 84.395042 " transform="matrix(0.0982308,0,0,-0.0982308,-0.000000000000000666,36.450346)"/>
+</g>
+<path style=" stroke:none;fill-rule:nonzero;fill:rgb(0.784302%,43.920898%,62.350464%);fill-opacity:1;" d="M 0.574219 35.914062 L 18.015625 35.914062 L 18.015625 7.335938 L 0.574219 7.335938 Z M 0.574219 35.914062 "/>
+<g clip-path="url(#ic-branch-office-clip3)" clip-rule="nonzero">
+<path style="fill:none;stroke-width:3.99994;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(100%,100%,100%);stroke-opacity:1;stroke-miterlimit:4;" d="M 183.401038 296.387872 L 5.84561 296.387872 L 5.84561 5.459426 L 183.401038 5.459426 Z M 183.401038 296.387872 " transform="matrix(0.0982308,0,0,-0.0982308,-0.000000000000000666,36.450346)"/>
+</g>
+<g clip-path="url(#ic-branch-office-clip4)" clip-rule="nonzero">
+<path style=" stroke:none;fill-rule:nonzero;fill:rgb(0.784302%,43.920898%,62.350464%);fill-opacity:1;" d="M 18.015625 7.335938 L 24.613281 0.726562 L 9.070312 0.726562 L 0.574219 7.335938 L 18.015625 7.335938 "/>
+</g>
+<g clip-path="url(#ic-branch-office-clip5)" clip-rule="nonzero">
+<path style="fill:none;stroke-width:3.99994;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(100%,100%,100%);stroke-opacity:1;stroke-miterlimit:4;" d="M 183.401038 296.387872 L 250.565902 363.672034 L 92.336776 363.672034 L 5.84561 296.387872 Z M 183.401038 296.387872 " transform="matrix(0.0982308,0,0,-0.0982308,-0.000000000000000666,36.450346)"/>
+</g>
+<path style="fill:none;stroke-width:3.60001;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(100%,100%,100%);stroke-opacity:1;stroke-miterlimit:4;" d="M 58.416332 95.489771 L 58.416332 70.079263 L 83.82684 70.079263 " transform="matrix(0.0982308,0,0,-0.0982308,-0.000000000000000666,36.450346)"/>
+<path style="fill:none;stroke-width:3.60001;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(100%,100%,100%);stroke-opacity:1;stroke-miterlimit:4;" d="M 55.752007 70.079263 L 83.82684 70.079263 " transform="matrix(0.0982308,0,0,-0.0982308,-0.000000000000000666,36.450346)"/>
+<path style="fill:none;stroke-width:3.60001;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(100%,100%,100%);stroke-opacity:1;stroke-miterlimit:4;" d="M 22.984779 95.489771 L 22.984779 70.079263 L 48.395287 70.079263 " transform="matrix(0.0982308,0,0,-0.0982308,-0.000000000000000666,36.450346)"/>
+<path style="fill:none;stroke-width:3.60001;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(100%,100%,100%);stroke-opacity:1;stroke-miterlimit:4;" d="M 20.320453 70.079263 L 48.395287 70.079263 " transform="matrix(0.0982308,0,0,-0.0982308,-0.000000000000000666,36.450346)"/>
+<path style="fill:none;stroke-width:3.60001;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(100%,100%,100%);stroke-opacity:1;stroke-miterlimit:4;" d="M 58.416332 138.874535 L 58.416332 113.464027 L 83.82684 113.464027 " transform="matrix(0.0982308,0,0,-0.0982308,-0.000000000000000666,36.450346)"/>
+<path style="fill:none;stroke-width:3.60001;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(100%,100%,100%);stroke-opacity:1;stroke-miterlimit:4;" d="M 55.752007 113.464027 L 83.82684 113.464027 " transform="matrix(0.0982308,0,0,-0.0982308,-0.000000000000000666,36.450346)"/>
+<path style="fill:none;stroke-width:3.60001;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(100%,100%,100%);stroke-opacity:1;stroke-miterlimit:4;" d="M 22.984779 138.874535 L 22.984779 113.464027 L 48.395287 113.464027 " transform="matrix(0.0982308,0,0,-0.0982308,-0.000000000000000666,36.450346)"/>
+<path style="fill:none;stroke-width:3.60001;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(100%,100%,100%);stroke-opacity:1;stroke-miterlimit:4;" d="M 20.320453 113.464027 L 48.395287 113.464027 " transform="matrix(0.0982308,0,0,-0.0982308,-0.000000000000000666,36.450346)"/>
+<path style="fill:none;stroke-width:3.60001;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(100%,100%,100%);stroke-opacity:1;stroke-miterlimit:4;" d="M 58.416332 187.627716 L 58.416332 162.217208 L 83.82684 162.217208 " transform="matrix(0.0982308,0,0,-0.0982308,-0.000000000000000666,36.450346)"/>
+<path style="fill:none;stroke-width:3.60001;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(100%,100%,100%);stroke-opacity:1;stroke-miterlimit:4;" d="M 55.752007 162.217208 L 83.82684 162.217208 " transform="matrix(0.0982308,0,0,-0.0982308,-0.000000000000000666,36.450346)"/>
+<path style="fill:none;stroke-width:3.60001;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(100%,100%,100%);stroke-opacity:1;stroke-miterlimit:4;" d="M 22.984779 187.627716 L 22.984779 162.217208 L 48.395287 162.217208 " transform="matrix(0.0982308,0,0,-0.0982308,-0.000000000000000666,36.450346)"/>
+<path style="fill:none;stroke-width:3.60001;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(100%,100%,100%);stroke-opacity:1;stroke-miterlimit:4;" d="M 20.320453 162.217208 L 48.395287 162.217208 " transform="matrix(0.0982308,0,0,-0.0982308,-0.000000000000000666,36.450346)"/>
+<path style="fill:none;stroke-width:3.60001;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(100%,100%,100%);stroke-opacity:1;stroke-miterlimit:4;" d="M 58.416332 236.341132 L 58.416332 210.930624 L 83.82684 210.930624 " transform="matrix(0.0982308,0,0,-0.0982308,-0.000000000000000666,36.450346)"/>
+<path style="fill:none;stroke-width:3.60001;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(100%,100%,100%);stroke-opacity:1;stroke-miterlimit:4;" d="M 55.752007 210.930624 L 83.82684 210.930624 " transform="matrix(0.0982308,0,0,-0.0982308,-0.000000000000000666,36.450346)"/>
+<path style="fill:none;stroke-width:3.60001;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(100%,100%,100%);stroke-opacity:1;stroke-miterlimit:4;" d="M 22.984779 236.341132 L 22.984779 210.930624 L 48.395287 210.930624 " transform="matrix(0.0982308,0,0,-0.0982308,-0.000000000000000666,36.450346)"/>
+<path style="fill:none;stroke-width:3.60001;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(100%,100%,100%);stroke-opacity:1;stroke-miterlimit:4;" d="M 20.320453 210.930624 L 48.395287 210.930624 " transform="matrix(0.0982308,0,0,-0.0982308,-0.000000000000000666,36.450346)"/>
+<path style="fill:none;stroke-width:3.60001;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(100%,100%,100%);stroke-opacity:1;stroke-miterlimit:4;" d="M 58.416332 285.054547 L 58.416332 259.644039 L 83.82684 259.644039 " transform="matrix(0.0982308,0,0,-0.0982308,-0.000000000000000666,36.450346)"/>
+<path style="fill:none;stroke-width:3.60001;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(100%,100%,100%);stroke-opacity:1;stroke-miterlimit:4;" d="M 55.752007 259.644039 L 83.82684 259.644039 " transform="matrix(0.0982308,0,0,-0.0982308,-0.000000000000000666,36.450346)"/>
+<path style="fill:none;stroke-width:3.60001;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(100%,100%,100%);stroke-opacity:1;stroke-miterlimit:4;" d="M 22.984779 285.054547 L 22.984779 259.644039 L 48.395287 259.644039 " transform="matrix(0.0982308,0,0,-0.0982308,-0.000000000000000666,36.450346)"/>
+<path style="fill:none;stroke-width:3.60001;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(100%,100%,100%);stroke-opacity:1;stroke-miterlimit:4;" d="M 20.320453 259.644039 L 48.395287 259.644039 " transform="matrix(0.0982308,0,0,-0.0982308,-0.000000000000000666,36.450346)"/>
+<path style="fill:none;stroke-width:3.60001;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(100%,100%,100%);stroke-opacity:1;stroke-miterlimit:4;" d="M 137.153118 95.489771 L 137.153118 70.079263 L 162.563626 70.079263 " transform="matrix(0.0982308,0,0,-0.0982308,-0.000000000000000666,36.450346)"/>
+<path style="fill:none;stroke-width:3.60001;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(100%,100%,100%);stroke-opacity:1;stroke-miterlimit:4;" d="M 134.488792 70.079263 L 162.563626 70.079263 " transform="matrix(0.0982308,0,0,-0.0982308,-0.000000000000000666,36.450346)"/>
+<path style="fill:none;stroke-width:3.60001;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(100%,100%,100%);stroke-opacity:1;stroke-miterlimit:4;" d="M 101.721564 95.489771 L 101.721564 70.079263 L 127.132072 70.079263 " transform="matrix(0.0982308,0,0,-0.0982308,-0.000000000000000666,36.450346)"/>
+<path style="fill:none;stroke-width:3.60001;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(100%,100%,100%);stroke-opacity:1;stroke-miterlimit:4;" d="M 99.057239 70.079263 L 127.132072 70.079263 " transform="matrix(0.0982308,0,0,-0.0982308,-0.000000000000000666,36.450346)"/>
+<path style="fill:none;stroke-width:3.60001;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(100%,100%,100%);stroke-opacity:1;stroke-miterlimit:4;" d="M 137.153118 138.874535 L 137.153118 113.464027 L 162.563626 113.464027 " transform="matrix(0.0982308,0,0,-0.0982308,-0.000000000000000666,36.450346)"/>
+<path style="fill:none;stroke-width:3.60001;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(100%,100%,100%);stroke-opacity:1;stroke-miterlimit:4;" d="M 134.488792 113.464027 L 162.563626 113.464027 " transform="matrix(0.0982308,0,0,-0.0982308,-0.000000000000000666,36.450346)"/>
+<path style="fill:none;stroke-width:3.60001;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(100%,100%,100%);stroke-opacity:1;stroke-miterlimit:4;" d="M 101.721564 138.874535 L 101.721564 113.464027 L 127.132072 113.464027 " transform="matrix(0.0982308,0,0,-0.0982308,-0.000000000000000666,36.450346)"/>
+<path style="fill:none;stroke-width:3.60001;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(100%,100%,100%);stroke-opacity:1;stroke-miterlimit:4;" d="M 99.057239 113.464027 L 127.132072 113.464027 " transform="matrix(0.0982308,0,0,-0.0982308,-0.000000000000000666,36.450346)"/>
+<path style="fill:none;stroke-width:3.60001;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(100%,100%,100%);stroke-opacity:1;stroke-miterlimit:4;" d="M 137.153118 187.627716 L 137.153118 162.217208 L 162.563626 162.217208 " transform="matrix(0.0982308,0,0,-0.0982308,-0.000000000000000666,36.450346)"/>
+<path style="fill:none;stroke-width:3.60001;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(100%,100%,100%);stroke-opacity:1;stroke-miterlimit:4;" d="M 134.488792 162.217208 L 162.563626 162.217208 " transform="matrix(0.0982308,0,0,-0.0982308,-0.000000000000000666,36.450346)"/>
+<path style="fill:none;stroke-width:3.60001;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(100%,100%,100%);stroke-opacity:1;stroke-miterlimit:4;" d="M 101.721564 187.627716 L 101.721564 162.217208 L 127.132072 162.217208 " transform="matrix(0.0982308,0,0,-0.0982308,-0.000000000000000666,36.450346)"/>
+<path style="fill:none;stroke-width:3.60001;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(100%,100%,100%);stroke-opacity:1;stroke-miterlimit:4;" d="M 99.057239 162.217208 L 127.132072 162.217208 " transform="matrix(0.0982308,0,0,-0.0982308,-0.000000000000000666,36.450346)"/>
+<path style="fill:none;stroke-width:3.60001;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(100%,100%,100%);stroke-opacity:1;stroke-miterlimit:4;" d="M 137.153118 236.341132 L 137.153118 210.930624 L 162.563626 210.930624 " transform="matrix(0.0982308,0,0,-0.0982308,-0.000000000000000666,36.450346)"/>
+<path style="fill:none;stroke-width:3.60001;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(100%,100%,100%);stroke-opacity:1;stroke-miterlimit:4;" d="M 134.488792 210.930624 L 162.563626 210.930624 " transform="matrix(0.0982308,0,0,-0.0982308,-0.000000000000000666,36.450346)"/>
+<path style="fill:none;stroke-width:3.60001;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(100%,100%,100%);stroke-opacity:1;stroke-miterlimit:4;" d="M 101.721564 236.341132 L 101.721564 210.930624 L 127.132072 210.930624 " transform="matrix(0.0982308,0,0,-0.0982308,-0.000000000000000666,36.450346)"/>
+<path style="fill:none;stroke-width:3.60001;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(100%,100%,100%);stroke-opacity:1;stroke-miterlimit:4;" d="M 99.057239 210.930624 L 127.132072 210.930624 " transform="matrix(0.0982308,0,0,-0.0982308,-0.000000000000000666,36.450346)"/>
+<path style="fill:none;stroke-width:3.60001;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(100%,100%,100%);stroke-opacity:1;stroke-miterlimit:4;" d="M 137.153118 285.054547 L 137.153118 259.644039 L 162.563626 259.644039 " transform="matrix(0.0982308,0,0,-0.0982308,-0.000000000000000666,36.450346)"/>
+<path style="fill:none;stroke-width:3.60001;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(100%,100%,100%);stroke-opacity:1;stroke-miterlimit:4;" d="M 134.488792 259.644039 L 162.563626 259.644039 " transform="matrix(0.0982308,0,0,-0.0982308,-0.000000000000000666,36.450346)"/>
+<path style="fill:none;stroke-width:3.60001;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(100%,100%,100%);stroke-opacity:1;stroke-miterlimit:4;" d="M 101.721564 285.054547 L 101.721564 259.644039 L 127.132072 259.644039 " transform="matrix(0.0982308,0,0,-0.0982308,-0.000000000000000666,36.450346)"/>
+<path style="fill:none;stroke-width:3.60001;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(100%,100%,100%);stroke-opacity:1;stroke-miterlimit:4;" d="M 99.057239 259.644039 L 127.132072 259.644039 " transform="matrix(0.0982308,0,0,-0.0982308,-0.000000000000000666,36.450346)"/>
+</g></symbol><symbol id="ic-content-switch" viewBox="0 0 31.13 41.56"><defs>
+<clipPath id="ic-content-switch-clip1">
+  <path d="M 24 0.351562 L 30 0.351562 L 30 40.78125 L 24 40.78125 Z M 24 0.351562 "/>
+</clipPath>
+<clipPath id="ic-content-switch-clip2">
+  <path d="M 22 0.351562 L 30.15625 0.351562 L 30.15625 40.78125 L 22 40.78125 Z M 22 0.351562 "/>
+</clipPath>
+<clipPath id="ic-content-switch-clip3">
+  <path d="M 0 0.351562 L 30 0.351562 L 30 6 L 0 6 Z M 0 0.351562 "/>
+</clipPath>
+<clipPath id="ic-content-switch-clip4">
+  <path d="M 0 0.351562 L 30.15625 0.351562 L 30.15625 8 L 0 8 Z M 0 0.351562 "/>
+</clipPath>
+<clipPath id="ic-content-switch-clip5">
+  <path d="M 0 29 L 25 29 L 25 40.78125 L 0 40.78125 Z M 0 29 "/>
+</clipPath>
+</defs>
+<g id="ic-content-switch-surface1">
+<g clip-path="url(#ic-content-switch-clip1)" clip-rule="nonzero">
+<path style=" stroke:none;fill-rule:nonzero;fill:rgb(3.292847%,48.297119%,73.150635%);fill-opacity:1;" d="M 29.796875 35.585938 L 29.796875 0.808594 L 24.800781 5.550781 L 24.800781 40.328125 L 29.796875 35.585938 "/>
+</g>
+<g clip-path="url(#ic-content-switch-clip2)" clip-rule="nonzero">
+<path style="fill:none;stroke-width:3.99994;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(100%,100%,100%);stroke-opacity:1;stroke-miterlimit:4;" d="M 306.296177 53.402763 L 306.296177 410.895535 L 254.938966 362.148346 L 254.938966 4.655573 Z M 306.296177 53.402763 " transform="matrix(0.0972813,0,0,-0.0972813,0,40.781025)"/>
+</g>
+<g clip-path="url(#ic-content-switch-clip3)" clip-rule="nonzero">
+<path style=" stroke:none;fill-rule:nonzero;fill:rgb(3.292847%,48.297119%,73.150635%);fill-opacity:1;" d="M 29.796875 0.808594 L 24.800781 5.550781 L 0.578125 5.550781 L 6.855469 0.808594 L 29.796875 0.808594 "/>
+</g>
+<g clip-path="url(#ic-content-switch-clip4)" clip-rule="nonzero">
+<path style="fill:none;stroke-width:3.99994;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(100%,100%,100%);stroke-opacity:1;stroke-miterlimit:4;" d="M 306.296177 410.895535 L 254.938966 362.148346 L 5.94282 362.148346 L 70.470607 410.895535 Z M 306.296177 410.895535 " transform="matrix(0.0972813,0,0,-0.0972813,0,40.781025)"/>
+</g>
+<path style=" stroke:none;fill-rule:nonzero;fill:rgb(3.292847%,48.297119%,73.150635%);fill-opacity:1;" d="M 0.578125 29.503906 L 24.800781 29.503906 L 24.800781 5.550781 L 0.578125 5.550781 Z M 0.578125 29.503906 "/>
+<path style="fill:none;stroke-width:3.99994;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(100%,100%,100%);stroke-opacity:1;stroke-miterlimit:4;" d="M 254.938966 115.92284 L 254.938966 362.148346 L 5.94282 362.148346 L 5.94282 115.92284 Z M 254.938966 115.92284 " transform="matrix(0.0972813,0,0,-0.0972813,0,40.781025)"/>
+<g clip-path="url(#ic-content-switch-clip5)" clip-rule="nonzero">
+<path style=" stroke:none;fill-rule:nonzero;fill:rgb(3.292847%,48.297119%,73.150635%);fill-opacity:1;" d="M 0.578125 40.328125 L 24.800781 40.328125 L 24.800781 29.75 L 0.578125 29.75 Z M 0.578125 40.328125 "/>
+<path style="fill:none;stroke-width:3.99994;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(100%,100%,100%);stroke-opacity:1;stroke-miterlimit:4;" d="M 254.938966 4.655573 L 254.938966 113.393126 L 5.94282 113.393126 L 5.94282 4.655573 Z M 254.938966 4.655573 " transform="matrix(0.0972813,0,0,-0.0972813,0,40.781025)"/>
+</g>
+<path style=" stroke:none;fill-rule:nonzero;fill:rgb(100%,100%,100%);fill-opacity:1;" d="M 10.53125 14.6875 L 6.847656 11.003906 L 7.472656 10.375 L 5.15625 9.910156 L 5.625 12.222656 L 6.25 11.597656 L 9.9375 15.28125 L 10.53125 14.6875 "/>
+<path style=" stroke:none;fill-rule:nonzero;fill:rgb(100%,100%,100%);fill-opacity:1;" d="M 9.183594 17.101562 L 3.972656 17.101562 L 3.972656 16.214844 L 2.003906 17.519531 L 3.972656 18.824219 L 3.972656 17.941406 L 9.183594 17.941406 L 9.183594 17.101562 "/>
+<path style=" stroke:none;fill-rule:nonzero;fill:rgb(100%,100%,100%);fill-opacity:1;" d="M 9.9375 19.757812 L 6.25 23.445312 L 5.625 22.820312 L 5.15625 25.132812 L 7.472656 24.664062 L 6.847656 24.039062 L 10.53125 20.355469 L 9.9375 19.757812 "/>
+<path style=" stroke:none;fill-rule:nonzero;fill:rgb(100%,100%,100%);fill-opacity:1;" d="M 12.347656 21.105469 L 12.347656 26.320312 L 11.464844 26.320312 L 12.769531 28.285156 L 14.074219 26.320312 L 13.191406 26.320312 L 13.191406 21.105469 L 12.347656 21.105469 "/>
+<path style=" stroke:none;fill-rule:nonzero;fill:rgb(100%,100%,100%);fill-opacity:1;" d="M 12.347656 14.085938 L 12.347656 8.871094 L 11.464844 8.871094 L 12.769531 6.90625 L 14.074219 8.871094 L 13.191406 8.871094 L 13.191406 14.085938 L 12.347656 14.085938 "/>
+<path style=" stroke:none;fill-rule:nonzero;fill:rgb(100%,100%,100%);fill-opacity:1;" d="M 15.007812 20.355469 L 18.691406 24.039062 L 18.066406 24.664062 L 20.382812 25.132812 L 19.914062 22.820312 L 19.289062 23.445312 L 15.601562 19.757812 L 15.007812 20.355469 "/>
+<path style=" stroke:none;fill-rule:nonzero;fill:rgb(100%,100%,100%);fill-opacity:1;" d="M 16.355469 17.941406 L 21.566406 17.941406 L 21.566406 18.824219 L 23.535156 17.519531 L 21.566406 16.214844 L 21.566406 17.101562 L 16.355469 17.101562 L 16.355469 17.941406 "/>
+<path style=" stroke:none;fill-rule:nonzero;fill:rgb(100%,100%,100%);fill-opacity:1;" d="M 15.601562 15.28125 L 19.289062 11.597656 L 19.914062 12.222656 L 20.382812 9.910156 L 18.066406 10.375 L 18.691406 11.003906 L 15.007812 14.6875 L 15.601562 15.28125 "/>
+<path style=" stroke:none;fill-rule:nonzero;fill:rgb(100%,100%,100%);fill-opacity:1;" d="M 15.96875 21.933594 C 18.425781 20.210938 19.023438 16.820312 17.304688 14.363281 C 15.582031 11.902344 12.191406 11.304688 9.730469 13.027344 C 7.273438 14.75 6.675781 18.136719 8.398438 20.597656 C 10.121094 23.058594 13.507812 23.652344 15.96875 21.933594 "/>
+<path style="fill:none;stroke-width:3.99994;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(13.729858%,12.159729%,12.548828%);stroke-opacity:1;stroke-miterlimit:4;" d="M 164.150337 193.741664 C 189.407324 211.449663 195.550916 246.303501 177.883071 271.560488 C 160.175072 296.857629 125.321234 303.001221 100.024093 285.293222 C 74.767106 267.585223 68.623514 232.771539 86.331513 207.474398 C 104.039512 182.177257 138.853196 176.073819 164.150337 193.741664 Z M 164.150337 193.741664 " transform="matrix(0.0972813,0,0,-0.0972813,0,40.781025)"/>
+<path style=" stroke:none;fill-rule:nonzero;fill:rgb(100%,100%,100%);fill-opacity:1;" d="M 13 35.433594 L 18.210938 35.433594 L 18.210938 36.316406 L 20.179688 35.015625 L 18.210938 33.710938 L 18.210938 34.59375 L 13 34.59375 L 13 35.433594 "/>
+<path style=" stroke:none;fill-rule:nonzero;fill:rgb(100%,100%,100%);fill-opacity:1;" d="M 12.878906 33.988281 L 17.777344 32.203125 L 18.082031 33.035156 L 19.484375 31.136719 L 17.1875 30.582031 L 17.488281 31.414062 L 12.59375 33.195312 L 12.878906 33.988281 "/>
+<path style=" stroke:none;fill-rule:nonzero;fill:rgb(100%,100%,100%);fill-opacity:1;" d="M 12.878906 36.007812 L 17.777344 37.789062 L 18.082031 36.960938 L 19.484375 38.859375 L 17.1875 39.410156 L 17.488281 38.582031 L 12.59375 36.796875 L 12.878906 36.007812 "/>
+<path style=" stroke:none;fill-rule:nonzero;fill:rgb(100%,100%,100%);fill-opacity:1;" d="M 4.917969 35.433594 L 9.941406 35.433594 L 9.941406 36.316406 L 11.910156 35.015625 L 9.941406 33.710938 L 9.941406 34.59375 L 4.917969 34.59375 L 4.917969 35.433594 "/>
+</g></symbol><symbol id="ic-fileserver" viewBox="0 0 20.99 30.11"><defs>
+<clipPath id="ic-fileserver-clip1">
+  <path d="M 0.296875 4 L 16 4 L 16 29 L 0.296875 29 Z M 0.296875 4 "/>
+</clipPath>
+<clipPath id="ic-fileserver-clip2">
+  <path d="M 0.296875 0.0078125 L 20.683594 0.0078125 L 20.683594 29 L 0.296875 29 Z M 0.296875 0.0078125 "/>
+</clipPath>
+<clipPath id="ic-fileserver-clip3">
+  <path d="M 0.296875 0.0078125 L 20.683594 0.0078125 L 20.683594 29.148438 L 0.296875 29.148438 Z M 0.296875 0.0078125 "/>
+</clipPath>
+<clipPath id="ic-fileserver-clip4">
+  <path d="M 15 0.0078125 L 20.683594 0.0078125 L 20.683594 5 L 15 5 Z M 15 0.0078125 "/>
+</clipPath>
+<clipPath id="ic-fileserver-clip5">
+  <path d="M 13 0.0078125 L 20.683594 0.0078125 L 20.683594 8 L 13 8 Z M 13 0.0078125 "/>
+</clipPath>
+<clipPath id="ic-fileserver-clip6">
+  <path d="M 0.296875 14 L 16 14 L 16 15 L 0.296875 15 Z M 0.296875 14 "/>
+</clipPath>
+<clipPath id="ic-fileserver-clip7">
+  <path d="M 0.296875 24 L 16 24 L 16 26 L 0.296875 26 Z M 0.296875 24 "/>
+</clipPath>
+</defs>
+<g id="ic-fileserver-surface1">
+<g clip-path="url(#ic-fileserver-clip1)" clip-rule="nonzero">
+<path style=" stroke:none;fill-rule:nonzero;fill:rgb(3.115845%,49.784851%,74.839783%);fill-opacity:1;" d="M 0.765625 28.777344 L 15.710938 28.777344 L 15.710938 4.96875 L 0.765625 4.96875 Z M 0.765625 28.777344 "/>
+<path style="fill:none;stroke-width:4;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(100%,100%,100%);stroke-opacity:1;stroke-miterlimit:4;" d="M 158.701117 249.943823 L 4.830413 249.943823 L 4.830413 4.820473 L 158.701117 4.820473 " transform="matrix(0.097129,0,0,-0.097129,0.296452,29.245552)"/>
+</g>
+<g clip-path="url(#ic-fileserver-clip2)" clip-rule="nonzero">
+<path style=" stroke:none;fill-rule:nonzero;fill:rgb(3.115845%,49.784851%,74.839783%);fill-opacity:1;" d="M 15.710938 28.777344 L 20.484375 24.003906 L 20.484375 0.195312 L 5.539062 0.195312 L 0.765625 4.96875 L 15.710938 4.96875 L 15.710938 28.777344 "/>
+</g>
+<g clip-path="url(#ic-fileserver-clip3)" clip-rule="nonzero">
+<path style="fill:none;stroke-width:4;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(100%,100%,100%);stroke-opacity:1;stroke-miterlimit:4;" d="M 158.701117 4.820473 L 207.846438 53.965794 L 207.846438 299.089144 L 53.975735 299.089144 L 4.830413 249.943823 L 158.701117 249.943823 Z M 158.701117 4.820473 " transform="matrix(0.097129,0,0,-0.097129,0.296452,29.245552)"/>
+</g>
+<g clip-path="url(#ic-fileserver-clip4)" clip-rule="nonzero">
+<path style=" stroke:none;fill-rule:nonzero;fill:rgb(3.115845%,49.784851%,74.839783%);fill-opacity:1;" d="M 15.710938 4.96875 L 20.484375 0.195312 "/>
+</g>
+<g clip-path="url(#ic-fileserver-clip5)" clip-rule="nonzero">
+<path style="fill:none;stroke-width:4;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(100%,100%,100%);stroke-opacity:1;stroke-miterlimit:4;" d="M 158.701117 249.943823 L 207.846438 299.089144 " transform="matrix(0.097129,0,0,-0.097129,0.296452,29.245552)"/>
+</g>
+<g clip-path="url(#ic-fileserver-clip6)" clip-rule="nonzero">
+<path style="fill:none;stroke-width:4;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(100%,100%,100%);stroke-opacity:1;stroke-miterlimit:4;" d="M 7.323875 154.468378 L 157.333735 154.468378 " transform="matrix(0.097129,0,0,-0.097129,0.296452,29.245552)"/>
+</g>
+<g clip-path="url(#ic-fileserver-clip7)" clip-rule="nonzero">
+<path style="fill:none;stroke-width:4;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(100%,100%,100%);stroke-opacity:1;stroke-miterlimit:4;" d="M 7.323875 41.940875 L 157.333735 41.940875 " transform="matrix(0.097129,0,0,-0.097129,0.296452,29.245552)"/>
+</g>
+<path style="fill:none;stroke-width:4;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(100%,100%,100%);stroke-opacity:1;stroke-miterlimit:4;" d="M 42.31277 211.938644 L 86.068997 211.938644 " transform="matrix(0.097129,0,0,-0.097129,0.296452,29.245552)"/>
+<path style="fill:none;stroke-width:4;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(100%,100%,100%);stroke-opacity:1;stroke-miterlimit:4;" d="M 102.316714 196.937658 L 102.316714 228.226578 L 24.818322 228.226578 L 24.818322 196.937658 Z M 102.316714 196.937658 " transform="matrix(0.097129,0,0,-0.097129,0.296452,29.245552)"/>
+</g></symbol><symbol id="ic-firewall" viewBox="0 0 15.1 33.12"><defs>
+<clipPath id="ic-firewall-clip1">
+  <path d="M 0 6 L 9 6 L 9 31.679688 L 0 31.679688 Z M 0 6 "/>
+</clipPath>
+<clipPath id="ic-firewall-clip2">
+  <path d="M 0 0.535156 L 14 0.535156 L 14 7 L 0 7 Z M 0 0.535156 "/>
+</clipPath>
+<clipPath id="ic-firewall-clip3">
+  <path d="M 0 0.535156 L 14.15625 0.535156 L 14.15625 9 L 0 9 Z M 0 0.535156 "/>
+</clipPath>
+<clipPath id="ic-firewall-clip4">
+  <path d="M 8 0.535156 L 14 0.535156 L 14 31.679688 L 8 31.679688 Z M 8 0.535156 "/>
+</clipPath>
+<clipPath id="ic-firewall-clip5">
+  <path d="M 5 0.535156 L 14.15625 0.535156 L 14.15625 31.679688 L 5 31.679688 Z M 5 0.535156 "/>
+</clipPath>
+<clipPath id="ic-firewall-clip6">
+  <path d="M 5 18 L 14.15625 18 L 14.15625 30 L 5 30 Z M 5 18 "/>
+</clipPath>
+<clipPath id="ic-firewall-clip7">
+  <path d="M 5 14 L 14.15625 14 L 14.15625 26 L 5 26 Z M 5 14 "/>
+</clipPath>
+<clipPath id="ic-firewall-clip8">
+  <path d="M 5 10 L 14.15625 10 L 14.15625 21 L 5 21 Z M 5 10 "/>
+</clipPath>
+<clipPath id="ic-firewall-clip9">
+  <path d="M 5 6 L 14.15625 6 L 14.15625 17 L 5 17 Z M 5 6 "/>
+</clipPath>
+<clipPath id="ic-firewall-clip10">
+  <path d="M 5 2 L 14.15625 2 L 14.15625 13 L 5 13 Z M 5 2 "/>
+</clipPath>
+<clipPath id="ic-firewall-clip11">
+  <path d="M 8 0.535156 L 14 0.535156 L 14 7 L 8 7 Z M 8 0.535156 "/>
+</clipPath>
+<clipPath id="ic-firewall-clip12">
+  <path d="M 5 0.535156 L 14.15625 0.535156 L 14.15625 9 L 5 9 Z M 5 0.535156 "/>
+</clipPath>
+</defs>
+<g id="ic-firewall-surface1">
+<g clip-path="url(#ic-firewall-clip1)" clip-rule="nonzero">
+<path style=" stroke:none;fill-rule:nonzero;fill:rgb(3.115845%,49.784851%,74.839783%);fill-opacity:1;" d="M 0.542969 31.242188 L 8.023438 31.242188 L 8.023438 6.246094 L 0.542969 6.246094 Z M 0.542969 31.242188 "/>
+<path style="fill:none;stroke-width:4;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(100%,100%,100%);stroke-opacity:1;stroke-miterlimit:4;" d="M 5.753311 5.627152 L 5.753311 270.486424 L 85.016556 270.486424 L 85.016556 5.627152 Z M 5.753311 5.627152 " transform="matrix(0.094375,0,0,-0.094375,0,31.77325)"/>
+</g>
+<g clip-path="url(#ic-firewall-clip2)" clip-rule="nonzero">
+<path style=" stroke:none;fill-rule:nonzero;fill:rgb(3.115845%,49.784851%,74.839783%);fill-opacity:1;" d="M 8.023438 6.246094 L 0.542969 6.246094 L 7.242188 0.949219 L 13.769531 0.949219 L 8.023438 6.246094 "/>
+</g>
+<g clip-path="url(#ic-firewall-clip3)" clip-rule="nonzero">
+<path style="fill:none;stroke-width:4;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(100%,100%,100%);stroke-opacity:1;stroke-miterlimit:4;" d="M 85.016556 270.486424 L 5.753311 270.486424 L 76.738411 326.612252 L 145.902318 326.612252 Z M 85.016556 270.486424 " transform="matrix(0.094375,0,0,-0.094375,0,31.77325)"/>
+</g>
+<g clip-path="url(#ic-firewall-clip4)" clip-rule="nonzero">
+<path style=" stroke:none;fill-rule:nonzero;fill:rgb(3.115845%,49.784851%,74.839783%);fill-opacity:1;" d="M 13.769531 0.949219 L 13.769531 24.796875 L 8.023438 31.277344 L 8.023438 6.246094 L 13.769531 0.949219 "/>
+</g>
+<g clip-path="url(#ic-firewall-clip5)" clip-rule="nonzero">
+<path style="fill:none;stroke-width:4;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(100%,100%,100%);stroke-opacity:1;stroke-miterlimit:4;" d="M 145.902318 326.612252 L 145.902318 73.921854 L 85.016556 5.254636 L 85.016556 270.486424 Z M 145.902318 326.612252 " transform="matrix(0.094375,0,0,-0.094375,0,31.77325)"/>
+</g>
+<path style="fill:none;stroke-width:4;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(100%,100%,100%);stroke-opacity:1;stroke-miterlimit:4;" d="M 127.193709 267.340728 L 127.193709 309.849007 " transform="matrix(0.094375,0,0,-0.094375,0,31.77325)"/>
+<path style="fill:none;stroke-width:4;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(100%,100%,100%);stroke-opacity:1;stroke-miterlimit:4;" d="M 127.193709 181.289404 L 127.193709 223.797682 " transform="matrix(0.094375,0,0,-0.094375,0,31.77325)"/>
+<path style="fill:none;stroke-width:4;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(100%,100%,100%);stroke-opacity:1;stroke-miterlimit:4;" d="M 127.193709 95.27947 L 127.193709 137.746358 " transform="matrix(0.094375,0,0,-0.094375,0,31.77325)"/>
+<path style=" stroke:none;fill-rule:nonzero;fill:rgb(3.115845%,49.784851%,74.839783%);fill-opacity:1;" d="M 13.769531 20.820312 L 8.023438 27.105469 "/>
+<g clip-path="url(#ic-firewall-clip6)" clip-rule="nonzero">
+<path style="fill:none;stroke-width:4;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(100%,100%,100%);stroke-opacity:1;stroke-miterlimit:4;" d="M 145.902318 116.057616 L 85.016556 49.459934 " transform="matrix(0.094375,0,0,-0.094375,0,31.77325)"/>
+</g>
+<path style=" stroke:none;fill-rule:nonzero;fill:rgb(3.115845%,49.784851%,74.839783%);fill-opacity:1;" d="M 13.769531 16.847656 L 8.023438 22.933594 "/>
+<g clip-path="url(#ic-firewall-clip7)" clip-rule="nonzero">
+<path style="fill:none;stroke-width:4;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(100%,100%,100%);stroke-opacity:1;stroke-miterlimit:4;" d="M 145.902318 158.151987 L 85.016556 93.665232 " transform="matrix(0.094375,0,0,-0.094375,0,31.77325)"/>
+</g>
+<path style=" stroke:none;fill-rule:nonzero;fill:rgb(3.115845%,49.784851%,74.839783%);fill-opacity:1;" d="M 13.769531 12.875 L 8.023438 18.761719 "/>
+<g clip-path="url(#ic-firewall-clip8)" clip-rule="nonzero">
+<path style="fill:none;stroke-width:4;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(100%,100%,100%);stroke-opacity:1;stroke-miterlimit:4;" d="M 145.902318 200.246358 L 85.016556 137.87053 " transform="matrix(0.094375,0,0,-0.094375,0,31.77325)"/>
+</g>
+<path style=" stroke:none;fill-rule:nonzero;fill:rgb(3.115845%,49.784851%,74.839783%);fill-opacity:1;" d="M 13.769531 8.898438 L 8.023438 14.589844 "/>
+<g clip-path="url(#ic-firewall-clip9)" clip-rule="nonzero">
+<path style="fill:none;stroke-width:4;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(100%,100%,100%);stroke-opacity:1;stroke-miterlimit:4;" d="M 145.902318 242.382119 L 85.016556 182.075828 " transform="matrix(0.094375,0,0,-0.094375,0,31.77325)"/>
+</g>
+<path style=" stroke:none;fill-rule:nonzero;fill:rgb(3.115845%,49.784851%,74.839783%);fill-opacity:1;" d="M 13.769531 4.921875 L 8.023438 10.421875 "/>
+<g clip-path="url(#ic-firewall-clip10)" clip-rule="nonzero">
+<path style="fill:none;stroke-width:4;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(100%,100%,100%);stroke-opacity:1;stroke-miterlimit:4;" d="M 145.902318 284.517881 L 85.016556 226.239735 " transform="matrix(0.094375,0,0,-0.094375,0,31.77325)"/>
+</g>
+<g clip-path="url(#ic-firewall-clip11)" clip-rule="nonzero">
+<path style=" stroke:none;fill-rule:nonzero;fill:rgb(3.115845%,49.784851%,74.839783%);fill-opacity:1;" d="M 8.023438 6.246094 L 13.769531 0.949219 "/>
+</g>
+<g clip-path="url(#ic-firewall-clip12)" clip-rule="nonzero">
+<path style="fill:none;stroke-width:4;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(100%,100%,100%);stroke-opacity:1;stroke-miterlimit:4;" d="M 85.016556 270.486424 L 145.902318 326.612252 " transform="matrix(0.094375,0,0,-0.094375,0,31.77325)"/>
+</g>
+<path style="fill:none;stroke-width:4;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(100%,100%,100%);stroke-opacity:1;stroke-miterlimit:4;" d="M 85.016556 49.79106 L 5.753311 49.79106 " transform="matrix(0.094375,0,0,-0.094375,0,31.77325)"/>
+<path style="fill:none;stroke-width:4;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(100%,100%,100%);stroke-opacity:1;stroke-miterlimit:4;" d="M 85.016556 93.913576 L 5.753311 93.913576 " transform="matrix(0.094375,0,0,-0.094375,0,31.77325)"/>
+<path style="fill:none;stroke-width:4;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(100%,100%,100%);stroke-opacity:1;stroke-miterlimit:4;" d="M 85.016556 138.036093 L 5.753311 138.036093 " transform="matrix(0.094375,0,0,-0.094375,0,31.77325)"/>
+<path style="fill:none;stroke-width:4;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(100%,100%,100%);stroke-opacity:1;stroke-miterlimit:4;" d="M 85.016556 182.2 L 5.753311 182.2 " transform="matrix(0.094375,0,0,-0.094375,0,31.77325)"/>
+<path style="fill:none;stroke-width:4;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(100%,100%,100%);stroke-opacity:1;stroke-miterlimit:4;" d="M 85.016556 226.322517 L 5.753311 226.322517 " transform="matrix(0.094375,0,0,-0.094375,0,31.77325)"/>
+<path style="fill:none;stroke-width:4;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(100%,100%,100%);stroke-opacity:1;stroke-miterlimit:4;" d="M 106.539735 29.633775 L 106.539735 72.349007 " transform="matrix(0.094375,0,0,-0.094375,0,31.77325)"/>
+<path style="fill:none;stroke-width:4;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(100%,100%,100%);stroke-opacity:1;stroke-miterlimit:4;" d="M 106.539735 116.926821 L 106.539735 159.642053 " transform="matrix(0.094375,0,0,-0.094375,0,31.77325)"/>
+<path style="fill:none;stroke-width:4;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(100%,100%,100%);stroke-opacity:1;stroke-miterlimit:4;" d="M 106.539735 203.392053 L 106.539735 246.107285 " transform="matrix(0.094375,0,0,-0.094375,0,31.77325)"/>
+</g></symbol><symbol id="ic-router" viewBox="0 0 37.16 25.18"><defs>
+<clipPath id="ic-router-clip1">
+  <path d="M 0.179688 7 L 36 7 L 36 24.210938 L 0.179688 24.210938 Z M 0.179688 7 "/>
+</clipPath>
+<clipPath id="ic-router-clip2">
+  <path d="M 0.179688 4 L 36.011719 4 L 36.011719 24.210938 L 0.179688 24.210938 Z M 0.179688 4 "/>
+</clipPath>
+<clipPath id="ic-router-clip3">
+  <path d="M 0.179688 0 L 36 0 L 36 15 L 0.179688 15 Z M 0.179688 0 "/>
+</clipPath>
+<clipPath id="ic-router-clip4">
+  <path d="M 0.179688 0 L 36.011719 0 L 36.011719 17 L 0.179688 17 Z M 0.179688 0 "/>
+</clipPath>
+</defs>
+<g id="ic-router-surface1">
+<g clip-path="url(#ic-router-clip1)" clip-rule="nonzero">
+<path style=" stroke:none;fill-rule:nonzero;fill:rgb(0.784302%,42.352295%,60.78186%);fill-opacity:1;" d="M 36 7.121094 C 36 10.945312 28.023438 14.046875 18.1875 14.046875 C 8.347656 14.046875 0.371094 10.945312 0.371094 7.121094 L 0.371094 17.265625 C 0.371094 21.089844 8.347656 24.191406 18.1875 24.191406 C 28.023438 24.191406 36 21.089844 36 17.265625 L 36 7.121094 "/>
+</g>
+<g clip-path="url(#ic-router-clip2)" clip-rule="nonzero">
+<path style="fill:none;stroke-width:4;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(100%,100%,100%);stroke-opacity:1;stroke-miterlimit:4;" d="M 369.872915 178.270041 C 369.872915 138.782476 287.50968 106.756811 185.94718 106.756811 C 84.344346 106.756811 1.981111 138.782476 1.981111 178.270041 L 1.981111 73.521108 C 1.981111 34.033543 84.344346 2.007878 185.94718 2.007878 C 287.50968 2.007878 369.872915 34.033543 369.872915 73.521108 Z M 369.872915 178.270041 " transform="matrix(0.0968462,0,0,-0.0968462,0.179231,24.385862)"/>
+</g>
+<g clip-path="url(#ic-router-clip3)" clip-rule="nonzero">
+<path style=" stroke:none;fill-rule:nonzero;fill:rgb(0.784302%,42.352295%,60.78186%);fill-opacity:1;" d="M 18.1875 14.046875 C 28.023438 14.046875 36 10.945312 36 7.121094 C 36 3.292969 28.023438 0.191406 18.1875 0.191406 C 8.347656 0.191406 0.371094 3.292969 0.371094 7.121094 C 0.371094 10.945312 8.347656 14.046875 18.1875 14.046875 "/>
+</g>
+<g clip-path="url(#ic-router-clip4)" clip-rule="nonzero">
+<path style="fill:none;stroke-width:4;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(100%,100%,100%);stroke-opacity:1;stroke-miterlimit:4;" d="M 185.94718 106.756811 C 287.50968 106.756811 369.872915 138.782476 369.872915 178.270041 C 369.872915 217.79794 287.50968 249.823605 185.94718 249.823605 C 84.344346 249.823605 1.981111 217.79794 1.981111 178.270041 C 1.981111 138.782476 84.344346 106.756811 185.94718 106.756811 Z M 185.94718 106.756811 " transform="matrix(0.0968462,0,0,-0.0968462,0.179231,24.385862)"/>
+</g>
+<path style=" stroke:none;fill-rule:nonzero;fill:rgb(100%,100%,100%);fill-opacity:1;" d="M 14.117188 4.410156 L 15.589844 6.617188 L 10.027344 7.902344 L 11.242188 6.890625 L 2.648438 5.421875 L 4.804688 3.804688 L 13.097656 5.210938 L 14.117188 4.410156 "/>
+<path style=" stroke:none;fill-rule:nonzero;fill:rgb(100%,100%,100%);fill-opacity:1;" d="M 21.941406 9.761719 L 20.941406 7.488281 L 25.957031 6.484375 L 25.085938 7.265625 L 33.445312 8.691406 L 31.441406 10.296875 L 23.128906 8.734375 L 21.941406 9.761719 "/>
+<path style=" stroke:none;fill-rule:nonzero;fill:rgb(100%,100%,100%);fill-opacity:1;" d="M 19.199219 3.207031 L 24.820312 1.667969 L 24.886719 4.078125 L 23.480469 3.808594 L 20.738281 6.082031 L 18.121094 5.703125 L 20.953125 3.476562 L 19.199219 3.207031 "/>
+<path style=" stroke:none;fill-rule:nonzero;fill:rgb(100%,100%,100%);fill-opacity:1;" d="M 16.792969 11.835938 L 11.441406 12.839844 L 11.242188 10.363281 L 12.78125 10.699219 L 15.726562 8.183594 L 18.332031 8.625 L 15.1875 11.367188 L 16.792969 11.835938 "/>
+</g></symbol></defs>
+<g class="zones"><g class="zone z-site"><polygon class="f-l" points="-146.5,299.0 -49.5,355.0 -49.5,373.0 -146.5,317.0"/><polygon class="f-r" points="144.5,243.0 -49.5,355.0 -49.5,373.0 144.5,261.0"/><polygon class="f-top" points="47.5,187.0 144.5,243.0 -49.5,355.0 -146.5,299.0"/><text class="zl" data-l="fr" transform="matrix(0.8660 0.5 0 1 -137.9 304.0)" y="12.5">Sites distants</text><text class="zl" data-l="en" transform="matrix(0.8660 0.5 0 1 -137.9 304.0)" y="12.5">Remote sites</text><text class="zl" data-l="nl" transform="matrix(0.8660 0.5 0 1 -137.9 304.0)" y="12.5">Externe sites</text><text class="zl" data-l="de" transform="matrix(0.8660 0.5 0 1 -137.9 304.0)" y="12.5">Außenstandorte</text></g><g class="zone z-core"><polygon class="f-l" points="147.9,279.0 307.3,371.0 307.3,389.0 147.9,297.0"/><polygon class="f-r" points="501.3,259.0 307.3,371.0 307.3,389.0 501.3,277.0"/><polygon class="f-top" points="341.9,167.0 501.3,259.0 307.3,371.0 147.9,279.0"/><text class="zl" data-l="fr" transform="matrix(0.8660 0.5 0 1 156.6 284.0)" y="12.5">Cœur de réseau</text><text class="zl" data-l="en" transform="matrix(0.8660 0.5 0 1 156.6 284.0)" y="12.5">Core backbone</text><text class="zl" data-l="nl" transform="matrix(0.8660 0.5 0 1 156.6 284.0)" y="12.5">Core-backbone</text><text class="zl" data-l="de" transform="matrix(0.8660 0.5 0 1 156.6 284.0)" y="12.5">Core-Backbone</text></g><g class="zone z-dc"><polygon class="f-l" points="612.1,233.0 813.0,349.0 813.0,367.0 612.1,251.0"/><polygon class="f-r" points="896.2,301.0 813.0,349.0 813.0,367.0 896.2,319.0"/><polygon class="f-top" points="695.2,185.0 896.2,301.0 813.0,349.0 612.1,233.0"/><text class="zl" transform="matrix(0.8660 0.5 0 1 620.8 238.0)" y="12.5">DC1</text></g><g class="zone z-dc"><polygon class="f-l" points="501.3,297.0 702.2,413.0 702.2,431.0 501.3,315.0"/><polygon class="f-r" points="785.3,365.0 702.2,413.0 702.2,431.0 785.3,383.0"/><polygon class="f-top" points="584.4,249.0 785.3,365.0 702.2,413.0 501.3,297.0"/><text class="zl" transform="matrix(0.8660 0.5 0 1 509.9 302.0)" y="12.5">DC2</text></g></g>
+<g class="links">
+<line x1="40.5" y1="251.0" x2="333.2" y2="216.0"/>
+<line x1="40.5" y1="251.0" x2="236.2" y2="272.0"/>
+<line x1="-56.5" y1="307.0" x2="236.2" y2="272.0"/>
+<line x1="-56.5" y1="307.0" x2="333.2" y2="216.0"/>
+<line x1="333.2" y1="216.0" x2="412.9" y2="262.0"/>
+<line x1="412.9" y1="262.0" x2="315.9" y2="318.0"/>
+<line x1="315.9" y1="318.0" x2="236.2" y2="272.0"/>
+<line x1="236.2" y1="272.0" x2="333.2" y2="216.0"/>
+<line x1="333.2" y1="216.0" x2="315.9" y2="318.0"/>
+<line x1="412.9" y1="262.0" x2="686.6" y2="226.0"/>
+<line x1="315.9" y1="318.0" x2="575.7" y2="290.0"/>
+<line class="dci" x1="686.6" y1="226.0" x2="575.7" y2="290.0"/>
+<line x1="686.6" y1="226.0" x2="745.5" y2="260.0"/>
+<line x1="575.7" y1="290.0" x2="634.6" y2="324.0"/>
+<line x1="745.5" y1="260.0" x2="837.3" y2="285.0"/>
+<line x1="745.5" y1="260.0" x2="813.0" y2="299.0"/>
+<line x1="745.5" y1="260.0" x2="788.8" y2="313.0"/>
+<line x1="634.6" y1="324.0" x2="726.4" y2="349.0"/>
+<line x1="634.6" y1="324.0" x2="702.2" y2="363.0"/>
+<line x1="634.6" y1="324.0" x2="677.9" y2="377.0"/>
+</g>
+<g class="pkts"></g><g class="nodes">
+<g class="decor"><use href="#ic-branch-office" x="30.8" y="161.0" width="40.2" height="58.0"/></g>
+<g class="node n-router" data-node="P1" data-x="333.2" data-y="216.0"><ellipse class="shadow" cx="333.2" cy="220.0" rx="27.6" ry="5"/><use href="#ic-router" x="308.2" y="188.0" width="50.2" height="34.0"/><text class="nl" x="333.2" y="183.0">P1</text></g>
+<g class="node n-fw" data-node="FW-1" data-x="686.6" data-y="226.0"><ellipse class="shadow" cx="686.6" cy="230.0" rx="12.5" ry="5"/><use href="#ic-firewall" x="675.2" y="182.0" width="22.8" height="50.0"/><text class="nl" x="686.6" y="177.0">FW-1</text></g>
+<g class="node n-ce" data-node="CE-A" data-x="40.5" data-y="251.0"><ellipse class="shadow" cx="40.5" cy="255.0" rx="22.7" ry="5"/><use href="#ic-router" x="19.9" y="229.0" width="41.3" height="28.0"/><text class="nl" x="40.5" y="224.0">CE-A</text><text class="sub" x="40.5" y="273.0">Site A</text></g>
+<g class="node n-lb" data-node="LB-1" data-x="745.5" data-y="260.0"><ellipse class="shadow" cx="745.5" cy="264.0" rx="19.8" ry="5"/><use href="#ic-content-switch" x="727.5" y="218.0" width="36.0" height="48.0"/><text class="nl" x="745.5" y="213.0">LB-1</text></g>
+<g class="node n-router" data-node="P2" data-x="412.9" data-y="262.0"><ellipse class="shadow" cx="412.9" cy="266.0" rx="27.6" ry="5"/><use href="#ic-router" x="387.8" y="234.0" width="50.2" height="34.0"/><text class="nl" x="412.9" y="229.0">P2</text></g>
+<g class="decor"><use href="#ic-branch-office" x="-66.2" y="217.0" width="40.2" height="58.0"/></g>
+<g class="node n-router" data-node="P4" data-x="236.2" data-y="272.0"><ellipse class="shadow" cx="236.2" cy="276.0" rx="27.6" ry="5"/><use href="#ic-router" x="211.2" y="244.0" width="50.2" height="34.0"/><text class="nl" x="236.2" y="239.0">P4</text></g>
+<g class="node n-srv" data-node="S1" data-x="837.3" data-y="285.0"><ellipse class="shadow" cx="837.3" cy="289.0" rx="16.1" ry="5"/><use href="#ic-fileserver" x="822.6" y="249.0" width="29.3" height="42.0"/><text class="nl" x="837.3" y="244.0">S1</text></g>
+<g class="node n-fw" data-node="FW-2" data-x="575.7" data-y="290.0"><ellipse class="shadow" cx="575.7" cy="294.0" rx="12.5" ry="5"/><use href="#ic-firewall" x="564.3" y="246.0" width="22.8" height="50.0"/><text class="nl" x="575.7" y="241.0">FW-2</text></g>
+<g class="node n-srv" data-node="S2" data-x="813.0" data-y="299.0"><ellipse class="shadow" cx="813.0" cy="303.0" rx="16.1" ry="5"/><use href="#ic-fileserver" x="798.4" y="263.0" width="29.3" height="42.0"/><text class="nl" x="813.0" y="258.0">S2</text></g>
+<g class="node n-ce" data-node="CE-B" data-x="-56.5" data-y="307.0"><ellipse class="shadow" cx="-56.5" cy="311.0" rx="22.7" ry="5"/><use href="#ic-router" x="-77.1" y="285.0" width="41.3" height="28.0"/><text class="nl" x="-56.5" y="280.0">CE-B</text><text class="sub" x="-56.5" y="329.0">Site B</text></g>
+<g class="node n-srv" data-node="S3" data-x="788.8" data-y="313.0"><ellipse class="shadow" cx="788.8" cy="317.0" rx="16.1" ry="5"/><use href="#ic-fileserver" x="774.1" y="277.0" width="29.3" height="42.0"/><text class="nl" x="788.8" y="272.0">S3</text></g>
+<g class="node n-router" data-node="P3" data-x="315.9" data-y="318.0"><ellipse class="shadow" cx="315.9" cy="322.0" rx="27.6" ry="5"/><use href="#ic-router" x="290.8" y="290.0" width="50.2" height="34.0"/><text class="nl" x="315.9" y="285.0">P3</text></g>
+<g class="node n-lb" data-node="LB-2" data-x="634.6" data-y="324.0"><ellipse class="shadow" cx="634.6" cy="328.0" rx="19.8" ry="5"/><use href="#ic-content-switch" x="616.6" y="282.0" width="36.0" height="48.0"/><text class="nl" x="634.6" y="277.0">LB-2</text></g>
+<g class="node n-srv" data-node="S4" data-x="726.4" data-y="349.0"><ellipse class="shadow" cx="726.4" cy="353.0" rx="16.1" ry="5"/><use href="#ic-fileserver" x="711.8" y="313.0" width="29.3" height="42.0"/><text class="nl" x="726.4" y="308.0">S4</text></g>
+<g class="node n-srv" data-node="S5" data-x="702.2" data-y="363.0"><ellipse class="shadow" cx="702.2" cy="367.0" rx="16.1" ry="5"/><use href="#ic-fileserver" x="687.5" y="327.0" width="29.3" height="42.0"/><text class="nl" x="702.2" y="322.0">S5</text></g>
+<g class="node n-srv" data-node="S6" data-x="677.9" data-y="377.0"><ellipse class="shadow" cx="677.9" cy="381.0" rx="16.1" ry="5"/><use href="#ic-fileserver" x="663.3" y="341.0" width="29.3" height="42.0"/><text class="nl" x="677.9" y="336.0">S6</text></g>
+</g></svg>
+<!--/TOPOLOGY-->
       </div>
       <figcaption>
-        <span class="cap"><span class="t" id="net-t"><span data-l="fr">Topologie de démonstration — sites distants, backbone, deux datacenters</span><span data-l="en">Demo topology — remote sites, core backbone, two data centers</span><span data-l="nl">Demotopologie — externe sites, core-backbone, twee datacenters</span><span data-l="de">Demo-Topologie — Außenstandorte, Core-Backbone, zwei Rechenzentren</span></span>
+        <span class="cap"><span class="t" id="net-t"><span data-l="fr">Topologie de démonstration : sites distants, backbone, deux datacenters</span><span data-l="en">Demo topology: remote sites, core backbone, two data centers</span><span data-l="nl">Demotopologie: externe sites, core-backbone, twee datacenters</span><span data-l="de">Demo-Topologie: Außenstandorte, Core-Backbone, zwei Rechenzentren</span></span>
         <span class="ticker mono" aria-hidden="true"></span>
       </span>
         <button type="button" class="net-toggle"><span class="sr-only">Pause</span><svg class="i-play" width="16" height="16" viewBox="0 0 24 24" aria-hidden="true" fill="currentColor"><path d="M8 5v14l11-7z"/></svg><svg class="i-pause" width="16" height="16" viewBox="0 0 24 24" aria-hidden="true" fill="currentColor"><path d="M7 5h3.5v14H7zM13.5 5H17v14h-3.5z"/></svg></button>
@@ -1019,27 +1321,29 @@ window.NPE = (function () {
       <dl class="legend net-legend">
         <div><dt><svg width="18" height="18" viewBox="-9 -9 18 18" aria-hidden="true" class="k-ospf"><circle r="7"/></svg></dt><dd>OSPF Hello</dd></div>
         <div><dt><svg width="18" height="18" viewBox="-10 -10 20 20" aria-hidden="true" class="k-bgp"><path d="M0-9 9 0 0 9-9 0z"/></svg></dt><dd>BGP UPDATE</dd></div>
-        <div><dt><svg width="18" height="18" viewBox="-9 -9 18 18" aria-hidden="true" class="k-tcp"><rect x="-7" y="-7" width="14" height="14" rx="3"/></svg></dt><dd><span data-l="fr">TLS · TCP 443, réparti en round robin</span><span data-l="en">TLS · TCP 443, load-balanced round robin</span><span data-l="nl">TLS · TCP 443, round robin verdeeld</span><span data-l="de">TLS · TCP 443, per Round Robin verteilt</span></dd></div>
+        <div><dt><svg width="18" height="18" viewBox="-9 -9 18 18" aria-hidden="true" class="k-tcp"><rect x="-7" y="-7" width="14" height="14" rx="3"/></svg></dt><dd><span data-l="fr">TLS (TCP 443), réparti en round robin</span><span data-l="en">TLS (TCP 443), load-balanced round robin</span><span data-l="nl">TLS (TCP 443), round robin verdeeld</span><span data-l="de">TLS (TCP 443), per Round Robin verteilt</span></dd></div>
         <div><dt><svg width="18" height="18" viewBox="-10 -10 20 20" aria-hidden="true" class="k-esp"><path d="M-8-4.5 0-9 8-4.5v9L0 9l-8-4.5z"/></svg></dt><dd><span data-l="fr">IPsec ESP (site → DC)</span><span data-l="en">IPsec ESP (site → DC)</span><span data-l="nl">IPsec ESP (site → DC)</span><span data-l="de">IPsec ESP (Standort → RZ)</span></dd></div>
-        <div><dt><span class="lg-node" aria-hidden="true">◯</span></dt><dd><span data-l="fr">Routeur (CE, P)</span><span data-l="en">Router (CE, P)</span><span data-l="nl">Router (CE, P)</span><span data-l="de">Router (CE, P)</span></dd></div>
-        <div><dt><span class="lg-node" aria-hidden="true">▭</span></dt><dd><span data-l="fr">Pare-feu</span><span data-l="en">Firewall</span><span data-l="nl">Firewall</span><span data-l="de">Firewall</span></dd></div>
-        <div><dt><span class="lg-node" aria-hidden="true">⬡</span></dt><dd><span data-l="fr">Répartiteur de charge</span><span data-l="en">Load balancer</span><span data-l="nl">Load balancer</span><span data-l="de">Load-Balancer</span></dd></div>
-        <div><dt><span class="lg-node" aria-hidden="true">▤</span></dt><dd><span data-l="fr">Serveur</span><span data-l="en">Server</span><span data-l="nl">Server</span><span data-l="de">Server</span></dd></div>
+        <div><dt><svg class="lg-ico" width="22" height="22" aria-hidden="true"><use href="#ic-router"/></svg></dt><dd><span data-l="fr">Routeur (CE, P)</span><span data-l="en">Router (CE, P)</span><span data-l="nl">Router (CE, P)</span><span data-l="de">Router (CE, P)</span></dd></div>
+        <div><dt><svg class="lg-ico" width="22" height="22" aria-hidden="true"><use href="#ic-firewall"/></svg></dt><dd><span data-l="fr">Pare-feu</span><span data-l="en">Firewall</span><span data-l="nl">Firewall</span><span data-l="de">Firewall</span></dd></div>
+        <div><dt><svg class="lg-ico" width="22" height="22" aria-hidden="true"><use href="#ic-content-switch"/></svg></dt><dd><span data-l="fr">Répartiteur de charge</span><span data-l="en">Load balancer</span><span data-l="nl">Load balancer</span><span data-l="de">Load-Balancer</span></dd></div>
+        <div><dt><svg class="lg-ico" width="22" height="22" aria-hidden="true"><use href="#ic-fileserver"/></svg></dt><dd><span data-l="fr">Serveur</span><span data-l="en">Server</span><span data-l="nl">Server</span><span data-l="de">Server</span></dd></div>
+        <div><dt><svg class="lg-ico" width="22" height="22" aria-hidden="true"><use href="#ic-branch-office"/></svg></dt><dd><span data-l="fr">Site distant</span><span data-l="en">Remote site</span><span data-l="nl">Externe site</span><span data-l="de">Außenstandort</span></dd></div>
         <div><dt><span class="lg-zone" aria-hidden="true"></span></dt><dd><span data-l="fr">Zone (sites, backbone, DC) ; DCI = lien inter-DC</span><span data-l="en">Zone (sites, backbone, DC); DCI = data center interconnect</span><span data-l="nl">Zone (sites, backbone, DC); DCI = datacenterinterconnectie</span><span data-l="de">Zone (Standorte, Backbone, RZ); DCI = RZ-Kopplung</span></dd></div>
       </dl>
-      <script type="application/json">
-[{"kind":"tcp","path":["CE-A","P1","P2","FW-1","LB-1"],"pool":["S1","S2","S3"],"label":"TLS · Site A → LB-1 → {s} · TCP 443 (round robin)"},
- {"kind":"ospf","path":["P1","P2"],"label":"OSPF Hello · P1 → 224.0.0.5 · IP 89"},
- {"kind":"esp","path":["CE-B","P4","P3","FW-2"],"label":"IPsec ESP · CE-B → FW-2 · IP 50"},
- {"kind":"tcp","path":["CE-B","P4","P3","FW-2","LB-2"],"pool":["S4","S5","S6"],"label":"TLS · Site B → LB-2 → {s} · TCP 443 (round robin)"},
- {"kind":"bgp","path":["P1","P3"],"label":"BGP UPDATE · P1 → P3 · TCP 179"},
- {"kind":"ospf","path":["P3","P4"],"label":"OSPF Hello · P3 → 224.0.0.5 · IP 89"},
- {"kind":"esp","path":["CE-A","P1","P2","FW-1"],"label":"IPsec ESP · CE-A → FW-1 · IP 50"},
- {"kind":"tcp","path":["CE-B","P1","P2","FW-1","LB-1"],"pool":["S1","S2","S3"],"label":"TLS · Site B → LB-1 → {s} · TCP 443 (round robin)"},
- {"kind":"ospf","path":["P2","P3"],"label":"OSPF Hello · P2 → 224.0.0.5 · IP 89"},
- {"kind":"tcp","path":["CE-A","P4","P3","FW-2","LB-2"],"pool":["S4","S5","S6"],"label":"TLS · Site A → LB-2 → {s} · TCP 443 (round robin)"},
- {"kind":"ospf","path":["P4","P1"],"label":"OSPF Hello · P4 → 224.0.0.5 · IP 89"}]
-      </script>
+      <p class="credit"><span data-l="fr">Icônes : Cisco Network Topology Icons, utilisées sans modification.</span><span data-l="en">Icons: Cisco Network Topology Icons, used unaltered.</span><span data-l="nl">Iconen: Cisco Network Topology Icons, ongewijzigd gebruikt.</span><span data-l="de">Symbole: Cisco Network Topology Icons, unverändert verwendet.</span></p>
+      <script type="application/json" data-flows>
+[{"kind": "tcp", "path": ["CE-A", "P1", "P2", "FW-1", "LB-1"], "pool": ["S1", "S2", "S3"], "label": "TLS, Site A → LB-1 → {s}, TCP 443, round robin"},
+ {"kind": "ospf", "path": ["P1", "P2"], "label": "OSPF Hello, P1 → 224.0.0.5, IP 89"},
+ {"kind": "esp", "path": ["CE-B", "P4", "P3", "FW-2"], "label": "IPsec ESP, CE-B → FW-2, IP 50"},
+ {"kind": "tcp", "path": ["CE-B", "P4", "P3", "FW-2", "LB-2"], "pool": ["S4", "S5", "S6"], "label": "TLS, Site B → LB-2 → {s}, TCP 443, round robin"},
+ {"kind": "bgp", "path": ["P1", "P3"], "label": "BGP UPDATE, P1 → P3, TCP 179"},
+ {"kind": "ospf", "path": ["P3", "P4"], "label": "OSPF Hello, P3 → 224.0.0.5, IP 89"},
+ {"kind": "esp", "path": ["CE-A", "P1", "P2", "FW-1"], "label": "IPsec ESP, CE-A → FW-1, IP 50"},
+ {"kind": "tcp", "path": ["CE-B", "P1", "P2", "FW-1", "LB-1"], "pool": ["S1", "S2", "S3"], "label": "TLS, Site B → LB-1 → {s}, TCP 443, round robin"},
+ {"kind": "ospf", "path": ["P2", "P3"], "label": "OSPF Hello, P2 → 224.0.0.5, IP 89"},
+ {"kind": "tcp", "path": ["CE-A", "P4", "P3", "FW-2", "LB-2"], "pool": ["S4", "S5", "S6"], "label": "TLS, Site A → LB-2 → {s}, TCP 443, round robin"},
+ {"kind": "ospf", "path": ["P4", "P1"], "label": "OSPF Hello, P4 → 224.0.0.5, IP 89"}]
+</script>
     </figure>
     <script>NPE.network("net-hero");</script>
   </section>
@@ -1086,7 +1390,7 @@ window.NPE = (function () {
   <section aria-labelledby="h-platforms">
     <h2 id="h-platforms" class="sec-title"><span data-l="fr">Plateformes couvertes</span><span data-l="en">Platforms covered</span><span data-l="nl">Behandelde platformen</span><span data-l="de">Abgedeckte Plattformen</span></h2>
     <ul class="vendors">
-      <li>Cisco <small>IOS XE · NX-OS · IOS XR</small></li><li>Check Point <small>Gaia</small></li><li>F5 <small>BIG-IP</small></li><li>Palo Alto <small>PAN-OS</small></li><li>NetScaler</li><li>Fortinet <small>FortiOS</small></li>
+      <li>Cisco <small>IOS XE, NX-OS, IOS XR</small></li><li>Check Point <small>Gaia</small></li><li>F5 <small>BIG-IP</small></li><li>Palo Alto <small>PAN-OS</small></li><li>NetScaler</li><li>Fortinet <small>FortiOS</small></li>
     </ul>
   </section>
 
@@ -1095,7 +1399,7 @@ window.NPE = (function () {
       <h2 id="h-about"><span data-l="fr">Qui écrit cette bibliothèque ?</span><span data-l="en">Who writes this library?</span><span data-l="nl">Wie schrijft deze bibliotheek?</span><span data-l="de">Wer schreibt diese Bibliothek?</span></h2>
       <p><span data-l="fr">Je travaille en ingénierie réseau et sécurité multi-vendeurs. Voici les pages de référence que je veux avoir sous la main : précises, sourcées, indépendantes des vendeurs.</span><span data-l="en">I work in multi-vendor network and security engineering. These are the reference pages I want at hand: precise, sourced and vendor-neutral.</span><span data-l="nl">Ik werk in multivendor netwerk- en security-engineering. Dit zijn de referentiepagina’s die ik bij de hand wil hebben: precies, met bronnen en vendoronafhankelijk.</span><span data-l="de">Ich arbeite im herstellerübergreifenden Netzwerk- und Security-Engineering. Das sind die Referenzseiten, die ich griffbereit haben möchte: präzise, belegt und herstellerneutral.</span></p>
     </div>
-    <a class="cta primary" href="https://about.cuvelier.tech"><span data-l="fr">À propos</span><span data-l="en">About</span><span data-l="nl">Over</span><span data-l="de">Über</span> <span aria-hidden="true">↗</span></a>
+    <a class="cta primary" href="https://about.cuvelier.tech"><span data-l="fr">À propos</span><span data-l="en">About</span><span data-l="nl">Over</span><span data-l="de">Über</span></a>
   </section>
 </main>
 
