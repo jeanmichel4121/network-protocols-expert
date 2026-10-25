@@ -39,7 +39,8 @@ each page available in **French, English, Dutch and German**.
 ```
 - When a page is created or renamed, update `index.html` in the same change.
 - Changes to the shared layout go into `templates/protocol-template.html` first,
-  then are propagated to every existing page (list the pages updated).
+  then are propagated to every existing page with `python3 tools/sync-shared.py`
+  (list the pages updated).
 
 ## Git hosting, CI/CD and publication
 - GitLab.com, **private** project "Network Protocols Expert" (`jeanmichel4121/network-protocols-expert`), default branch `main`.

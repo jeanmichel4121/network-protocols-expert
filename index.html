@@ -110,7 +110,10 @@ button { font: inherit; color: inherit; }
 .icon-btn .moon { display: none; }
 .icon-btn[aria-pressed="true"] .sun { display: none; }
 .icon-btn[aria-pressed="true"] .moon { display: block; }
-@media (max-width: 30rem) { .brand span { display: none; } }
+.nav-link { display: inline-flex; align-items: center; white-space: nowrap; min-height: 2.25rem; padding: 0 0.75rem; border-radius: 999px; color: var(--fg); text-decoration: none; font-size: 0.9rem; font-weight: 600; }
+.nav-link:hover { background: var(--surface-2); }
+/* Small screens: the brand name is hidden visually only — it stays the link's accessible name. */
+@media (max-width: 30rem) { .brand span { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; } .nav-link { padding: 0 0.4rem; } }
 
 /* ===== Layout ========================================================= */
 .layout { max-width: 84rem; margin-inline: auto; padding: 0 clamp(1rem, 3vw, 2rem) 4rem; display: grid; gap: 2rem; }
@@ -354,19 +357,93 @@ th { background: var(--surface-2); font-weight: 650; white-space: nowrap; }
 }
 </style>
 <style data-page>
-/* Home-page components (the shared tokens and chrome come from the template block above). */
-.home { max-width: 84rem; margin-inline: auto; padding: 0 clamp(1rem, 3vw, 2rem) 4rem; }
-.home-hero { padding: clamp(2.5rem, 6vw, 5rem) 0 2.5rem; border-bottom: 1px solid var(--line); }
-.home-hero h1 { font-size: clamp(2.25rem, 1.6rem + 3vw, 3.75rem); max-width: 18ch; }
-.home-hero .lede { max-width: 60ch; }
-.chips { display: flex; flex-wrap: wrap; gap: 0.5rem; list-style: none; padding: 0; margin: 0; }
-.chips li { font-size: 0.875rem; font-weight: 600; padding: 0.3rem 0.85rem; border-radius: 999px; border: 1px solid var(--line); background: var(--surface); }
-.features { display: grid; grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr)); gap: 1rem; margin: 2.5rem 0 3.5rem; padding: 0; list-style: none; }
-.features li { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 1.25rem; }
-.features svg { color: var(--accent); margin-bottom: 0.6rem; }
-.features h3 { font-size: 1.0625rem; margin-bottom: 0.35rem; }
+/* Landing-page components (shared tokens and chrome come from the template block above). */
+.home { max-width: 84rem; margin-inline: auto; padding: 0 clamp(1rem, 3vw, 2rem) 4rem; overflow-x: clip; }
+.sec-title { font-size: clamp(1.5rem, 1.2rem + 1.2vw, 2.25rem); margin: 0 0 1.5rem; max-width: 30ch; }
+.mono { font-family: var(--mono); }
+
+/* Hero: copy + animated topology, on a faint "network fabric" dot grid */
+.hero-l {
+  position: relative; display: grid; gap: clamp(2rem, 4vw, 3.5rem); align-items: center;
+  padding: clamp(2.5rem, 7vw, 6rem) 0 clamp(2.5rem, 5vw, 4rem); isolation: isolate;
+}
+.hero-l::before {
+  content: ""; position: absolute; inset: 0 calc(-1 * clamp(1rem, 3vw, 2rem)); z-index: -1;
+  background-image: radial-gradient(color-mix(in srgb, var(--fg) 13%, transparent) 1px, transparent 1.2px);
+  background-size: 22px 22px;
+  -webkit-mask-image: radial-gradient(ellipse 70% 70% at 70% 45%, #000 15%, transparent 75%);
+  mask-image: radial-gradient(ellipse 70% 70% at 70% 45%, #000 15%, transparent 75%);
+}
+.hero-l::after {
+  content: ""; position: absolute; z-index: -1; width: 38rem; height: 38rem; right: -2rem; top: -4rem; border-radius: 50%;
+  background: radial-gradient(closest-side, color-mix(in srgb, var(--accent) 16%, transparent), transparent);
+  pointer-events: none;
+}
+@media (min-width: 64rem) { .hero-l { grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr); } }
+.hero-copy h1 { font-size: clamp(2.4rem, 1.5rem + 3.6vw, 4.25rem); line-height: 1.05; letter-spacing: -0.03em; margin-bottom: 1.25rem; }
+.hero-copy h1 em { font-style: normal; color: var(--accent); }
+.hero-copy .lede { max-width: 56ch; margin-bottom: 2rem; }
+.ctas { display: flex; flex-wrap: wrap; gap: 0.75rem; }
+.cta {
+  display: inline-flex; align-items: center; gap: 0.45rem; min-height: 3rem; padding: 0 1.2rem; border-radius: 999px; font-size: 0.95rem;
+  border: 1px solid var(--line); background: var(--surface); color: var(--fg); font-weight: 650; text-decoration: none;
+  transition: border-color 0.15s, transform 0.15s, box-shadow 0.15s;
+}
+.cta:hover { border-color: var(--accent); }
+.cta.primary { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); box-shadow: 0 10px 30px -12px color-mix(in srgb, var(--accent) 70%, transparent); }
+@media (prefers-reduced-motion: no-preference) { .cta:hover { transform: translateY(-1px); } }
+
+/* Animated topology */
+.net {
+  position: relative; margin: 0; border: 1px solid var(--line); border-radius: 20px; background: color-mix(in srgb, var(--surface) 82%, transparent);
+  box-shadow: 0 40px 90px -45px color-mix(in srgb, var(--accent) 55%, transparent); backdrop-filter: blur(4px); overflow: hidden;
+}
+.net > svg { display: block; width: 100%; height: auto; padding: 0.75rem 0.75rem 0; }
+.net .links line { stroke: color-mix(in srgb, var(--fg) 22%, transparent); stroke-width: 2; stroke-linecap: round; }
+.net .node circle, .net .node rect, .net .node > path:first-of-type { fill: var(--surface); stroke: var(--accent); stroke-width: 2.5; }
+.net .node.core circle { fill: var(--blue-bg); }
+.net .node.fw path:nth-of-type(1) { fill: none; stroke: var(--accent); stroke-width: 1.2; opacity: 0.7; }
+.net .node.fw rect { fill: var(--surface); }
+.net .node.lb path { fill: var(--surface); }
+.net text { fill: var(--fg); font: 700 15px var(--mono); text-anchor: middle; }
+.net .pkt, .net-legend svg { stroke-width: 2; }
+.k-ospf { fill: var(--blue-bg); stroke: var(--blue); }
+.k-bgp { fill: var(--purple-bg); stroke: var(--purple); }
+.k-tcp { fill: var(--teal-bg); stroke: var(--teal); }
+.k-esp { fill: var(--grey-bg); stroke: var(--grey); }
+.net figcaption { display: flex; flex-wrap: wrap; gap: 0.25rem 1rem; justify-content: space-between; align-items: baseline; padding: 0.5rem 1.1rem 0; }
+.net figcaption .t { font-weight: 650; font-size: 0.9375rem; }
+.net .ticker { font-size: 0.8125rem; color: var(--muted); min-height: 1.3em; }
+.net-legend { border-top: 0; background: transparent; padding-top: 0.6rem; }
+.lg-node { font-size: 1rem; line-height: 1; color: var(--accent); width: 1.1rem; text-align: center; }
+.net-toggle {
+  position: absolute; top: 0.75rem; right: 0.75rem; width: 2.5rem; height: 2.5rem; display: grid; place-items: center;
+  border-radius: 999px; border: 1px solid var(--line); background: var(--surface); color: var(--fg); cursor: pointer;
+}
+
+/* Key numbers */
+.stats dl { display: grid; grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr)); gap: 1px; margin: 0 0 4.5rem; background: var(--line); border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; }
+.stats dl div { display: flex; flex-direction: column-reverse; background: var(--surface); padding: 1.25rem 1.5rem; }
+.stats dd { margin: 0; font: 750 clamp(2rem, 1.6rem + 1.5vw, 2.75rem)/1 var(--font); color: var(--accent); letter-spacing: -0.02em; }
+.stats dt { margin-top: 0.4rem; color: var(--muted); font-size: 0.9375rem; }
+
+/* Features */
+.features { display: grid; grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr)); gap: 1rem; margin: 0 0 4.5rem; padding: 0; list-style: none; }
+.features li { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 1.5rem; }
+.features svg { color: var(--accent); margin-bottom: 0.75rem; }
+.features h3 { font-size: 1.0625rem; margin-bottom: 0.4rem; }
 .features p { margin: 0; color: var(--muted); font-size: 0.9375rem; }
-.pcards { display: grid; grid-template-columns: repeat(auto-fill, minmax(17rem, 1fr)); gap: 1rem; padding: 0; margin: 1rem 0 3rem; list-style: none; }
+
+/* How a page teaches */
+.how { list-style: none; padding: 0; margin: 0 0 4.5rem; display: grid; grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr)); gap: 1.5rem; counter-reset: how; }
+.how li { position: relative; padding-top: 1rem; border-top: 2px solid var(--line); }
+.how li::before { content: ""; position: absolute; top: -2px; left: 0; width: 3rem; height: 2px; background: var(--accent); }
+.how-n { font: 700 0.875rem var(--mono); color: var(--accent); }
+.how h3 { margin: 0.4rem 0 0.35rem; font-size: 1.125rem; }
+.how p { margin: 0; color: var(--muted); }
+
+/* Protocol cards */
+.pcards { display: grid; grid-template-columns: repeat(auto-fill, minmax(17rem, 1fr)); gap: 1rem; padding: 0; margin: 0 0 4.5rem; list-style: none; }
 .pcard { display: flex; flex-direction: column; gap: 0.35rem; height: 100%; padding: 1.25rem; border: 1px solid var(--line); border-radius: var(--radius); background: var(--surface); color: var(--fg); text-decoration: none; transition: border-color 0.15s, transform 0.15s; }
 .pcard:hover { border-color: var(--accent); }
 @media (prefers-reduced-motion: no-preference) { .pcard:hover { transform: translateY(-2px); } }
@@ -375,8 +452,22 @@ th { background: var(--surface-2); font-weight: 650; white-space: nowrap; }
 .pcard .pd { color: var(--muted); font-size: 0.9375rem; }
 .pcard .tags { display: flex; flex-wrap: wrap; gap: 0.35rem; margin-top: auto; padding-top: 0.5rem; }
 .pcard .tags span { font: 600 0.75rem var(--mono); padding: 0.1rem 0.5rem; border-radius: 6px; background: var(--surface-2); color: var(--muted); }
-.empty { grid-column: 1 / -1; border: 1px dashed var(--line); border-radius: var(--radius); padding: 2rem; text-align: center; color: var(--muted); }
-.vendors { display: flex; flex-wrap: wrap; gap: 0.5rem 1.5rem; padding: 0; margin: 1rem 0 0; list-style: none; font-weight: 650; color: var(--muted); }
+.pcards:has(.empty) { display: block; }
+.empty { grid-column: 1 / -1; border: 1px dashed var(--line); border-radius: var(--radius); padding: 2.5rem 1.5rem; text-align: center; color: var(--muted); }
+
+/* Platforms */
+.vendors { display: flex; flex-wrap: wrap; gap: 0.75rem; padding: 0; margin: 0 0 4.5rem; list-style: none; }
+.vendors li { padding: 0.6rem 1.1rem; border: 1px solid var(--line); border-radius: 999px; background: var(--surface); font-weight: 700; }
+.vendors small { font-weight: 500; color: var(--muted); margin-left: 0.3rem; }
+
+/* About band */
+.about-band {
+  display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 1.5rem;
+  padding: clamp(1.5rem, 4vw, 2.5rem); border-radius: 20px; border: 1px solid var(--line);
+  background: linear-gradient(135deg, var(--blue-bg), var(--surface) 60%);
+}
+.about-band h2 { font-size: clamp(1.4rem, 1.2rem + 0.8vw, 1.9rem); margin-bottom: 0.5rem; }
+.about-band p { margin: 0; color: var(--muted); max-width: 60ch; }
 </style>
 <script>
 /* ===== Page library (functions only; called inline after each component) ===== */
@@ -651,6 +742,71 @@ window.NPE = (function () {
     total();
   }
 
+  /* ---------- Animated network (decorative hero): pausable, off-screen aware, reduced-motion safe ---------- */
+  function network(id) {
+    var fig = document.getElementById(id);
+    if (!fig) return;
+    var svg = fig.querySelector("svg"), layer = svg.querySelector(".pkts"), ticker = fig.querySelector(".ticker"),
+        btn = fig.querySelector(".net-toggle"), NS = "http://www.w3.org/2000/svg";
+    var flows = JSON.parse(fig.querySelector('script[type="application/json"]').textContent);
+    var nodes = {};
+    svg.querySelectorAll("[data-node]").forEach(function (g) { nodes[g.dataset.node] = [+g.dataset.x, +g.dataset.y]; });
+    var shapes = {
+      ospf: '<circle r="7"/>',
+      bgp: '<path d="M0-9 9 0 0 9-9 0z"/>',
+      tcp: '<rect x="-7" y="-7" width="14" height="14" rx="3"/>',
+      esp: '<path d="M-8-4.5 0-9 8-4.5v9L0 9l-8-4.5z"/>'
+    };
+    var live = [], next = 0, last = 0, wait = 0, raf = 0, running = false, onScreen = true;
+    var wanted = !matchMedia("(prefers-reduced-motion: reduce)").matches;
+    function spawn(flow, t) {
+      var g = document.createElementNS(NS, "g");
+      g.setAttribute("class", "pkt k-" + flow.kind);
+      g.innerHTML = shapes[flow.kind];
+      layer.appendChild(g);
+      var p = { g: g, path: flow.path, hop: 0, t: t || 0 };
+      live.push(p); place(p);
+      ticker.textContent = flow.label;
+    }
+    function place(p) {
+      var a = nodes[p.path[p.hop]], b = nodes[p.path[p.hop + 1]];
+      p.g.setAttribute("transform", "translate(" + (a[0] + (b[0] - a[0]) * p.t).toFixed(1) + " " + (a[1] + (b[1] - a[1]) * p.t).toFixed(1) + ")");
+    }
+    function frame(now) {
+      var dt = last ? Math.min(now - last, 64) : 16;
+      last = now; wait -= dt;
+      if (wait <= 0) { spawn(flows[next++ % flows.length]); wait = 650; }
+      live = live.filter(function (p) {
+        p.t += dt / 1600;
+        if (p.t >= 1) { p.hop++; p.t -= 1; }
+        if (p.hop >= p.path.length - 1) { p.g.remove(); return false; }
+        place(p); return true;
+      });
+      raf = requestAnimationFrame(frame);
+    }
+    function label() {
+      btn.querySelector(".sr-only").textContent = running ? ui("pause") : ui("play");
+      btn.querySelector(".i-play").style.display = running ? "none" : "";
+      btn.querySelector(".i-pause").style.display = running ? "" : "none";
+    }
+    function sync() {
+      var go = wanted && onScreen && !document.hidden;
+      if (go && !running) { running = true; last = 0; raf = requestAnimationFrame(frame); }
+      if (!go && running) { running = false; cancelAnimationFrame(raf); }
+      label();
+    }
+    // Static first frame (also what reduced-motion users keep): one packet of each kind mid-link.
+    flows.forEach(function (f) { spawn(f, 0.5); });
+    ticker.textContent = flows[0].label;
+    btn.addEventListener("click", function () { wanted = !running; sync(); });
+    document.addEventListener("visibilitychange", sync);
+    if ("IntersectionObserver" in window) {
+      new IntersectionObserver(function (es) { onScreen = es[0].isIntersecting; sync(); }).observe(svg);
+    }
+    onLang(label);
+    sync();
+  }
+
   /* ---------- Page chrome: language, theme, TOC scroll-spy, copy, print ---------- */
   function chrome() {
     var meta = json("#page-meta");
@@ -728,7 +884,7 @@ window.NPE = (function () {
     setLang(lang(), false);
   }
 
-  return { packet: packet, animation: animation, tabs: tabs, quiz: quiz, chrome: chrome, onLang: onLang };
+  return { packet: packet, animation: animation, tabs: tabs, quiz: quiz, network: network, chrome: chrome, onLang: onLang };
 })();
 </script>
 </head>
@@ -741,6 +897,7 @@ window.NPE = (function () {
       <svg width="28" height="28" viewBox="0 0 32 32" aria-hidden="true"><rect width="32" height="32" rx="7" fill="#1a5fb4"/><path d="M7 10h18M7 16h12M7 22h15" stroke="#fff" stroke-width="3" stroke-linecap="round"/></svg>
       <span>Network Protocols Expert</span>
     </a>
+    <a class="nav-link" href="https://about.cuvelier.tech"><span data-l="fr">À propos</span><span data-l="en">About</span><span data-l="nl">Over</span><span data-l="de">Über</span></a>
     <div class="controls">
       <div class="lang" role="group" data-aria="langs" aria-label="Language">
         <button type="button" data-lang="fr" lang="fr">FR</button>
@@ -757,19 +914,76 @@ window.NPE = (function () {
 </header>
 
 <main id="main" class="home" tabindex="-1">
-  <section class="home-hero" aria-labelledby="h-home">
-    <p class="eyebrow"><span data-l="fr">Niveau expert · CCIE</span><span data-l="en">Expert level · CCIE</span><span data-l="nl">Expertniveau · CCIE</span><span data-l="de">Expertenniveau · CCIE</span></p>
-    <h1 id="h-home"><span data-l="fr">Comprendre les protocoles réseau au bit près</span><span data-l="en">Understand network protocols down to the bit</span><span data-l="nl">Netwerkprotocollen tot op de bit begrijpen</span><span data-l="de">Netzwerkprotokolle bis aufs Bit verstehen</span></h1>
-    <p class="lede"><span data-l="fr">Une page par protocole, construite depuis les RFC et la documentation officielle des vendeurs : formats de paquets, machines à états, comportement avancé, configuration multi-vendeurs, dépannage et quiz.</span><span data-l="en">One page per protocol, built from the RFCs and official vendor documentation: packet formats, state machines, advanced behaviour, multi-vendor configuration, troubleshooting and quizzes.</span><span data-l="nl">Eén pagina per protocol, opgebouwd uit de RFC’s en de officiële documentatie van de vendors: pakketformaten, state machines, geavanceerd gedrag, configuratie per vendor, probleemoplossing en quizzen.</span><span data-l="de">Eine Seite pro Protokoll, erstellt aus den RFCs und der offiziellen Herstellerdokumentation: Paketformate, Zustandsautomaten, fortgeschrittenes Verhalten, herstellerübergreifende Konfiguration, Fehlersuche und Quiz.</span></p>
-    <ul class="chips">
-      <li>FR · EN · NL · DE</li>
-      <li><span data-l="fr">RFC cités par section</span><span data-l="en">RFCs cited by section</span><span data-l="nl">RFC’s per sectie geciteerd</span><span data-l="de">RFCs abschnittsgenau zitiert</span></li>
-      <li><span data-l="fr">Fonctionne hors ligne</span><span data-l="en">Works offline</span><span data-l="nl">Werkt offline</span><span data-l="de">Funktioniert offline</span></li>
-    </ul>
+  <section class="hero-l" aria-labelledby="h-home">
+    <div class="hero-copy">
+      <p class="eyebrow"><span data-l="fr">Niveau expert · CCIE</span><span data-l="en">Expert level · CCIE</span><span data-l="nl">Expertniveau · CCIE</span><span data-l="de">Expertenniveau · CCIE</span></p>
+      <h1 id="h-home"><span data-l="fr">Comprendre les protocoles réseau <em>au bit près</em></span><span data-l="en">Understand network protocols <em>down to the bit</em></span><span data-l="nl">Netwerkprotocollen begrijpen <em>tot op de bit</em></span><span data-l="de">Netzwerkprotokolle verstehen, <em>bis aufs Bit</em></span></h1>
+      <p class="lede"><span data-l="fr">Une page par protocole, construite depuis les RFC et la documentation officielle des vendeurs : chaque paquet décodé champ par champ, chaque échange animé pas à pas, chaque commande sourcée sur six plateformes.</span><span data-l="en">One page per protocol, built from the RFCs and official vendor documentation: every packet decoded field by field, every exchange animated step by step, every command sourced on six platforms.</span><span data-l="nl">Eén pagina per protocol, opgebouwd uit de RFC’s en de officiële documentatie van de vendors: elk pakket veld voor veld ontleed, elke uitwisseling stap voor stap geanimeerd, elk commando met bron op zes platformen.</span><span data-l="de">Eine Seite pro Protokoll, erstellt aus den RFCs und der offiziellen Herstellerdokumentation: jedes Paket Feld für Feld zerlegt, jeder Ablauf Schritt für Schritt animiert, jeder Befehl auf sechs Plattformen belegt.</span></p>
+      <div class="ctas">
+        <a class="cta primary" href="#protocols"><span data-l="fr">Explorer les protocoles</span><span data-l="en">Explore the protocols</span><span data-l="nl">Protocollen verkennen</span><span data-l="de">Protokolle entdecken</span> <span aria-hidden="true">→</span></a>
+        <a class="cta" href="#how"><span data-l="fr">Comment une page enseigne</span><span data-l="en">How a page teaches</span><span data-l="nl">Hoe een pagina lesgeeft</span><span data-l="de">Wie eine Seite lehrt</span></a>
+      </div>
+    </div>
+
+    <figure class="net" id="net-hero" aria-labelledby="net-t">
+      <svg viewBox="0 0 560 400" role="img" aria-labelledby="net-t net-d">
+        <title id="net-d">R1, R2, R3, R4, FW-A, LB-01</title>
+        <g class="links">
+          <line x1="80" y1="80" x2="280" y2="50"/><line x1="280" y1="50" x2="480" y2="90"/>
+          <line x1="80" y1="80" x2="280" y2="200"/><line x1="280" y1="50" x2="280" y2="200"/>
+          <line x1="480" y1="90" x2="280" y2="200"/><line x1="280" y1="200" x2="110" y2="320"/>
+          <line x1="280" y1="200" x2="460" y2="320"/><line x1="80" y1="80" x2="110" y2="320"/>
+          <line x1="480" y1="90" x2="460" y2="320"/>
+        </g>
+        <g class="pkts"></g>
+        <g class="nodes">
+          <g class="node router" data-node="R1" data-x="80" data-y="80"><circle cx="80" cy="80" r="24"/><text x="80" y="85">R1</text></g>
+          <g class="node router" data-node="R2" data-x="280" data-y="50"><circle cx="280" cy="50" r="24"/><text x="280" y="55">R2</text></g>
+          <g class="node router" data-node="R3" data-x="480" data-y="90"><circle cx="480" cy="90" r="24"/><text x="480" y="95">R3</text></g>
+          <g class="node router core" data-node="R4" data-x="280" data-y="200"><circle cx="280" cy="200" r="28"/><text x="280" y="205">R4</text></g>
+          <g class="node fw" data-node="FW-A" data-x="110" data-y="320"><rect x="72" y="300" width="76" height="40" rx="6"/><path d="M72 313h76M72 327h76M97 300v13M123 300v13M85 313v14M110 313v14M135 313v14M97 327v13M123 327v13"/><text x="110" y="361">FW-A</text></g>
+          <g class="node lb" data-node="LB-01" data-x="460" data-y="320"><path d="M436 320l12-21h24l12 21-12 21h-24z"/><text x="460" y="325">LB</text><text x="460" y="361">LB-01</text></g>
+        </g>
+      </svg>
+      <figcaption>
+        <span class="t" id="net-t"><span data-l="fr">Topologie de démonstration — paquets en transit</span><span data-l="en">Demo topology — packets in flight</span><span data-l="nl">Demotopologie — pakketten onderweg</span><span data-l="de">Demo-Topologie — Pakete unterwegs</span></span>
+        <span class="ticker mono" aria-hidden="true"></span>
+      </figcaption>
+      <dl class="legend net-legend">
+        <div><dt><svg width="18" height="18" viewBox="-9 -9 18 18" aria-hidden="true" class="k-ospf"><circle r="7"/></svg></dt><dd>OSPF Hello</dd></div>
+        <div><dt><svg width="18" height="18" viewBox="-10 -10 20 20" aria-hidden="true" class="k-bgp"><path d="M0-9 9 0 0 9-9 0z"/></svg></dt><dd>BGP UPDATE</dd></div>
+        <div><dt><svg width="18" height="18" viewBox="-9 -9 18 18" aria-hidden="true" class="k-tcp"><rect x="-7" y="-7" width="14" height="14" rx="3"/></svg></dt><dd>TLS · TCP 443</dd></div>
+        <div><dt><svg width="18" height="18" viewBox="-10 -10 20 20" aria-hidden="true" class="k-esp"><path d="M-8-4.5 0-9 8-4.5v9L0 9l-8-4.5z"/></svg></dt><dd>IPsec ESP</dd></div>
+        <div><dt><span class="lg-node" aria-hidden="true">◯</span></dt><dd><span data-l="fr">Routeur</span><span data-l="en">Router</span><span data-l="nl">Router</span><span data-l="de">Router</span></dd></div>
+        <div><dt><span class="lg-node" aria-hidden="true">▭</span></dt><dd><span data-l="fr">Pare-feu</span><span data-l="en">Firewall</span><span data-l="nl">Firewall</span><span data-l="de">Firewall</span></dd></div>
+        <div><dt><span class="lg-node" aria-hidden="true">⬡</span></dt><dd><span data-l="fr">Répartiteur de charge</span><span data-l="en">Load balancer</span><span data-l="nl">Load balancer</span><span data-l="de">Load-Balancer</span></dd></div>
+      </dl>
+      <button type="button" class="net-toggle"><span class="sr-only">Pause</span><svg class="i-play" width="16" height="16" viewBox="0 0 24 24" aria-hidden="true" fill="currentColor"><path d="M8 5v14l11-7z"/></svg><svg class="i-pause" width="16" height="16" viewBox="0 0 24 24" aria-hidden="true" fill="currentColor"><path d="M7 5h3.5v14H7zM13.5 5H17v14h-3.5z"/></svg></button>
+      <script type="application/json">
+[{"kind":"ospf","path":["R1","R2"],"label":"OSPF Hello · R1 → 224.0.0.5 · IP 89"},
+ {"kind":"bgp","path":["R3","R4","R1"],"label":"BGP UPDATE · R3 → R1 · TCP 179"},
+ {"kind":"tcp","path":["FW-A","R4","LB-01"],"label":"TLS · FW-A → LB-01 · TCP 443"},
+ {"kind":"esp","path":["R1","FW-A"],"label":"IPsec ESP · R1 → FW-A · IP 50"},
+ {"kind":"ospf","path":["R2","R4"],"label":"OSPF Hello · R2 → 224.0.0.5 · IP 89"},
+ {"kind":"tcp","path":["LB-01","R3","R2"],"label":"TLS · LB-01 → R2 · TCP 443"},
+ {"kind":"ospf","path":["R4","R3"],"label":"OSPF Hello · R4 → 224.0.0.5 · IP 89"}]
+      </script>
+    </figure>
+    <script>NPE.network("net-hero");</script>
+  </section>
+
+  <section class="stats" aria-labelledby="h-stats">
+    <h2 id="h-stats" class="sr-only"><span data-l="fr">En chiffres</span><span data-l="en">In numbers</span><span data-l="nl">In cijfers</span><span data-l="de">In Zahlen</span></h2>
+    <dl>
+      <div><dt><span data-l="fr">langues, contenu identique</span><span data-l="en">languages, identical content</span><span data-l="nl">talen, identieke inhoud</span><span data-l="de">Sprachen, identischer Inhalt</span></dt><dd>4</dd></div>
+      <div><dt><span data-l="fr">plateformes vendeurs</span><span data-l="en">vendor platforms</span><span data-l="nl">vendorplatformen</span><span data-l="de">Herstellerplattformen</span></dt><dd>6</dd></div>
+      <div><dt><span data-l="fr">sections par protocole</span><span data-l="en">sections per protocol</span><span data-l="nl">secties per protocol</span><span data-l="de">Abschnitte pro Protokoll</span></dt><dd>9</dd></div>
+      <div><dt><span data-l="fr">questions de quiz minimum</span><span data-l="en">quiz questions at least</span><span data-l="nl">quizvragen minimaal</span><span data-l="de">Quizfragen mindestens</span></dt><dd>15</dd></div>
+    </dl>
   </section>
 
   <section aria-labelledby="h-features">
-    <h2 id="h-features" class="sr-only"><span data-l="fr">Contenu de chaque page</span><span data-l="en">What every page contains</span><span data-l="nl">Inhoud van elke pagina</span><span data-l="de">Inhalt jeder Seite</span></h2>
+    <h2 id="h-features" class="sec-title"><span data-l="fr">Tout ce qu’il faut pour maîtriser un protocole</span><span data-l="en">Everything you need to master a protocol</span><span data-l="nl">Alles wat je nodig hebt om een protocol te beheersen</span><span data-l="de">Alles, um ein Protokoll zu beherrschen</span></h2>
     <ul class="features">
       <li><svg width="28" height="28" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="6" rx="1"/><path d="M9 4v6M15 4v6"/><path d="M5 14h14M7 17.5h10M9 21h6"/></svg><h3><span data-l="fr">Paquets bit à bit</span><span data-l="en">Packets bit by bit</span><span data-l="nl">Pakketten bit voor bit</span><span data-l="de">Pakete Bit für Bit</span></h3><p><span data-l="fr">Chaque message en diagramme RFC et en arbre Wireshark synchronisés, avec les noms de filtres.</span><span data-l="en">Every message as a synchronised RFC diagram and Wireshark tree, with filter names.</span><span data-l="nl">Elk bericht als gesynchroniseerd RFC-diagram en Wireshark-boom, met filternamen.</span><span data-l="de">Jede Nachricht als synchrones RFC-Diagramm und Wireshark-Baum, mit Filternamen.</span></p></li>
       <li><svg width="28" height="28" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="12" r="2.5"/><circle cx="18" cy="6" r="2.5"/><circle cx="18" cy="18" r="2.5"/><path d="M8.3 11l7.4-3.8M8.3 13l7.4 3.8"/></svg><h3><span data-l="fr">Machines à états animées</span><span data-l="en">Animated state machines</span><span data-l="nl">Geanimeerde state machines</span><span data-l="de">Animierte Zustandsautomaten</span></h3><p><span data-l="fr">Les échanges pas à pas, avec lecture, pause et une prédiction à faire avant chaque étape.</span><span data-l="en">Exchanges step by step, with play, pause and a prediction to make before each step.</span><span data-l="nl">Uitwisselingen stap voor stap, met afspelen, pauzeren en een voorspelling vóór elke stap.</span><span data-l="de">Abläufe Schritt für Schritt, mit Abspielen, Pause und einer Vermutung vor jedem Schritt.</span></p></li>
@@ -778,20 +992,38 @@ window.NPE = (function () {
     </ul>
   </section>
 
-  <section aria-labelledby="h-protocols">
-    <h2 id="h-protocols"><span data-l="fr">Protocoles</span><span data-l="en">Protocols</span><span data-l="nl">Protocollen</span><span data-l="de">Protokolle</span></h2>
+  <section id="how" aria-labelledby="h-how">
+    <h2 id="h-how" class="sec-title"><span data-l="fr">Comment une page enseigne</span><span data-l="en">How a page teaches</span><span data-l="nl">Hoe een pagina lesgeeft</span><span data-l="de">Wie eine Seite lehrt</span></h2>
+    <ol class="how">
+      <li><span class="how-n" aria-hidden="true">01</span><h3><span data-l="fr">Lire le paquet</span><span data-l="en">Read the packet</span><span data-l="nl">Het pakket lezen</span><span data-l="de">Das Paket lesen</span></h3><p><span data-l="fr">Un exemple réel, généré par script, décodé champ par champ.</span><span data-l="en">A real sample, generated by script, decoded field by field.</span><span data-l="nl">Een echt voorbeeld, door een script gegenereerd, veld voor veld ontleed.</span><span data-l="de">Ein echtes, per Skript erzeugtes Beispiel, Feld für Feld zerlegt.</span></p></li>
+      <li><span class="how-n" aria-hidden="true">02</span><h3><span data-l="fr">Prédire puis observer</span><span data-l="en">Predict, then watch</span><span data-l="nl">Voorspellen, dan kijken</span><span data-l="de">Vermuten, dann beobachten</span></h3><p><span data-l="fr">Devinez l’état suivant avant que l’animation ne le montre.</span><span data-l="en">Guess the next state before the animation shows it.</span><span data-l="nl">Raad de volgende toestand voordat de animatie die toont.</span><span data-l="de">Erraten Sie den nächsten Zustand, bevor die Animation ihn zeigt.</span></p></li>
+      <li><span class="how-n" aria-hidden="true">03</span><h3><span data-l="fr">Configurer</span><span data-l="en">Configure</span><span data-l="nl">Configureren</span><span data-l="de">Konfigurieren</span></h3><p><span data-l="fr">Les commandes des six plateformes, et leurs écarts avec la RFC.</span><span data-l="en">The commands for six platforms, and where they deviate from the RFC.</span><span data-l="nl">De commando’s voor zes platformen, en waar ze van de RFC afwijken.</span><span data-l="de">Die Befehle für sechs Plattformen und ihre Abweichungen vom RFC.</span></p></li>
+      <li><span class="how-n" aria-hidden="true">04</span><h3><span data-l="fr">Se tester</span><span data-l="en">Test yourself</span><span data-l="nl">Jezelf testen</span><span data-l="de">Sich selbst prüfen</span></h3><p><span data-l="fr">Un quiz qui explique chaque réponse, avec la référence exacte.</span><span data-l="en">A quiz that explains every answer, with the exact reference.</span><span data-l="nl">Een quiz die elk antwoord uitlegt, met de exacte referentie.</span><span data-l="de">Ein Quiz, das jede Antwort erklärt, mit genauer Referenz.</span></p></li>
+    </ol>
+  </section>
+
+  <section id="protocols" aria-labelledby="h-protocols">
+    <h2 id="h-protocols" class="sec-title"><span data-l="fr">Protocoles</span><span data-l="en">Protocols</span><span data-l="nl">Protocollen</span><span data-l="de">Protokolle</span></h2>
     <ul class="pcards">
 <!--PROTOCOLS-->
-      <li class="empty"><span data-l="fr">Aucun protocole publié pour l’instant.</span><span data-l="en">No protocol published yet.</span><span data-l="nl">Nog geen protocol gepubliceerd.</span><span data-l="de">Noch kein Protokoll veröffentlicht.</span></li>
+      <li class="empty"><span data-l="fr">Les premières pages sont en cours de rédaction.</span><span data-l="en">The first pages are being written.</span><span data-l="nl">De eerste pagina’s worden geschreven.</span><span data-l="de">Die ersten Seiten sind in Arbeit.</span></li>
 <!--/PROTOCOLS-->
     </ul>
   </section>
 
   <section aria-labelledby="h-platforms">
-    <h2 id="h-platforms"><span data-l="fr">Plateformes couvertes</span><span data-l="en">Platforms covered</span><span data-l="nl">Behandelde platformen</span><span data-l="de">Abgedeckte Plattformen</span></h2>
+    <h2 id="h-platforms" class="sec-title"><span data-l="fr">Plateformes couvertes</span><span data-l="en">Platforms covered</span><span data-l="nl">Behandelde platformen</span><span data-l="de">Abgedeckte Plattformen</span></h2>
     <ul class="vendors">
-      <li>Cisco IOS XE · NX-OS · IOS XR</li><li>Check Point Gaia</li><li>F5 BIG-IP</li><li>Palo Alto PAN-OS</li><li>NetScaler</li><li>FortiGate FortiOS</li>
+      <li>Cisco <small>IOS XE · NX-OS · IOS XR</small></li><li>Check Point <small>Gaia</small></li><li>F5 <small>BIG-IP</small></li><li>Palo Alto <small>PAN-OS</small></li><li>NetScaler</li><li>Fortinet <small>FortiOS</small></li>
     </ul>
+  </section>
+
+  <section class="about-band" aria-labelledby="h-about">
+    <div>
+      <h2 id="h-about"><span data-l="fr">Qui écrit cette bibliothèque ?</span><span data-l="en">Who writes this library?</span><span data-l="nl">Wie schrijft deze bibliotheek?</span><span data-l="de">Wer schreibt diese Bibliothek?</span></h2>
+      <p><span data-l="fr">Je travaille en ingénierie réseau et sécurité multi-vendeurs. Voici les pages de référence que je veux avoir sous la main : précises, sourcées, indépendantes des vendeurs.</span><span data-l="en">I work in multi-vendor network and security engineering. These are the reference pages I want at hand: precise, sourced and vendor-neutral.</span><span data-l="nl">Ik werk in multivendor netwerk- en security-engineering. Dit zijn de referentiepagina’s die ik bij de hand wil hebben: precies, met bronnen en vendoronafhankelijk.</span><span data-l="de">Ich arbeite im herstellerübergreifenden Netzwerk- und Security-Engineering. Das sind die Referenzseiten, die ich griffbereit haben möchte: präzise, belegt und herstellerneutral.</span></p>
+    </div>
+    <a class="cta primary" href="https://about.cuvelier.tech"><span data-l="fr">À propos</span><span data-l="en">About</span><span data-l="nl">Over</span><span data-l="de">Über</span> <span aria-hidden="true">↗</span></a>
   </section>
 </main>
 

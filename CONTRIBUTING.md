@@ -7,6 +7,7 @@ New protocol page: copy `templates/protocol-template.html` to `protocols/<slug>/
 fill `#page-meta`, replace every `TEMPLATE` block, add the packet samples to
 `tools/packet-builder.py`, then run `python3 tools/packet-builder.py --update protocols/<slug>/index.html`.
 Preview the published layout with `python3 scripts/build_site.py /tmp/site`.
+Changed the template's styles, page library or header? Run `python3 tools/sync-shared.py`.
 
 ## Workflow
 
