@@ -4,3 +4,10 @@ public/
 __pycache__/
 *.pyc
 .DS_Store
+.cache/
+gl-code-quality-report.json
+gitleaks.sarif
+
+# Claude Code personal / machine-specific files
+CLAUDE.local.md
+.claude/settings.local.json

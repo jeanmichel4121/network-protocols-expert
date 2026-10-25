@@ -1,0 +1,17 @@
+# Tooling configuration only — this repository is not a Python package.
+[tool.ruff]
+target-version = "py312"
+line-length = 110
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "B", "UP", "S", "SIM", "PL"]
+ignore = [
+  "S603", "S607",   # subprocess with fixed arguments in CI scripts
+  "S310",           # urlopen on the GitLab API URL provided by CI
+  "PLR2004",        # magic numbers are protocol constants (field sizes, codes)
+  "E702",           # compact one-line statements in small CLI helpers
+]
+
+[tool.ruff.lint.per-file-ignores]
+# Packet builders take one keyword argument per protocol field; "0.0.0.0" is an OSPF Area ID.
+"tools/*.py" = ["PLR0913", "S104"]

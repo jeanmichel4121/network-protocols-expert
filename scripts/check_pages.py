@@ -6,6 +6,7 @@
   for fr, en, nl and de.
 Exit code 1 if any page fails.
 """
+
 import pathlib
 import re
 import sys
@@ -16,7 +17,10 @@ LANGS = ("fr", "en", "nl", "de")
 EXTERNAL = [
     (re.compile(r"<script[^>]+src\s*=\s*[\"']?(https?:)?//", re.I), "external <script src>"),
     (re.compile(r"<link[^>]+href\s*=\s*[\"']?(https?:)?//", re.I), "external <link href>"),
-    (re.compile(r"<(img|source|video|audio|iframe)[^>]+src\s*=\s*[\"']?(https?:)?//", re.I), "external media"),
+    (
+        re.compile(r"<(img|source|video|audio|iframe)[^>]+src\s*=\s*[\"']?(https?:)?//", re.I),
+        "external media",
+    ),
     (re.compile(r"@import\s+(url\()?[\"']?(https?:)?//", re.I), "CSS @import of a remote file"),
     (re.compile(r"url\(\s*[\"']?(https?:)?//", re.I), "CSS url() to a remote file"),
     (re.compile(r"\bfetch\s*\(\s*[\"'`](https?:)?//", re.I), "fetch() to a remote URL"),

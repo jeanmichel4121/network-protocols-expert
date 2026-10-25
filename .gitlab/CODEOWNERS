@@ -1,0 +1,8 @@
+# Default owner of every file. (Approval enforcement needs GitLab Premium;
+# on Free this file documents ownership and suggests reviewers.)
+* @jeanmichel4121
+
+[CI/CD and infrastructure]
+/.gitlab-ci.yml @jeanmichel4121
+/infra/ @jeanmichel4121
+/requirements/ @jeanmichel4121
