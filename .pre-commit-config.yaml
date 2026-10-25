@@ -1,0 +1,45 @@
+# Same checks as the CI lint/test/security stages, run before each commit.
+# Install once: pip install pre-commit && pre-commit install --install-hooks -t pre-commit -t commit-msg
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: 3e8a8703264a2f4a69428a0aa4dcb512790b2c8c  # frozen: v6.0.0
+    hooks:
+      - id: check-yaml
+      - id: end-of-file-fixer
+      - id: trailing-whitespace
+      - id: check-merge-conflict
+      - id: check-added-large-files
+        args: [--maxkb=1024]
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: f368fb366ff7f2f808dd324b83a6d32267799e19  # frozen: v0.17.2
+    hooks:
+      - id: ruff-check
+      - id: ruff-format
+  - repo: https://github.com/adrienverge/yamllint
+    rev: cba56bcde1fdd01c1deb3f945e69764c291a6530  # frozen: v1.38.0
+    hooks:
+      - id: yamllint
+        args: [--strict]
+  - repo: https://github.com/gitleaks/gitleaks
+    rev: 83d9cd684c87d95d656c1458ef04895a7f1cbd8e  # frozen: v8.30.1
+    hooks:
+      - id: gitleaks
+  - repo: local
+    hooks:
+      - id: packet-builder-self-test
+        name: packet-builder self-test
+        entry: python3 tools/packet-builder.py --self-test
+        language: system
+        pass_filenames: false
+        files: ^tools/
+      - id: check-pages
+        name: check pages (self-contained, 4 languages)
+        entry: python3 scripts/check_pages.py
+        language: system
+        pass_filenames: false
+        files: \.html$
+      - id: conventional-commit
+        name: conventional commit message
+        entry: python3 scripts/check_commits.py --msg-file
+        language: system
+        stages: [commit-msg]

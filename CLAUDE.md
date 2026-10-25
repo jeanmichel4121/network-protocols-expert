@@ -26,27 +26,43 @@ each page available in **French, English, Dutch and German**.
 │       └── sources.md              # every source used, with section numbers and links
 ├── tools/
 │   └── packet-builder.py           # builds sample packets, computes checksums/lengths
-├── scripts/
-│   └── check_pages.py              # CI checks: self-contained, 4 languages present
-└── infra/
-    └── nas-runner/                 # docker-compose for the self-hosted runner (no secrets)
+├── scripts/                        # CI scripts: check_pages, smoke_test (browser),
+│                                   # check_commits, release_notes, create_release
+├── requirements/                   # pinned CI tooling (ci.in → ci.txt with hashes)
+├── infra/
+│   └── nas-runner/                 # docker-compose for the self-hosted runner (no secrets)
+├── .gitlab/                        # MR/issue templates, CODEOWNERS
+├── CHANGELOG.md · CONTRIBUTING.md · SECURITY.md
+└── .pre-commit-config.yaml · .yamllint.yml · pyproject.toml (ruff) · .editorconfig
 ```
 - When a page is created or renamed, update `index.html` in the same change.
 - Changes to the shared layout go into `templates/protocol-template.html` first,
   then are propagated to every existing page (list the pages updated).
 
 ## Git hosting, CI/CD and publication
-- GitLab.com, **private** project `jeanmichel4121/network-protocols-expert`, default branch `main`.
+- GitLab.com, **private** project "Network Protocols Expert" (`jeanmichel4121/network-protocols-expert`), default branch `main`.
 - All CI jobs run on my **self-hosted runner on my home NAS** (ARM64, Docker executor,
   tag `nas`). Shared GitLab runners are disabled. Every CI image must exist for
   `linux/arm64` (use official multi-arch images: python, alpine, node…).
-- Pipeline: `build` (packet-builder self-test) → `validate` (`scripts/check_pages.py`)
-  → `deploy` (GitLab Pages, `main` only). Pages access = project members only.
-- Work on a branch, open a merge request, merge to `main` only when the pipeline is green.
-  A page is "done" only when it is published by a green pipeline.
+- Pipeline stages: `lint` (yamllint, ruff, Conventional Commits) → `test` (packet-builder
+  self-test, static page checks) → `security` (gitleaks) → `build` (assemble `public/`)
+  → `verify` (Playwright: no external request, no console error, 4 languages, 360 px)
+  → `deploy` (GitLab Pages, `main` only, environment `production`) → `release` (tags).
+  Pages access = project members only.
+- `main` is protected: **no direct push**. Workflow: branch `<type>/<name>` → merge request
+  (Default template) → green pipeline + resolved threads → squash merge.
+  A page is "done" only when it is published by a green `main` pipeline.
+- Commits: **Conventional Commits** in English, scope = protocol slug or area
+  (e.g. `feat(ospf): add LSU packet views`, `fix(bgp): correct hold timer default`,
+  `ci(pipeline): pin playwright image`).
+- Every MR adds a line to `CHANGELOG.md` under `[Unreleased]` (Keep a Changelog).
+  Releases: SemVer tags `vX.Y.Z` on `main` (MAJOR = template change for all pages,
+  MINOR = new protocol/section, PATCH = corrections); the pipeline creates the release.
+- Pin everything: CI images by tag + `@sha256` digest (must support `linux/arm64`),
+  Python tools in `requirements/ci.txt` with hashes, pre-commit hooks frozen to SHAs.
+- Run `pre-commit run --all-files` before pushing.
 - Never commit secrets: no tokens, no runner token, no real IPs/hostnames.
   `infra/nas-runner/.env` is git-ignored.
-- Commit messages: imperative, English, prefixed by scope (e.g. `ospf: add LSU packet views`).
 
 ## Document library (Google Drive)
 - Reference sources (RFC PDFs, vendor guides) live in Google Drive (connector available):

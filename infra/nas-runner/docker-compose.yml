@@ -1,4 +1,4 @@
-# GitLab Runner for network-protocols-expert, on the home NAS (ARM64).
+# GitLab Runner for Network Protocols Expert, on the home NAS (ARM64).
 # 1. cp .env.example .env  and paste the runner authentication token (glrt-...) in .env
 # 2. docker compose run --rm register   (one-shot: writes ./config/config.toml)
 # 3. docker compose up -d runner

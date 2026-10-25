@@ -1,39 +1,202 @@
-# All jobs run on the self-hosted runner on the home NAS (ARM64, Docker executor).
-# Images must be multi-arch (linux/arm64). Shared GitLab runners are disabled.
-default:
-  tags: [nas]
-  interruptible: true
-
-stages: [build, validate, deploy]
+# network-protocols-expert — CI/CD pipeline
+#
+# Runs only on the self-hosted runner on the home NAS (tag `nas`, ARM64, Docker
+# executor). Shared runners are disabled at project level.
+#
+# Conventions (GitLab "pipeline efficiency" and "pipeline security" guides):
+# - images pinned by tag AND SHA-256 digest, all multi-arch (linux/arm64)
+# - Python tooling pinned with hashes (requirements/ci.txt, pip --require-hashes)
+# - DAG with `needs`, fail-fast lint stage, interruptible jobs
+# - one pipeline per change: MR pipelines for branches with an open MR,
+#   branch pipelines otherwise, tag pipelines for releases
+# - deploy only from the default branch, serialised (resource_group), tracked
+#   as the `production` environment
+# - releases only from protected tags vX.Y.Z, notes taken from CHANGELOG.md
+#
+# Updating an image: change the tag and its digest together (see CONTRIBUTING.md).
 
 workflow:
+  name: "$CI_COMMIT_REF_NAME · $CI_PIPELINE_SOURCE"
+  auto_cancel:
+    on_new_commit: interruptible
   rules:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+    - if: $CI_COMMIT_TAG =~ /^v\d+\.\d+\.\d+$/
     - if: $CI_COMMIT_BRANCH && $CI_OPEN_MERGE_REQUESTS
       when: never
     - if: $CI_COMMIT_BRANCH
+    - if: $CI_PIPELINE_SOURCE == "web"
 
-packet-builder:
-  stage: build
-  image: python:3.12-slim
+stages:
+  - lint
+  - test
+  - security
+  - build
+  - verify
+  - deploy
+  - release
+
+variables:
+  GIT_DEPTH: "20"
+  PIP_CACHE_DIR: "$CI_PROJECT_DIR/.cache/pip"
+  PIP_DISABLE_PIP_VERSION_CHECK: "1"
+  PIP_NO_INPUT: "1"
+  PYTHONDONTWRITEBYTECODE: "1"
+
+default:
+  tags: [nas]
+  interruptible: true
+  timeout: 15 minutes
+  retry:
+    max: 2
+    when: [runner_system_failure, scheduler_failure, api_failure]
+
+# ---------------------------------------------------------------- templates
+.python:
+  image: python:3.12.12-slim-bookworm@sha256:593bd06efe90efa80dc4eee3948be7c0fde4134606dd40d8dd8dbcade98e669c
+  cache:
+    key:
+      files: [requirements/ci.txt]
+    paths: [.cache/pip]
+    when: always
+
+.python-tools:
+  extends: .python
+  before_script:
+    - pip install --require-hashes -r requirements/ci.txt
+
+.on-default-branch:
+  rules:
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+
+# ---------------------------------------------------------------- lint
+lint:yaml:
+  stage: lint
+  extends: .python-tools
+  needs: []
+  script:
+    - yamllint --strict .
+
+lint:python:
+  stage: lint
+  extends: .python-tools
+  needs: []
+  script:
+    - ruff check --exit-zero --output-format=gitlab --output-file=gl-code-quality-report.json .
+    - ruff check .
+    - ruff format --check --diff .
+  artifacts:
+    when: always
+    expire_in: 1 week
+    reports:
+      codequality: gl-code-quality-report.json
+
+lint:commits:
+  stage: lint
+  extends: .python
+  needs: []
+  variables:
+    GIT_DEPTH: "0"
+  script:
+    - apt-get -qq update >/dev/null && apt-get -qq install -y --no-install-recommends git >/dev/null
+    - python3 scripts/check_commits.py "$CI_MERGE_REQUEST_DIFF_BASE_SHA" HEAD
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+
+# ---------------------------------------------------------------- test
+test:packet-builder:
+  stage: test
+  extends: .python
+  needs: []
   script:
     - python3 tools/packet-builder.py --self-test
 
-check-pages:
-  stage: validate
-  image: python:3.12-slim
+test:pages-static:
+  stage: test
+  extends: .python
+  needs: []
   script:
     - python3 scripts/check_pages.py
 
-pages:
-  stage: deploy
-  image: alpine:3.20
+# ---------------------------------------------------------------- security
+security:secrets:
+  stage: security
+  image:
+    name: zricethezav/gitleaks:v8.30.1@sha256:c00b6bd0aeb3071cbcb79009cb16a60dd9e0a7c60e2be9ab65d25e6bc8abbb7f
+    entrypoint: [""]
+  needs: []
+  variables:
+    GIT_DEPTH: "0"
+  script:
+    - |
+      if [ "$CI_PIPELINE_SOURCE" = "merge_request_event" ]; then
+        LOG_OPTS="--log-opts=${CI_MERGE_REQUEST_DIFF_BASE_SHA}..HEAD"
+      else
+        LOG_OPTS=""
+      fi
+      gitleaks git --redact --verbose --report-format sarif --report-path gitleaks.sarif $LOG_OPTS .
+  artifacts:
+    when: always
+    expire_in: 1 week
+    paths: [gitleaks.sarif]
+
+# ---------------------------------------------------------------- build
+build:site:
+  stage: build
+  image: alpine:3.22@sha256:2e0b81d60597f449baa56dc25d355367869d2dca4cd57e866f1e2b52af3eb55f
+  needs: [test:pages-static, test:packet-builder]
   script:
     - mkdir -p public
     - cp index.html public/
-    - if [ -n "$(ls -A protocols 2>/dev/null | grep -v '^.gitkeep$')" ]; then cp -r protocols public/; fi
-    - find public -name 'sources.md' -delete
+    - for d in protocols/*/; do [ -f "$d/index.html" ] && mkdir -p "public/$d" && cp "$d/index.html" "public/$d"; done || true
+    - echo "$CI_COMMIT_SHA" > public/version.txt
+    - find public -type f | sort
   artifacts:
     paths: [public]
+    expire_in: 1 week
+
+# ---------------------------------------------------------------- verify
+verify:browser:
+  stage: verify
+  image: mcr.microsoft.com/playwright/python:v1.64.1-noble@sha256:330d401ae23c905896a0c26c66c36fc971b621519e7b11b435a8328d7bf6e031
+  needs: [build:site]
+  # The image ships the browsers only, not the Python package: install it pinned
+  # with hashes, at the same version as the image tag.
+  before_script:
+    - pip install --require-hashes -r requirements/browser.txt
+  script:
+    - python3 scripts/smoke_test.py public
+
+# ---------------------------------------------------------------- deploy
+pages:
+  stage: deploy
+  image: alpine:3.22@sha256:2e0b81d60597f449baa56dc25d355367869d2dca4cd57e866f1e2b52af3eb55f
+  needs:
+    - build:site
+    - verify:browser
+    - security:secrets
+    - lint:yaml
+    - lint:python
+  interruptible: false
+  resource_group: production
+  environment:
+    name: production
+    url: $CI_PAGES_URL
+  script:
+    - test -f public/index.html
+  artifacts:
+    paths: [public]
+    expire_in: 30 days
   rules:
-    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+    - !reference [.on-default-branch, rules]
+
+# ---------------------------------------------------------------- release
+release:
+  stage: release
+  extends: .python
+  needs: [build:site, verify:browser, security:secrets]
+  interruptible: false
+  script:
+    - python3 scripts/create_release.py
+  rules:
+    - if: $CI_COMMIT_TAG =~ /^v\d+\.\d+\.\d+$/
