@@ -99,7 +99,7 @@ def head_tags(meta: dict, lang: str, path: str) -> str:
 
 def full_title(meta: dict, lang: str) -> str:
     t = meta["title"][lang]
-    return t if meta.get("kind") == "home" else f"{t} · {BRAND}"
+    return t if meta.get("kind") == "home" else f"{t} | {BRAND}"
 
 
 def localise(text: str, meta: dict, lang: str, path: str, home_href: str) -> str:
@@ -227,7 +227,7 @@ def not_found(blocks: dict) -> str:
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="color-scheme" content="light dark">
 <meta name="robots" content="noindex">
-<title>404 · {BRAND}</title>
+<title>404 | {BRAND}</title>
 {blocks["icon"]}
 {blocks["early"]}
 <script>

@@ -11,7 +11,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="color-scheme" content="light dark">
-<title>Protocol page template · Network Protocols Expert</title>
+<title>Protocol page template | Network Protocols Expert</title>
 <meta name="description" content="Reference template for every protocol page of the Network Protocols Expert library.">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%231a5fb4'/%3E%3Cpath d='M7 10h18M7 16h12M7 22h15' stroke='%23fff' stroke-width='3' stroke-linecap='round'/%3E%3C/svg%3E">
 <script type="application/json" id="page-meta">
@@ -157,7 +157,7 @@ button { font: inherit; color: inherit; }
 .sec > details > summary h2::after { content: "▾"; margin-left: auto; font-size: 0.7em; color: var(--muted); transition: transform 0.2s; }
 .sec > details:not([open]) > summary h2::after { transform: rotate(-90deg); }
 .tpl { border: 2px dashed var(--orange); background: var(--orange-bg); border-radius: var(--radius); padding: 0.75rem 1rem; font-size: 0.9375rem; margin: 1rem 0; }
-.tpl strong { color: var(--fg); letter-spacing: 0.04em; }
+.tpl strong { display: inline-block; margin-right: 0.5rem; padding: 0.05rem 0.5rem; border-radius: 5px; background: var(--orange); color: var(--surface); font-size: 0.75rem; letter-spacing: 0.06em; }
 .card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 1.25rem; }
 .terms { display: grid; gap: 0.75rem; margin: 1rem 0; }
 .terms div { border-left: 3px solid var(--blue); padding-left: 0.9rem; }
@@ -367,10 +367,10 @@ window.NPE = (function () {
   "use strict";
   var LANGS = ["fr", "en", "nl", "de"];
   var UI = {
-    fr: { name: "Nom", offset: "Offset", size: "Taille", value: "Valeur", filter: "Filtre Wireshark", ref: "Référence", role: "Rôle", bits: "bits", bytes: "octets", hint: "Survolez ou sélectionnez un champ (diagramme ou arbre) pour afficher son détail.", cont: "suite", repeat: "répété", step: "Étape", start: "État initial : aucun paquet échangé.", play: "Lecture", pause: "Pause", prev: "Étape précédente", next: "Étape suivante", reset: "Recommencer", copy: "Copier", copied: "Copié ✓", correct: "✓ Correct.", wrong: "✗ Incorrect — la bonne réponse est :", choose: "Choisissez d'abord une réponse.", score: "Score :", crumbs: "Fil d'Ariane", langs: "Langue", vendors: "Vendeurs", bitdiag: "Diagramme de bits RFC", wstree: "Arbre Wireshark", theme: "Thème sombre", toc: "Sur cette page", set: "Activé", notset: "Non activé" },
-    en: { name: "Name", offset: "Offset", size: "Size", value: "Value", filter: "Wireshark filter", ref: "Reference", role: "Role", bits: "bits", bytes: "bytes", hint: "Hover or select a field (diagram or tree) to see its details.", cont: "cont.", repeat: "repeated", step: "Step", start: "Initial state: no packet exchanged yet.", play: "Play", pause: "Pause", prev: "Previous step", next: "Next step", reset: "Restart", copy: "Copy", copied: "Copied ✓", correct: "✓ Correct.", wrong: "✗ Incorrect — the correct answer is:", choose: "Choose an answer first.", score: "Score:", crumbs: "Breadcrumb", langs: "Language", vendors: "Vendors", bitdiag: "RFC bit diagram", wstree: "Wireshark tree", theme: "Dark theme", toc: "On this page", set: "Set", notset: "Not set" },
-    nl: { name: "Naam", offset: "Offset", size: "Grootte", value: "Waarde", filter: "Wireshark-filter", ref: "Referentie", role: "Rol", bits: "bits", bytes: "bytes", hint: "Beweeg over een veld of selecteer het (diagram of boom) om de details te zien.", cont: "vervolg", repeat: "herhaald", step: "Stap", start: "Beginsituatie: nog geen pakket uitgewisseld.", play: "Afspelen", pause: "Pauzeren", prev: "Vorige stap", next: "Volgende stap", reset: "Opnieuw beginnen", copy: "Kopiëren", copied: "Gekopieerd ✓", correct: "✓ Juist.", wrong: "✗ Onjuist — het juiste antwoord is:", choose: "Kies eerst een antwoord.", score: "Score:", crumbs: "Kruimelpad", langs: "Taal", vendors: "Vendors", bitdiag: "RFC-bitdiagram", wstree: "Wireshark-boom", theme: "Donker thema", toc: "Op deze pagina", set: "Ingesteld", notset: "Niet ingesteld" },
-    de: { name: "Name", offset: "Offset", size: "Größe", value: "Wert", filter: "Wireshark-Filter", ref: "Referenz", role: "Funktion", bits: "Bit", bytes: "Byte", hint: "Bewegen Sie den Zeiger über ein Feld oder wählen Sie es aus (Diagramm oder Baum), um Details zu sehen.", cont: "Forts.", repeat: "wiederholt", step: "Schritt", start: "Ausgangszustand: noch kein Paket ausgetauscht.", play: "Abspielen", pause: "Pause", prev: "Vorheriger Schritt", next: "Nächster Schritt", reset: "Neu starten", copy: "Kopieren", copied: "Kopiert ✓", correct: "✓ Richtig.", wrong: "✗ Falsch — richtig ist:", choose: "Wählen Sie zuerst eine Antwort.", score: "Punkte:", crumbs: "Brotkrumennavigation", langs: "Sprache", vendors: "Hersteller", bitdiag: "RFC-Bitdiagramm", wstree: "Wireshark-Baum", theme: "Dunkles Design", toc: "Auf dieser Seite", set: "Gesetzt", notset: "Nicht gesetzt" }
+    fr: { name: "Nom", offset: "Offset", size: "Taille", value: "Valeur", filter: "Filtre Wireshark", ref: "Référence", role: "Rôle", bits: "bits", bytes: "octets", hint: "Survolez ou sélectionnez un champ (diagramme ou arbre) pour afficher son détail.", cont: "suite", repeat: "répété", step: "Étape", start: "État initial : aucun paquet échangé.", play: "Lecture", pause: "Pause", prev: "Étape précédente", next: "Étape suivante", reset: "Recommencer", copy: "Copier", copied: "Copié ✓", correct: "✓ Correct.", wrong: "✗ Incorrect. La bonne réponse est :", choose: "Choisissez d'abord une réponse.", score: "Score :", crumbs: "Fil d'Ariane", langs: "Langue", vendors: "Vendeurs", bitdiag: "Diagramme de bits RFC", wstree: "Arbre Wireshark", theme: "Thème sombre", toc: "Sur cette page", set: "Activé", notset: "Non activé" },
+    en: { name: "Name", offset: "Offset", size: "Size", value: "Value", filter: "Wireshark filter", ref: "Reference", role: "Role", bits: "bits", bytes: "bytes", hint: "Hover or select a field (diagram or tree) to see its details.", cont: "cont.", repeat: "repeated", step: "Step", start: "Initial state: no packet exchanged yet.", play: "Play", pause: "Pause", prev: "Previous step", next: "Next step", reset: "Restart", copy: "Copy", copied: "Copied ✓", correct: "✓ Correct.", wrong: "✗ Incorrect. The correct answer is:", choose: "Choose an answer first.", score: "Score:", crumbs: "Breadcrumb", langs: "Language", vendors: "Vendors", bitdiag: "RFC bit diagram", wstree: "Wireshark tree", theme: "Dark theme", toc: "On this page", set: "Set", notset: "Not set" },
+    nl: { name: "Naam", offset: "Offset", size: "Grootte", value: "Waarde", filter: "Wireshark-filter", ref: "Referentie", role: "Rol", bits: "bits", bytes: "bytes", hint: "Beweeg over een veld of selecteer het (diagram of boom) om de details te zien.", cont: "vervolg", repeat: "herhaald", step: "Stap", start: "Beginsituatie: nog geen pakket uitgewisseld.", play: "Afspelen", pause: "Pauzeren", prev: "Vorige stap", next: "Volgende stap", reset: "Opnieuw beginnen", copy: "Kopiëren", copied: "Gekopieerd ✓", correct: "✓ Juist.", wrong: "✗ Onjuist. Het juiste antwoord is:", choose: "Kies eerst een antwoord.", score: "Score:", crumbs: "Kruimelpad", langs: "Taal", vendors: "Vendors", bitdiag: "RFC-bitdiagram", wstree: "Wireshark-boom", theme: "Donker thema", toc: "Op deze pagina", set: "Ingesteld", notset: "Niet ingesteld" },
+    de: { name: "Name", offset: "Offset", size: "Größe", value: "Wert", filter: "Wireshark-Filter", ref: "Referenz", role: "Funktion", bits: "Bit", bytes: "Byte", hint: "Bewegen Sie den Zeiger über ein Feld oder wählen Sie es aus (Diagramm oder Baum), um Details zu sehen.", cont: "Forts.", repeat: "wiederholt", step: "Schritt", start: "Ausgangszustand: noch kein Paket ausgetauscht.", play: "Abspielen", pause: "Pause", prev: "Vorheriger Schritt", next: "Nächster Schritt", reset: "Neu starten", copy: "Kopieren", copied: "Kopiert ✓", correct: "✓ Richtig.", wrong: "✗ Falsch. Richtig ist:", choose: "Wählen Sie zuerst eine Antwort.", score: "Punkte:", crumbs: "Brotkrumennavigation", langs: "Sprache", vendors: "Hersteller", bitdiag: "RFC-Bitdiagramm", wstree: "Wireshark-Baum", theme: "Dunkles Design", toc: "Auf dieser Seite", set: "Gesetzt", notset: "Nicht gesetzt" }
   };
   var root = document.documentElement;
   function lang() { return LANGS.indexOf(root.lang) < 0 ? "en" : root.lang; }
@@ -494,10 +494,10 @@ window.NPE = (function () {
       if (!f) { panel.innerHTML = '<p class="hint">' + esc(ui("hint")) + "</p>"; return; }
       var d = docs[fid.replace(/\d+$/, "")] || {};
       panel.innerHTML = "<h4>" + esc(f.name) + "</h4><dl>" +
-        "<dt>" + ui("value") + "</dt><dd><code>" + esc(f.value) + "</code> · <code>" + esc(f.hex) + "</code></dd>" +
+        "<dt>" + ui("value") + "</dt><dd><code>" + esc(f.value) + "</code> (<code>" + esc(f.hex) + "</code>)</dd>" +
         "<dt>" + ui("offset") + "</dt><dd>" + f.offset + " " + ui("bits") + " (" + f.offset / 8 + " " + ui("bytes") + ")</dd>" +
-        "<dt>" + ui("size") + "</dt><dd>" + f.bits + " " + ui("bits") + " (" + f.bits / 8 + " " + ui("bytes") + ")" + (f.repeat ? " · " + ui("repeat") : "") + "</dd>" +
-        "<dt>" + ui("role") + "</dt><dd>" + esc(d[lang()] || "—") + "</dd>" +
+        "<dt>" + ui("size") + "</dt><dd>" + f.bits + " " + ui("bits") + " (" + f.bits / 8 + " " + ui("bytes") + ")" + (f.repeat ? ", " + ui("repeat") : "") + "</dd>" +
+        "<dt>" + ui("role") + "</dt><dd>" + esc(d[lang()] || "") + "</dd>" +
         "<dt>" + ui("filter") + "</dt><dd><code>" + esc(f.ws) + "</code></dd>" +
         "<dt>" + ui("ref") + "</dt><dd>" + esc(f.ref) + "</dd></dl>";
     }
@@ -550,7 +550,7 @@ window.NPE = (function () {
         li.classList.toggle("past", k < i - 1);
         if (k === i - 1) li.setAttribute("aria-current", "step"); else li.removeAttribute("aria-current");
       });
-      now.textContent = i === 0 ? ui("start") : ui("step") + " " + i + "/" + n + " — " + visibleText(steps[i - 1].querySelector(".txt"));
+      now.textContent = i === 0 ? ui("start") : ui("step") + " " + i + "/" + n + ". " + visibleText(steps[i - 1].querySelector(".txt"));
       btn.prev.disabled = i === 0; btn.reset.disabled = i === 0; btn.next.disabled = i === n;
       label();
     }
@@ -730,7 +730,7 @@ window.NPE = (function () {
       document.querySelectorAll("button[data-lang]").forEach(function (b) { b.setAttribute("aria-pressed", b.dataset.lang === l ? "true" : "false"); });
       document.querySelectorAll("[data-aria]").forEach(function (n) { n.setAttribute("aria-label", ui(n.dataset.aria)); });
       if (meta) {
-        document.title = meta.title[l] + (meta.kind === "home" ? "" : " · Network Protocols Expert");
+        document.title = meta.title[l] + (meta.kind === "home" ? "" : " | Network Protocols Expert");
         var d = document.querySelector('meta[name="description"]');
         if (d) d.setAttribute("content", meta.description[l]);
       }
@@ -839,8 +839,8 @@ window.NPE = (function () {
 
   <!-- ===== 1. Header ===== -->
   <header class="hero">
-    <p class="eyebrow"><span data-l="fr">Protocole de routage · IGP à état de liens</span><span data-l="en">Routing protocol · link-state IGP</span><span data-l="nl">Routeringsprotocol · link-state-IGP</span><span data-l="de">Routing-Protokoll · Link-State-IGP</span></p>
-    <h1>OSPFv2 <span class="sr-only">— Open Shortest Path First version 2</span></h1>
+    <p class="eyebrow"><span data-l="fr">Protocole de routage, IGP à état de liens</span><span data-l="en">Routing protocol, link-state IGP</span><span data-l="nl">Routeringsprotocol, link-state-IGP</span><span data-l="de">Routing-Protokoll, Link-State-IGP</span></p>
+    <h1>OSPFv2 <span class="sr-only">(Open Shortest Path First version 2)</span></h1>
     <p class="lede">
       <span data-l="fr">Protocole de routage intérieur à état de liens : chaque routeur d'une zone construit la même base topologique et calcule ses routes avec l'algorithme SPF de Dijkstra.</span>
       <span data-l="en">Link-state interior gateway protocol: every router in an area builds the same topology database and computes its routes with Dijkstra's SPF algorithm.</span>
@@ -849,18 +849,18 @@ window.NPE = (function () {
     </p>
     <div class="tpl" data-tpl>
       <strong>TEMPLATE</strong>
-      <span data-l="fr">— contenu de démonstration (OSPFv2 Hello, partiel). Remplacez chaque bloc marqué TEMPLATE ; gardez l'ordre des sections et les quatre langues.</span>
-      <span data-l="en">— demo content (OSPFv2 Hello, partial). Replace every block marked TEMPLATE; keep the section order and the four languages.</span>
-      <span data-l="nl">— democontent (OSPFv2 Hello, gedeeltelijk). Vervang elk blok gemarkeerd met TEMPLATE; behoud de volgorde van de secties en de vier talen.</span>
-      <span data-l="de">— Demo-Inhalt (OSPFv2 Hello, unvollständig). Ersetzen Sie jeden mit TEMPLATE markierten Block; Reihenfolge der Abschnitte und die vier Sprachen beibehalten.</span>
+      <span data-l="fr">Contenu de démonstration (OSPFv2 Hello, partiel). Remplacez chaque bloc marqué TEMPLATE ; gardez l'ordre des sections et les quatre langues.</span>
+      <span data-l="en">Demo content (OSPFv2 Hello, partial). Replace every block marked TEMPLATE; keep the section order and the four languages.</span>
+      <span data-l="nl">Democontent (OSPFv2 Hello, gedeeltelijk). Vervang elk blok gemarkeerd met TEMPLATE; behoud de volgorde van de secties en de vier talen.</span>
+      <span data-l="de">Demo-Inhalt (OSPFv2 Hello, unvollständig). Ersetzen Sie jeden mit TEMPLATE markierten Block; Reihenfolge der Abschnitte und die vier Sprachen beibehalten.</span>
     </div>
     <dl class="facts">
       <div><dt><span data-l="fr">Couche OSI</span><span data-l="en">OSI layer</span><span data-l="nl">OSI-laag</span><span data-l="de">OSI-Schicht</span></dt>
-        <dd><span data-l="fr">3 — réseau</span><span data-l="en">3 — network</span><span data-l="nl">3 — netwerk</span><span data-l="de">3 — Vermittlung</span></dd></div>
+        <dd><span data-l="fr">3 (réseau)</span><span data-l="en">3 (network)</span><span data-l="nl">3 (netwerk)</span><span data-l="de">3 (Vermittlung)</span></dd></div>
       <div><dt><span data-l="fr">Encapsulation</span><span data-l="en">Encapsulation</span><span data-l="nl">Encapsulatie</span><span data-l="de">Kapselung</span></dt>
         <dd>IPv4, protocol 89</dd></div>
       <div><dt><span data-l="fr">Destinations</span><span data-l="en">Destinations</span><span data-l="nl">Bestemmingen</span><span data-l="de">Ziele</span></dt>
-        <dd>224.0.0.5 · 224.0.0.6</dd></div>
+        <dd>224.0.0.5, 224.0.0.6</dd></div>
       <div><dt>Standards</dt>
         <dd><a href="https://www.rfc-editor.org/rfc/rfc2328">RFC 2328</a><a class="ref-link" href="#src-1">[1]</a></dd></div>
     </dl>
@@ -870,10 +870,10 @@ window.NPE = (function () {
   <section class="sec" id="concepts" aria-labelledby="h-concepts">
     <h2 id="h-concepts"><span class="num">1</span><span data-l="fr">Concepts</span><span data-l="en">Concepts</span><span data-l="nl">Concepten</span><span data-l="de">Konzepte</span></h2>
     <div class="tpl" data-tpl><strong>TEMPLATE</strong>
-      <span data-l="fr">— rôle, place dans la pile, terminologie, compromis de conception, versions et différences. Une idée par paragraphe ; une phrase précise vaut mieux qu'un long paragraphe.</span>
-      <span data-l="en">— purpose, place in the stack, terminology, design trade-offs, versions and differences. One idea per paragraph; one precise sentence beats a long paragraph.</span>
-      <span data-l="nl">— doel, plaats in de stack, terminologie, ontwerpafwegingen, versies en verschillen. Eén idee per alinea; één precieze zin is beter dan een lange alinea.</span>
-      <span data-l="de">— Zweck, Einordnung im Stack, Terminologie, Designabwägungen, Versionen und Unterschiede. Ein Gedanke pro Absatz; ein präziser Satz ist besser als ein langer Absatz.</span>
+      <span data-l="fr">Rôle, place dans la pile, terminologie, compromis de conception, versions et différences. Une idée par paragraphe ; une phrase précise vaut mieux qu'un long paragraphe.</span>
+      <span data-l="en">Purpose, place in the stack, terminology, design trade-offs, versions and differences. One idea per paragraph; one precise sentence beats a long paragraph.</span>
+      <span data-l="nl">Doel, plaats in de stack, terminologie, ontwerpafwegingen, versies en verschillen. Eén idee per alinea; één precieze zin is beter dan een lange alinea.</span>
+      <span data-l="de">Zweck, Einordnung im Stack, Terminologie, Designabwägungen, Versionen und Unterschiede. Ein Gedanke pro Absatz; ein präziser Satz ist besser als ein langer Absatz.</span>
     </div>
     <dl class="terms">
       <div><dt>Router ID</dt>
@@ -898,7 +898,7 @@ window.NPE = (function () {
       <ul class="packet-meta" data-ref="RFC 2328 §A.3.2"></ul>
       <figure class="diagram">
         <figcaption>
-          <span class="t"><span data-l="fr">Paquet OSPFv2 Hello — diagramme de bits RFC et arbre Wireshark synchronisés</span><span data-l="en">OSPFv2 Hello packet — synchronised RFC bit diagram and Wireshark tree</span><span data-l="nl">OSPFv2 Hello-pakket — gesynchroniseerd RFC-bitdiagram en Wireshark-boom</span><span data-l="de">OSPFv2-Hello-Paket — synchronisiertes RFC-Bitdiagramm und Wireshark-Baum</span></span>
+          <span class="t"><span data-l="fr">Paquet OSPFv2 Hello : diagramme de bits RFC et arbre Wireshark synchronisés</span><span data-l="en">OSPFv2 Hello packet: synchronised RFC bit diagram and Wireshark tree</span><span data-l="nl">OSPFv2 Hello-pakket: gesynchroniseerd RFC-bitdiagram en Wireshark-boom</span><span data-l="de">OSPFv2-Hello-Paket: synchronisiertes RFC-Bitdiagramm und Wireshark-Baum</span></span>
           <span class="s"><span data-l="fr">Exemple généré par tools/packet-builder.py : R1 (1.1.1.1), zone 0, un voisin (2.2.2.2).</span><span data-l="en">Sample generated by tools/packet-builder.py: R1 (1.1.1.1), area 0, one neighbor (2.2.2.2).</span><span data-l="nl">Voorbeeld gegenereerd door tools/packet-builder.py: R1 (1.1.1.1), area 0, één buur (2.2.2.2).</span><span data-l="de">Beispiel erzeugt mit tools/packet-builder.py: R1 (1.1.1.1), Area 0, ein Nachbar (2.2.2.2).</span></span>
         </figcaption>
         <div class="body">
@@ -959,20 +959,20 @@ window.NPE = (function () {
 
     <figure class="diagram anim" id="anim-2way" aria-labelledby="anim-2way-t">
       <figcaption>
-        <span class="t" id="anim-2way-t"><span data-l="fr">Séquence — de Down à 2-Way entre R1 et R2 (segment broadcast)</span><span data-l="en">Sequence — from Down to 2-Way between R1 and R2 (broadcast segment)</span><span data-l="nl">Sequentie — van Down naar 2-Way tussen R1 en R2 (broadcastsegment)</span><span data-l="de">Ablauf — von Down zu 2-Way zwischen R1 und R2 (Broadcast-Segment)</span></span>
+        <span class="t" id="anim-2way-t"><span data-l="fr">Séquence : de Down à 2-Way entre R1 et R2 (segment broadcast)</span><span data-l="en">Sequence: from Down to 2-Way between R1 and R2 (broadcast segment)</span><span data-l="nl">Sequentie: van Down naar 2-Way tussen R1 en R2 (broadcastsegment)</span><span data-l="de">Ablauf: von Down zu 2-Way zwischen R1 und R2 (Broadcast-Segment)</span></span>
         <span class="s"><span data-l="fr">Machine à états du voisin, RFC 2328 §10.1, §10.3, §10.5. Faites une prédiction avant chaque étape.</span><span data-l="en">Neighbor state machine, RFC 2328 §10.1, §10.3, §10.5. Make a prediction before each step.</span><span data-l="nl">Neighbor state machine, RFC 2328 §10.1, §10.3, §10.5. Maak een voorspelling vóór elke stap.</span><span data-l="de">Nachbar-Zustandsautomat, RFC 2328 §10.1, §10.3, §10.5. Stellen Sie vor jedem Schritt eine Vermutung auf.</span></span>
       </figcaption>
       <div class="body" tabindex="0">
         <svg viewBox="0 0 640 330" role="img" aria-labelledby="anim-2way-t anim-2way-now">
-          <g class="node"><rect x="50" y="12" width="180" height="44" rx="8"/><text x="140" y="40" text-anchor="middle">R1 · 1.1.1.1</text></g>
-          <g class="node"><rect x="410" y="12" width="180" height="44" rx="8"/><text x="500" y="40" text-anchor="middle">R2 · 2.2.2.2</text></g>
+          <g class="node"><rect x="50" y="12" width="180" height="44" rx="8"/><text x="140" y="40" text-anchor="middle">R1 (1.1.1.1)</text></g>
+          <g class="node"><rect x="410" y="12" width="180" height="44" rx="8"/><text x="500" y="40" text-anchor="middle">R2 (2.2.2.2)</text></g>
           <g class="badge s-grey" id="b-r1"><rect x="60" y="64" width="160" height="30" rx="15"/><text x="140" y="84" text-anchor="middle">R2: Down</text></g>
           <g class="badge s-grey" id="b-r2"><rect x="420" y="64" width="160" height="30" rx="15"/><text x="500" y="84" text-anchor="middle">R1: Down</text></g>
           <line class="life" x1="140" y1="100" x2="140" y2="318"/>
           <line class="life" x1="500" y1="100" x2="500" y2="318"/>
-          <g class="msg future" data-step="1"><text class="lbl" x="320" y="140" text-anchor="middle">① Hello · Neighbor: —</text><line x1="146" y1="152" x2="486" y2="152"/><path d="M494 152l-12-6v12z"/></g>
-          <g class="msg future" data-step="2"><text class="lbl" x="320" y="210" text-anchor="middle">② Hello · Neighbor: 1.1.1.1</text><line x1="494" y1="222" x2="154" y2="222"/><path d="M146 222l12-6v12z"/></g>
-          <g class="msg future" data-step="3"><text class="lbl" x="320" y="280" text-anchor="middle">③ Hello · Neighbor: 2.2.2.2</text><line x1="146" y1="292" x2="486" y2="292"/><path d="M494 292l-12-6v12z"/></g>
+          <g class="msg future" data-step="1"><text class="lbl" x="320" y="140" text-anchor="middle">① Hello, Neighbor: ∅</text><line x1="146" y1="152" x2="486" y2="152"/><path d="M494 152l-12-6v12z"/></g>
+          <g class="msg future" data-step="2"><text class="lbl" x="320" y="210" text-anchor="middle">② Hello, Neighbor: 1.1.1.1</text><line x1="494" y1="222" x2="154" y2="222"/><path d="M146 222l12-6v12z"/></g>
+          <g class="msg future" data-step="3"><text class="lbl" x="320" y="280" text-anchor="middle">③ Hello, Neighbor: 2.2.2.2</text><line x1="146" y1="292" x2="486" y2="292"/><path d="M494 292l-12-6v12z"/></g>
         </svg>
       </div>
       <div class="anim-controls">
@@ -994,7 +994,7 @@ window.NPE = (function () {
         <div><dt><svg width="28" height="10" aria-hidden="true" opacity=".2"><line x1="0" y1="5" x2="28" y2="5" stroke="var(--blue)" stroke-width="2"/></svg></dt><dd><span data-l="fr">Message pas encore envoyé (estompé)</span><span data-l="en">Message not sent yet (faded)</span><span data-l="nl">Bericht nog niet verzonden (vervaagd)</span><span data-l="de">Nachricht noch nicht gesendet (blass)</span></dd></div>
         <div><dt><span class="sw" style="background:var(--grey-bg);border-color:var(--grey);border-radius:99px"></span></dt><dd><span data-l="fr">État du voisin vu par ce routeur : Down</span><span data-l="en">Neighbor state as seen by this router: Down</span><span data-l="nl">Status van de buur volgens deze router: Down</span><span data-l="de">Nachbarzustand aus Sicht dieses Routers: Down</span></dd></div>
         <div><dt><span class="sw" style="background:var(--blue-bg);border-color:var(--blue);border-radius:99px"></span></dt><dd>Init</dd></div>
-        <div><dt><span class="sw" style="background:var(--green-bg);border-color:var(--green);border-radius:99px"></span></dt><dd><span data-l="fr">2-Way ✓ (l'adjacence éventuelle — ExStart — est décidée ensuite, §10.4)</span><span data-l="en">2-Way ✓ (whether to form an adjacency — ExStart — is decided next, §10.4)</span><span data-l="nl">2-Way ✓ (of er een adjacency — ExStart — komt, wordt daarna beslist, §10.4)</span><span data-l="de">2-Way ✓ (ob eine Adjacency — ExStart — entsteht, wird danach entschieden, §10.4)</span></dd></div>
+        <div><dt><span class="sw" style="background:var(--green-bg);border-color:var(--green);border-radius:99px"></span></dt><dd><span data-l="fr">2-Way ✓ (l'adjacence éventuelle, ExStart, est décidée ensuite, §10.4)</span><span data-l="en">2-Way ✓ (whether to form an adjacency, ExStart, is decided next, §10.4)</span><span data-l="nl">2-Way ✓ (of er een adjacency, ExStart, komt, wordt daarna beslist, §10.4)</span><span data-l="de">2-Way ✓ (ob eine Adjacency, ExStart, entsteht, wird danach entschieden, §10.4)</span></dd></div>
       </dl>
     </figure>
     <script>NPE.animation("anim-2way");</script>
@@ -1016,20 +1016,20 @@ window.NPE = (function () {
     <details open>
       <summary><h2 id="h-advanced"><span class="num">4</span><span data-l="fr">Comportement avancé</span><span data-l="en">Advanced behaviour</span><span data-l="nl">Geavanceerd gedrag</span><span data-l="de">Fortgeschrittenes Verhalten</span></h2></summary>
       <div class="tpl" data-tpl><strong>TEMPLATE</strong>
-        <span data-l="fr">— cas limites, interopérabilité, limites d'échelle, sécurité (attaques et protections), réglages, convergence, ambiguïtés des RFC. Utilisez les encadrés ci-dessous.</span>
-        <span data-l="en">— edge cases, interoperability, scaling limits, security (attacks and protections), tuning, convergence, RFC ambiguities. Use the callouts below.</span>
-        <span data-l="nl">— randgevallen, interoperabiliteit, schaalgrenzen, beveiliging (aanvallen en bescherming), tuning, convergentie, dubbelzinnigheden in RFC's. Gebruik de kaders hieronder.</span>
-        <span data-l="de">— Grenzfälle, Interoperabilität, Skalierungsgrenzen, Sicherheit (Angriffe und Schutz), Tuning, Konvergenz, Mehrdeutigkeiten der RFCs. Verwenden Sie die Hinweisboxen unten.</span>
+        <span data-l="fr">Cas limites, interopérabilité, limites d'échelle, sécurité (attaques et protections), réglages, convergence, ambiguïtés des RFC. Utilisez les encadrés ci-dessous.</span>
+        <span data-l="en">Edge cases, interoperability, scaling limits, security (attacks and protections), tuning, convergence, RFC ambiguities. Use the callouts below.</span>
+        <span data-l="nl">Randgevallen, interoperabiliteit, schaalgrenzen, beveiliging (aanvallen en bescherming), tuning, convergentie, dubbelzinnigheden in RFC's. Gebruik de kaders hieronder.</span>
+        <span data-l="de">Grenzfälle, Interoperabilität, Skalierungsgrenzen, Sicherheit (Angriffe und Schutz), Tuning, Konvergenz, Mehrdeutigkeiten der RFCs. Verwenden Sie die Hinweisboxen unten.</span>
       </div>
       <div class="callout note"><svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9.5"/><path d="M12 11v6M12 7.5v.5" stroke-linecap="round"/></svg>
         <div><span class="label"><span data-l="fr">À retenir</span><span data-l="en">Key point</span><span data-l="nl">Kernpunt</span><span data-l="de">Merke</span></span>
           <p><span data-l="fr">HelloInterval et RouterDeadInterval doivent être identiques des deux côtés, sinon le Hello est rejeté.</span><span data-l="en">HelloInterval and RouterDeadInterval must match on both sides, otherwise the Hello is rejected.</span><span data-l="nl">HelloInterval en RouterDeadInterval moeten aan beide kanten gelijk zijn, anders wordt de Hello verworpen.</span><span data-l="de">HelloInterval und RouterDeadInterval müssen auf beiden Seiten übereinstimmen, sonst wird das Hello verworfen.</span><a class="ref-link" href="#src-1">[1]</a></p></div></div>
       <div class="callout warn"><svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M12 3 2 20h20z"/><path d="M12 10v4M12 17v.5" stroke-linecap="round"/></svg>
         <div><span class="label"><span data-l="fr">Sécurité</span><span data-l="en">Security</span><span data-l="nl">Beveiliging</span><span data-l="de">Sicherheit</span></span>
-          <p><span data-l="fr">TEMPLATE — attaque, impact, protection, avec référence.</span><span data-l="en">TEMPLATE — attack, impact, protection, with a reference.</span><span data-l="nl">TEMPLATE — aanval, impact, bescherming, met referentie.</span><span data-l="de">TEMPLATE — Angriff, Auswirkung, Schutz, mit Referenz.</span></p></div></div>
+          <p><span data-l="fr">TEMPLATE Attaque, impact, protection, avec référence.</span><span data-l="en">TEMPLATE Attack, impact, protection, with a reference.</span><span data-l="nl">TEMPLATE Aanval, impact, bescherming, met referentie.</span><span data-l="de">TEMPLATE Angriff, Auswirkung, Schutz, mit Referenz.</span></p></div></div>
       <div class="callout vendor"><svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 7h16M4 12h10M4 17h13" stroke-linecap="round"/></svg>
         <div><span class="label"><span data-l="fr">Écart vendeur / RFC</span><span data-l="en">Vendor deviation from the RFC</span><span data-l="nl">Afwijking van de vendor t.o.v. de RFC</span><span data-l="de">Herstellerabweichung vom RFC</span></span>
-          <p><span data-l="fr">TEMPLATE — comportement RFC, comportement vendeur, lequel s'applique, sources des deux.</span><span data-l="en">TEMPLATE — RFC behaviour, vendor behaviour, which one applies, sources for both.</span><span data-l="nl">TEMPLATE — gedrag volgens de RFC, gedrag van de vendor, welk van toepassing is, bronnen voor beide.</span><span data-l="de">TEMPLATE — Verhalten laut RFC, Verhalten des Herstellers, was gilt, Quellen für beides.</span></p></div></div>
+          <p><span data-l="fr">TEMPLATE Comportement RFC, comportement vendeur, lequel s'applique, sources des deux.</span><span data-l="en">TEMPLATE RFC behaviour, vendor behaviour, which one applies, sources for both.</span><span data-l="nl">TEMPLATE Gedrag volgens de RFC, gedrag van de vendor, welk van toepassing is, bronnen voor beide.</span><span data-l="de">TEMPLATE Verhalten laut RFC, Verhalten des Herstellers, was gilt, Quellen für beides.</span></p></div></div>
     </details>
   </section>
 
@@ -1052,13 +1052,13 @@ window.NPE = (function () {
             <div class="cmd-head"><span data-l="fr">Configuration</span><span data-l="en">Configuration</span><span data-l="nl">Configuratie</span><span data-l="de">Konfiguration</span><span class="ver">IOS XE ⟨version⟩</span>
               <button type="button" class="copy"><span data-l="fr">Copier</span><span data-l="en">Copy</span><span data-l="nl">Kopiëren</span><span data-l="de">Kopieren</span><span class="copied sr-only" aria-live="polite"></span></button></div>
             <pre tabindex="0"><code>⟨TEMPLATE: configuration copied from the cited vendor document⟩</code></pre>
-            <p class="src"><span data-l="fr">Source</span><span data-l="en">Source</span><span data-l="nl">Bron</span><span data-l="de">Quelle</span> : ⟨document title · version · section · URL⟩</p>
+            <p class="src"><span data-l="fr">Source :</span><span data-l="en">Source:</span><span data-l="nl">Bron:</span><span data-l="de">Quelle:</span> ⟨document title, version, section, URL⟩</p>
           </div>
           <div class="cmd">
             <div class="cmd-head"><span data-l="fr">Vérification</span><span data-l="en">Verification</span><span data-l="nl">Verificatie</span><span data-l="de">Verifikation</span><span class="ver">IOS XE ⟨version⟩</span>
               <button type="button" class="copy"><span data-l="fr">Copier</span><span data-l="en">Copy</span><span data-l="nl">Kopiëren</span><span data-l="de">Kopieren</span><span class="copied sr-only" aria-live="polite"></span></button></div>
             <pre tabindex="0"><code>⟨TEMPLATE: verification command + expected output⟩</code></pre>
-            <p class="src"><span data-l="fr">Source</span><span data-l="en">Source</span><span data-l="nl">Bron</span><span data-l="de">Quelle</span> : ⟨document title · version · section · URL⟩</p>
+            <p class="src"><span data-l="fr">Source :</span><span data-l="en">Source:</span><span data-l="nl">Bron:</span><span data-l="de">Quelle:</span> ⟨document title, version, section, URL⟩</p>
           </div>
           <div class="callout warn"><svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M12 3 2 20h20z"/><path d="M12 10v4M12 17v.5" stroke-linecap="round"/></svg>
             <div><span class="label"><span data-l="fr">Debug en production</span><span data-l="en">Debug in production</span><span data-l="nl">Debug in productie</span><span data-l="de">Debug im Produktivbetrieb</span></span>
@@ -1067,14 +1067,14 @@ window.NPE = (function () {
             <div class="cmd-head">Debug<span class="ver">IOS XE ⟨version⟩</span>
               <button type="button" class="copy"><span data-l="fr">Copier</span><span data-l="en">Copy</span><span data-l="nl">Kopiëren</span><span data-l="de">Kopieren</span><span class="copied sr-only" aria-live="polite"></span></button></div>
             <pre tabindex="0"><code>⟨TEMPLATE: debug command⟩</code></pre>
-            <p class="src"><span data-l="fr">Source</span><span data-l="en">Source</span><span data-l="nl">Bron</span><span data-l="de">Quelle</span> : ⟨document title · version · section · URL⟩</p>
+            <p class="src"><span data-l="fr">Source :</span><span data-l="en">Source:</span><span data-l="nl">Bron:</span><span data-l="de">Quelle:</span> ⟨document title, version, section, URL⟩</p>
           </div>
         </div>
-        <div role="tabpanel" id="p-checkpoint" aria-labelledby="t-checkpoint" tabindex="0" hidden><h3 class="sr-only">Check Point</h3><p class="tpl" data-tpl><strong>TEMPLATE</strong> <span data-l="fr">— même structure que Cisco (Gaia clish, mode expert).</span><span data-l="en">— same structure as Cisco (Gaia clish, expert mode).</span><span data-l="nl">— zelfde structuur als Cisco (Gaia clish, expertmodus).</span><span data-l="de">— gleicher Aufbau wie bei Cisco (Gaia clish, Expert-Modus).</span></p></div>
-        <div role="tabpanel" id="p-f5" aria-labelledby="t-f5" tabindex="0" hidden><h3 class="sr-only">F5 BIG-IP</h3><p class="tpl" data-tpl><strong>TEMPLATE</strong> <span data-l="fr">— TMOS tmsh ; ZebOS imish pour le routage dynamique.</span><span data-l="en">— TMOS tmsh; ZebOS imish for dynamic routing.</span><span data-l="nl">— TMOS tmsh; ZebOS imish voor dynamische routering.</span><span data-l="de">— TMOS tmsh; ZebOS imish für dynamisches Routing.</span></p></div>
-        <div role="tabpanel" id="p-paloalto" aria-labelledby="t-paloalto" tabindex="0" hidden><h3 class="sr-only">Palo Alto</h3><p class="tpl" data-tpl><strong>TEMPLATE</strong> <span data-l="fr">— PAN-OS : commandes set et commandes opérationnelles.</span><span data-l="en">— PAN-OS: set commands and operational commands.</span><span data-l="nl">— PAN-OS: set-commando's en operationele commando's.</span><span data-l="de">— PAN-OS: set-Befehle und operative Befehle.</span></p></div>
-        <div role="tabpanel" id="p-netscaler" aria-labelledby="t-netscaler" tabindex="0" hidden><h3 class="sr-only">NetScaler</h3><p class="tpl" data-tpl><strong>TEMPLATE</strong> <span data-l="fr">— CLI NetScaler ; ZebOS VTYSH pour le routage dynamique.</span><span data-l="en">— NetScaler CLI; ZebOS VTYSH for dynamic routing.</span><span data-l="nl">— NetScaler-CLI; ZebOS VTYSH voor dynamische routering.</span><span data-l="de">— NetScaler-CLI; ZebOS VTYSH für dynamisches Routing.</span></p></div>
-        <div role="tabpanel" id="p-fortigate" aria-labelledby="t-fortigate" tabindex="0" hidden><h3 class="sr-only">FortiGate</h3><p class="tpl" data-tpl><strong>TEMPLATE</strong> <span data-l="fr">— CLI FortiOS.</span><span data-l="en">— FortiOS CLI.</span><span data-l="nl">— FortiOS-CLI.</span><span data-l="de">— FortiOS-CLI.</span></p></div>
+        <div role="tabpanel" id="p-checkpoint" aria-labelledby="t-checkpoint" tabindex="0" hidden><h3 class="sr-only">Check Point</h3><p class="tpl" data-tpl><strong>TEMPLATE</strong> <span data-l="fr">Même structure que Cisco (Gaia clish, mode expert).</span><span data-l="en">Same structure as Cisco (Gaia clish, expert mode).</span><span data-l="nl">Zelfde structuur als Cisco (Gaia clish, expertmodus).</span><span data-l="de">Gleicher Aufbau wie bei Cisco (Gaia clish, Expert-Modus).</span></p></div>
+        <div role="tabpanel" id="p-f5" aria-labelledby="t-f5" tabindex="0" hidden><h3 class="sr-only">F5 BIG-IP</h3><p class="tpl" data-tpl><strong>TEMPLATE</strong> <span data-l="fr">TMOS tmsh ; ZebOS imish pour le routage dynamique.</span><span data-l="en">TMOS tmsh; ZebOS imish for dynamic routing.</span><span data-l="nl">TMOS tmsh; ZebOS imish voor dynamische routering.</span><span data-l="de">TMOS tmsh; ZebOS imish für dynamisches Routing.</span></p></div>
+        <div role="tabpanel" id="p-paloalto" aria-labelledby="t-paloalto" tabindex="0" hidden><h3 class="sr-only">Palo Alto</h3><p class="tpl" data-tpl><strong>TEMPLATE</strong> <span data-l="fr">PAN-OS : commandes set et commandes opérationnelles.</span><span data-l="en">PAN-OS: set commands and operational commands.</span><span data-l="nl">PAN-OS: set-commando's en operationele commando's.</span><span data-l="de">PAN-OS: set-Befehle und operative Befehle.</span></p></div>
+        <div role="tabpanel" id="p-netscaler" aria-labelledby="t-netscaler" tabindex="0" hidden><h3 class="sr-only">NetScaler</h3><p class="tpl" data-tpl><strong>TEMPLATE</strong> <span data-l="fr">CLI NetScaler ; ZebOS VTYSH pour le routage dynamique.</span><span data-l="en">NetScaler CLI; ZebOS VTYSH for dynamic routing.</span><span data-l="nl">NetScaler-CLI; ZebOS VTYSH voor dynamische routering.</span><span data-l="de">NetScaler-CLI; ZebOS VTYSH für dynamisches Routing.</span></p></div>
+        <div role="tabpanel" id="p-fortigate" aria-labelledby="t-fortigate" tabindex="0" hidden><h3 class="sr-only">FortiGate</h3><p class="tpl" data-tpl><strong>TEMPLATE</strong> <span data-l="fr">CLI FortiOS.</span><span data-l="en">FortiOS CLI.</span><span data-l="nl">FortiOS-CLI.</span><span data-l="de">FortiOS-CLI.</span></p></div>
       </div>
       <noscript><style>[role="tabpanel"][hidden] { display: block; }</style></noscript>
       <script>NPE.tabs("vendor-tabs");</script>
@@ -1091,7 +1091,7 @@ window.NPE = (function () {
           <ul class="ans"><li><a class="yes" href="#dt-2">✓ <span data-l="fr">Oui → Q2</span><span data-l="en">Yes → Q2</span><span data-l="nl">Ja → Q2</span><span data-l="de">Ja → Q2</span></a></li><li><a class="no" href="#dt-3">✗ <span data-l="fr">Non → Q3</span><span data-l="en">No → Q3</span><span data-l="nl">Nee → Q3</span><span data-l="de">Nein → Q3</span></a></li></ul></li>
         <li id="dt-2"><p class="q"><span class="id">Q2</span><span data-l="fr">Un côté reste-t-il en Init ? Son Router ID manque dans le Hello reçu (1-WayReceived, RFC 2328 §10.5) : cherchez un filtrage multicast dans un seul sens.</span><span data-l="en">Does one side stay in Init? Its Router ID is missing from the Hello it receives (1-WayReceived, RFC 2328 §10.5): look for multicast filtering in one direction.</span><span data-l="nl">Blijft één kant in Init? Zijn Router ID ontbreekt in de ontvangen Hello (1-WayReceived, RFC 2328 §10.5): zoek naar multicastfiltering in één richting.</span><span data-l="de">Bleibt eine Seite in Init? Ihre Router ID fehlt im empfangenen Hello (1-WayReceived, RFC 2328 §10.5): Suchen Sie nach Multicast-Filterung in einer Richtung.</span></p></li>
         <li id="dt-3" class="leaf"><p class="q"><span class="id">Q3</span><span data-l="fr">Vérifiez la couche 2, les ACL et la concordance de HelloInterval, RouterDeadInterval, masque et zone.</span><span data-l="en">Check layer 2, ACLs and that HelloInterval, RouterDeadInterval, mask and area match.</span><span data-l="nl">Controleer laag 2, ACL's en of HelloInterval, RouterDeadInterval, masker en area overeenkomen.</span><span data-l="de">Prüfen Sie Schicht 2, ACLs und ob HelloInterval, RouterDeadInterval, Maske und Area übereinstimmen.</span></p>
-          <p class="tpl" data-tpl><strong>TEMPLATE</strong> <span data-l="fr">— commandes de vérification par vendeur, avec source.</span><span data-l="en">— verification commands per vendor, with source.</span><span data-l="nl">— verificatiecommando's per vendor, met bron.</span><span data-l="de">— Verifikationsbefehle je Hersteller, mit Quelle.</span></p></li>
+          <p class="tpl" data-tpl><strong>TEMPLATE</strong> <span data-l="fr">Commandes de vérification par vendeur, avec source.</span><span data-l="en">Verification commands per vendor, with source.</span><span data-l="nl">Verificatiecommando's per vendor, met bron.</span><span data-l="de">Verifikationsbefehle je Hersteller, mit Quelle.</span></p></li>
       </ol>
       <div class="table-wrap" tabindex="0">
         <table>
@@ -1117,7 +1117,7 @@ window.NPE = (function () {
   <section class="sec" id="quiz" aria-labelledby="h-quiz">
     <details open>
       <summary><h2 id="h-quiz"><span class="num">7</span>Quiz</h2></summary>
-      <p class="tpl" data-tpl><strong>TEMPLATE</strong> <span data-l="fr">— au moins 15 questions niveau CCIE (scénario, lecture de paquet, « que se passe-t-il si… »), chacune avec explication et référence.</span><span data-l="en">— at least 15 CCIE-level questions (scenario, packet reading, "what breaks if…"), each with an explanation and a reference.</span><span data-l="nl">— minstens 15 vragen op CCIE-niveau (scenario, pakket lezen, „wat gaat er mis als…"), elk met uitleg en referentie.</span><span data-l="de">— mindestens 15 Fragen auf CCIE-Niveau (Szenario, Paket lesen, „was passiert, wenn…"), jeweils mit Erklärung und Referenz.</span></p>
+      <p class="tpl" data-tpl><strong>TEMPLATE</strong> <span data-l="fr">Au moins 15 questions niveau CCIE (scénario, lecture de paquet, « que se passe-t-il si… »), chacune avec explication et référence.</span><span data-l="en">At least 15 CCIE-level questions (scenario, packet reading, "what breaks if…"), each with an explanation and a reference.</span><span data-l="nl">Minstens 15 vragen op CCIE-niveau (scenario, pakket lezen, „wat gaat er mis als…"), elk met uitleg en referentie.</span><span data-l="de">Mindestens 15 Fragen auf CCIE-Niveau (Szenario, Paket lesen, „was passiert, wenn…"), jeweils mit Erklärung und Referenz.</span></p>
       <form id="quiz-form" novalidate>
         <fieldset class="quiz-q" data-answer="c">
           <legend>1. <span data-l="fr">R1 (1.1.1.1) reçoit de R2 un Hello dont le champ Neighbor contient 1.1.1.1. Quel événement R1 exécute-t-il pour R2 ?</span><span data-l="en">R1 (1.1.1.1) receives a Hello from R2 whose Neighbor field contains 1.1.1.1. Which event does R1 execute for R2?</span><span data-l="nl">R1 (1.1.1.1) ontvangt van R2 een Hello waarvan het Neighbor-veld 1.1.1.1 bevat. Welk event voert R1 uit voor R2?</span><span data-l="de">R1 (1.1.1.1) empfängt von R2 ein Hello, dessen Feld Neighbor 1.1.1.1 enthält. Welches Ereignis führt R1 für R2 aus?</span></legend>
@@ -1144,9 +1144,9 @@ window.NPE = (function () {
   <section class="sec" id="sources" aria-labelledby="h-sources">
     <h2 id="h-sources"><span class="num">8</span><span data-l="fr">Sources</span><span data-l="en">Sources</span><span data-l="nl">Bronnen</span><span data-l="de">Quellen</span></h2>
     <ol class="sources">
-      <li id="src-1"><cite>RFC 2328 — OSPF Version 2</cite>, J. Moy, IETF, April 1998 — §A.2, §A.3.1, §A.3.2, §10.1–§10.5, §C.3, §D.4. <a href="https://www.rfc-editor.org/rfc/rfc2328">https://www.rfc-editor.org/rfc/rfc2328</a></li>
-      <li id="src-2"><cite>IANA — Open Shortest Path First v2 (OSPFv2) Parameters</cite>, registry "OSPFv2 Options". <a href="https://www.iana.org/assignments/ospfv2-parameters/ospfv2-parameters.xhtml">https://www.iana.org/assignments/ospfv2-parameters/ospfv2-parameters.xhtml</a></li>
-      <li id="src-3"><cite>Wireshark — Display Filter Reference: Open Shortest Path First</cite>. <a href="https://www.wireshark.org/docs/dfref/o/ospf.html">https://www.wireshark.org/docs/dfref/o/ospf.html</a></li>
+      <li id="src-1"><cite>RFC 2328, OSPF Version 2</cite>, J. Moy, IETF, April 1998: §A.2, §A.3.1, §A.3.2, §10.1 to §10.5, §C.3, §D.4. <a href="https://www.rfc-editor.org/rfc/rfc2328">https://www.rfc-editor.org/rfc/rfc2328</a></li>
+      <li id="src-2"><cite>IANA, Open Shortest Path First v2 (OSPFv2) Parameters</cite>, registry "OSPFv2 Options". <a href="https://www.iana.org/assignments/ospfv2-parameters/ospfv2-parameters.xhtml">https://www.iana.org/assignments/ospfv2-parameters/ospfv2-parameters.xhtml</a></li>
+      <li id="src-3"><cite>Wireshark, Display Filter Reference: Open Shortest Path First</cite>. <a href="https://www.wireshark.org/docs/dfref/o/ospf.html">https://www.wireshark.org/docs/dfref/o/ospf.html</a></li>
     </ol>
   </section>
 </main>
