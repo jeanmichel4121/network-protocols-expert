@@ -113,7 +113,7 @@ button { font: inherit; color: inherit; }
 .nav-link { display: inline-flex; align-items: center; white-space: nowrap; min-height: 2.25rem; padding: 0 0.75rem; border-radius: 999px; color: var(--fg); text-decoration: none; font-size: 0.9rem; font-weight: 600; }
 .nav-link:hover { background: var(--surface-2); }
 /* Small screens: the brand name is hidden visually only — it stays the link's accessible name. */
-@media (max-width: 30rem) { .brand span { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; } .nav-link { padding: 0 0.4rem; } }
+@media (max-width: 30rem) { .site-header .brand span { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; } .nav-link { padding: 0 0.4rem; } }
 
 /* ===== Layout ========================================================= */
 .layout { max-width: 84rem; margin-inline: auto; padding: 0 clamp(1rem, 3vw, 2rem) 4rem; display: grid; gap: 2rem; }
@@ -335,8 +335,30 @@ th { background: var(--surface-2); font-weight: 650; white-space: nowrap; }
 .sources li { margin-bottom: 0.5rem; overflow-wrap: anywhere; }
 .sources cite { font-style: normal; font-weight: 600; }
 .ref-link { display: inline-block; min-width: 24px; min-height: 24px; line-height: 24px; text-align: center; font-size: 0.75em; font-weight: 600; text-decoration: none; vertical-align: middle; margin-left: 0.15em; }
-.site-footer { border-top: 1px solid var(--line); color: var(--muted); font-size: 0.875rem; }
-.site-footer .bar { max-width: 84rem; margin-inline: auto; padding: 1.5rem clamp(1rem, 3vw, 2rem); display: flex; flex-wrap: wrap; gap: 0.5rem 1.5rem; justify-content: space-between; }
+.site-footer {
+  --f-bg: #0f1d33; --f-fg: #c3cede; --f-hi: #ffffff; --f-line: #2a3a55;
+  margin-top: 1.5rem; background: var(--f-bg); color: var(--f-fg); font-size: 0.9375rem;
+  background-image: radial-gradient(ellipse 60% 120% at 100% 0%, #1e3a66 0%, transparent 70%);
+}
+.site-footer .cols {
+  max-width: 84rem; margin-inline: auto; padding: 3.5rem clamp(1rem, 3vw, 2rem) 2.5rem;
+  display: grid; gap: 2.5rem 2rem; grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr));
+}
+@media (min-width: 64rem) { .site-footer .cols { grid-template-columns: 1.6fr 1fr 1.3fr 1fr; } }
+.site-footer .brand { color: var(--f-hi); margin: 0 0 0.9rem; }
+.site-footer p { margin: 0 0 0.6rem; max-width: 36ch; }
+.site-footer .f-note { font-size: 0.8125rem; }
+.site-footer h2 { font-size: 0.9375rem; color: var(--f-hi); margin: 0.3rem 0 0.9rem; letter-spacing: 0; }
+.site-footer ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.35rem; }
+.site-footer li { min-height: 24px; }
+.site-footer a { color: var(--f-fg); text-decoration: none; }
+.site-footer a:hover { color: var(--f-hi); text-decoration: underline; text-underline-offset: 3px; }
+.site-footer a:focus-visible { outline-color: var(--f-hi); }
+.site-footer .bar {
+  max-width: 84rem; margin-inline: auto; padding: 1.25rem clamp(1rem, 3vw, 2rem) 1.75rem; border-top: 1px solid var(--f-line);
+  display: flex; flex-wrap: wrap; gap: 0.5rem 1.5rem; justify-content: space-between; font-size: 0.8125rem;
+}
+.site-footer code { background: none; padding: 0; color: var(--f-hi); }
 
 /* ===== Motion & print ================================================= */
 @media (prefers-reduced-motion: reduce) {
@@ -353,6 +375,8 @@ th { background: var(--surface-2); font-weight: 650; white-space: nowrap; }
   .sources a[href^="http"]::after { content: " <" attr(href) ">"; font-size: 0.85em; word-break: break-all; }
   .anim .msg.future { opacity: 1; }
   .scroll-x, .table-wrap, .wstree, .hexdump, .cmd pre { overflow: visible; }
+  .site-footer { background: none; color: inherit; margin-top: 2rem; border-top: 1px solid #999; }
+  .site-footer .cols nav { display: none; }
   a { color: inherit; }
 }
 </style>
@@ -481,12 +505,21 @@ th { background: var(--surface-2); font-weight: 650; white-space: nowrap; }
 
 /* About band */
 .about-band {
-  display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 1.5rem;
-  padding: clamp(1.5rem, 4vw, 2.5rem); border-radius: 20px; border: 1px solid var(--line);
-  background: linear-gradient(135deg, var(--blue-bg), var(--surface) 60%);
+  position: relative; overflow: hidden; isolation: isolate; text-align: center;
+  padding: clamp(2.5rem, 7vw, 4.5rem) clamp(1.25rem, 5vw, 3rem); border-radius: 24px; color: #fff;
+  background: linear-gradient(135deg, #1a5fb4 0%, #2a4fa8 45%, #4a3596 100%);
+  box-shadow: 0 40px 80px -40px rgba(26, 95, 180, 0.6);
 }
-.about-band h2 { font-size: clamp(1.4rem, 1.2rem + 0.8vw, 1.9rem); margin-bottom: 0.5rem; }
-.about-band p { margin: 0; color: var(--muted); max-width: 60ch; }
+.about-band::before {
+  content: ""; position: absolute; inset: 0; z-index: -1;
+  background-image: radial-gradient(rgba(255, 255, 255, 0.16) 1px, transparent 1.2px); background-size: 22px 22px;
+  -webkit-mask-image: radial-gradient(ellipse 60% 80% at 50% 50%, #000 10%, transparent 80%);
+  mask-image: radial-gradient(ellipse 60% 80% at 50% 50%, #000 10%, transparent 80%);
+}
+.about-band h2 { font-size: clamp(1.75rem, 1.3rem + 2vw, 2.75rem); letter-spacing: -0.02em; margin: 0 auto 0.75rem; max-width: 22ch; color: #fff; }
+.about-band p { margin: 0 auto 2rem; max-width: 58ch; color: #e4ebf7; font-size: 1.0625rem; }
+.about-band .cta.primary { background: #fff; border-color: #fff; color: #1a4f96; box-shadow: 0 12px 30px -12px rgba(0, 0, 0, 0.45); }
+.about-band .cta:focus-visible { outline-color: #fff; }
 </style>
 <script>
 /* ===== Page library (functions only; called inline after each component) ===== */
@@ -494,10 +527,10 @@ window.NPE = (function () {
   "use strict";
   var LANGS = ["fr", "en", "nl", "de"];
   var UI = {
-    fr: { name: "Nom", offset: "Offset", size: "Taille", value: "Valeur", filter: "Filtre Wireshark", ref: "Référence", role: "Rôle", bits: "bits", bytes: "octets", hint: "Survolez ou sélectionnez un champ (diagramme ou arbre) pour afficher son détail.", cont: "suite", repeat: "répété", step: "Étape", start: "État initial : aucun paquet échangé.", play: "Lecture", pause: "Pause", prev: "Étape précédente", next: "Étape suivante", reset: "Recommencer", copy: "Copier", copied: "Copié ✓", correct: "✓ Correct.", wrong: "✗ Incorrect. La bonne réponse est :", choose: "Choisissez d'abord une réponse.", score: "Score :", crumbs: "Fil d'Ariane", langs: "Langue", vendors: "Vendeurs", bitdiag: "Diagramme de bits RFC", wstree: "Arbre Wireshark", theme: "Thème sombre", toc: "Sur cette page", set: "Activé", notset: "Non activé" },
-    en: { name: "Name", offset: "Offset", size: "Size", value: "Value", filter: "Wireshark filter", ref: "Reference", role: "Role", bits: "bits", bytes: "bytes", hint: "Hover or select a field (diagram or tree) to see its details.", cont: "cont.", repeat: "repeated", step: "Step", start: "Initial state: no packet exchanged yet.", play: "Play", pause: "Pause", prev: "Previous step", next: "Next step", reset: "Restart", copy: "Copy", copied: "Copied ✓", correct: "✓ Correct.", wrong: "✗ Incorrect. The correct answer is:", choose: "Choose an answer first.", score: "Score:", crumbs: "Breadcrumb", langs: "Language", vendors: "Vendors", bitdiag: "RFC bit diagram", wstree: "Wireshark tree", theme: "Dark theme", toc: "On this page", set: "Set", notset: "Not set" },
-    nl: { name: "Naam", offset: "Offset", size: "Grootte", value: "Waarde", filter: "Wireshark-filter", ref: "Referentie", role: "Rol", bits: "bits", bytes: "bytes", hint: "Beweeg over een veld of selecteer het (diagram of boom) om de details te zien.", cont: "vervolg", repeat: "herhaald", step: "Stap", start: "Beginsituatie: nog geen pakket uitgewisseld.", play: "Afspelen", pause: "Pauzeren", prev: "Vorige stap", next: "Volgende stap", reset: "Opnieuw beginnen", copy: "Kopiëren", copied: "Gekopieerd ✓", correct: "✓ Juist.", wrong: "✗ Onjuist. Het juiste antwoord is:", choose: "Kies eerst een antwoord.", score: "Score:", crumbs: "Kruimelpad", langs: "Taal", vendors: "Vendors", bitdiag: "RFC-bitdiagram", wstree: "Wireshark-boom", theme: "Donker thema", toc: "Op deze pagina", set: "Ingesteld", notset: "Niet ingesteld" },
-    de: { name: "Name", offset: "Offset", size: "Größe", value: "Wert", filter: "Wireshark-Filter", ref: "Referenz", role: "Funktion", bits: "Bit", bytes: "Byte", hint: "Bewegen Sie den Zeiger über ein Feld oder wählen Sie es aus (Diagramm oder Baum), um Details zu sehen.", cont: "Forts.", repeat: "wiederholt", step: "Schritt", start: "Ausgangszustand: noch kein Paket ausgetauscht.", play: "Abspielen", pause: "Pause", prev: "Vorheriger Schritt", next: "Nächster Schritt", reset: "Neu starten", copy: "Kopieren", copied: "Kopiert ✓", correct: "✓ Richtig.", wrong: "✗ Falsch. Richtig ist:", choose: "Wählen Sie zuerst eine Antwort.", score: "Punkte:", crumbs: "Brotkrumennavigation", langs: "Sprache", vendors: "Hersteller", bitdiag: "RFC-Bitdiagramm", wstree: "Wireshark-Baum", theme: "Dunkles Design", toc: "Auf dieser Seite", set: "Gesetzt", notset: "Nicht gesetzt" }
+    fr: { name: "Nom", offset: "Offset", size: "Taille", value: "Valeur", filter: "Filtre Wireshark", ref: "Référence", role: "Rôle", bits: "bits", bytes: "octets", hint: "Survolez ou sélectionnez un champ (diagramme ou arbre) pour afficher son détail.", cont: "suite", repeat: "répété", step: "Étape", start: "État initial : aucun paquet échangé.", play: "Lecture", pause: "Pause", prev: "Étape précédente", next: "Étape suivante", reset: "Recommencer", copy: "Copier", copied: "Copié ✓", correct: "✓ Correct.", wrong: "✗ Incorrect. La bonne réponse est :", choose: "Choisissez d'abord une réponse.", score: "Score :", crumbs: "Fil d'Ariane", langs: "Langue", vendors: "Vendeurs", bitdiag: "Diagramme de bits RFC", wstree: "Arbre Wireshark", theme: "Thème sombre", toc: "Sur cette page", footnav: "Navigation du pied de page", set: "Activé", notset: "Non activé" },
+    en: { name: "Name", offset: "Offset", size: "Size", value: "Value", filter: "Wireshark filter", ref: "Reference", role: "Role", bits: "bits", bytes: "bytes", hint: "Hover or select a field (diagram or tree) to see its details.", cont: "cont.", repeat: "repeated", step: "Step", start: "Initial state: no packet exchanged yet.", play: "Play", pause: "Pause", prev: "Previous step", next: "Next step", reset: "Restart", copy: "Copy", copied: "Copied ✓", correct: "✓ Correct.", wrong: "✗ Incorrect. The correct answer is:", choose: "Choose an answer first.", score: "Score:", crumbs: "Breadcrumb", langs: "Language", vendors: "Vendors", bitdiag: "RFC bit diagram", wstree: "Wireshark tree", theme: "Dark theme", toc: "On this page", footnav: "Footer navigation", set: "Set", notset: "Not set" },
+    nl: { name: "Naam", offset: "Offset", size: "Grootte", value: "Waarde", filter: "Wireshark-filter", ref: "Referentie", role: "Rol", bits: "bits", bytes: "bytes", hint: "Beweeg over een veld of selecteer het (diagram of boom) om de details te zien.", cont: "vervolg", repeat: "herhaald", step: "Stap", start: "Beginsituatie: nog geen pakket uitgewisseld.", play: "Afspelen", pause: "Pauzeren", prev: "Vorige stap", next: "Volgende stap", reset: "Opnieuw beginnen", copy: "Kopiëren", copied: "Gekopieerd ✓", correct: "✓ Juist.", wrong: "✗ Onjuist. Het juiste antwoord is:", choose: "Kies eerst een antwoord.", score: "Score:", crumbs: "Kruimelpad", langs: "Taal", vendors: "Vendors", bitdiag: "RFC-bitdiagram", wstree: "Wireshark-boom", theme: "Donker thema", toc: "Op deze pagina", footnav: "Voettekstnavigatie", set: "Ingesteld", notset: "Niet ingesteld" },
+    de: { name: "Name", offset: "Offset", size: "Größe", value: "Wert", filter: "Wireshark-Filter", ref: "Referenz", role: "Funktion", bits: "Bit", bytes: "Byte", hint: "Bewegen Sie den Zeiger über ein Feld oder wählen Sie es aus (Diagramm oder Baum), um Details zu sehen.", cont: "Forts.", repeat: "wiederholt", step: "Schritt", start: "Ausgangszustand: noch kein Paket ausgetauscht.", play: "Abspielen", pause: "Pause", prev: "Vorheriger Schritt", next: "Nächster Schritt", reset: "Neu starten", copy: "Kopieren", copied: "Kopiert ✓", correct: "✓ Richtig.", wrong: "✗ Falsch. Richtig ist:", choose: "Wählen Sie zuerst eine Antwort.", score: "Punkte:", crumbs: "Brotkrumennavigation", langs: "Sprache", vendors: "Hersteller", bitdiag: "RFC-Bitdiagramm", wstree: "Wireshark-Baum", theme: "Dunkles Design", toc: "Auf dieser Seite", footnav: "Fußzeilennavigation", set: "Gesetzt", notset: "Nicht gesetzt" }
   };
   var root = document.documentElement;
   function lang() { return LANGS.indexOf(root.lang) < 0 ? "en" : root.lang; }
@@ -1387,7 +1420,7 @@ window.NPE = (function () {
     </ul>
   </section>
 
-  <section aria-labelledby="h-platforms">
+  <section id="platforms" aria-labelledby="h-platforms">
     <h2 id="h-platforms" class="sec-title"><span data-l="fr">Plateformes couvertes</span><span data-l="en">Platforms covered</span><span data-l="nl">Behandelde platformen</span><span data-l="de">Abgedeckte Plattformen</span></h2>
     <ul class="vendors">
       <li>Cisco <small>IOS XE, NX-OS, IOS XR</small></li><li>Check Point <small>Gaia</small></li><li>F5 <small>BIG-IP</small></li><li>Palo Alto <small>PAN-OS</small></li><li>NetScaler</li><li>Fortinet <small>FortiOS</small></li>
@@ -1395,18 +1428,49 @@ window.NPE = (function () {
   </section>
 
   <section class="about-band" aria-labelledby="h-about">
-    <div>
-      <h2 id="h-about"><span data-l="fr">Qui écrit cette bibliothèque ?</span><span data-l="en">Who writes this library?</span><span data-l="nl">Wie schrijft deze bibliotheek?</span><span data-l="de">Wer schreibt diese Bibliothek?</span></h2>
-      <p><span data-l="fr">Je travaille en ingénierie réseau et sécurité multi-vendeurs. Voici les pages de référence que je veux avoir sous la main : précises, sourcées, indépendantes des vendeurs.</span><span data-l="en">I work in multi-vendor network and security engineering. These are the reference pages I want at hand: precise, sourced and vendor-neutral.</span><span data-l="nl">Ik werk in multivendor netwerk- en security-engineering. Dit zijn de referentiepagina’s die ik bij de hand wil hebben: precies, met bronnen en vendoronafhankelijk.</span><span data-l="de">Ich arbeite im herstellerübergreifenden Netzwerk- und Security-Engineering. Das sind die Referenzseiten, die ich griffbereit haben möchte: präzise, belegt und herstellerneutral.</span></p>
-    </div>
+    <h2 id="h-about"><span data-l="fr">Qui écrit cette bibliothèque ?</span><span data-l="en">Who writes this library?</span><span data-l="nl">Wie schrijft deze bibliotheek?</span><span data-l="de">Wer schreibt diese Bibliothek?</span></h2>
+    <p><span data-l="fr">Je travaille en ingénierie réseau et sécurité multi-vendeurs. Voici les pages de référence que je veux avoir sous la main : précises, sourcées, indépendantes des vendeurs.</span><span data-l="en">I work in multi-vendor network and security engineering. These are the reference pages I want at hand: precise, sourced and vendor-neutral.</span><span data-l="nl">Ik werk in multivendor netwerk- en security-engineering. Dit zijn de referentiepagina’s die ik bij de hand wil hebben: precies, met bronnen en vendoronafhankelijk.</span><span data-l="de">Ich arbeite im herstellerübergreifenden Netzwerk- und Security-Engineering. Das sind die Referenzseiten, die ich griffbereit haben möchte: präzise, belegt und herstellerneutral.</span></p>
     <a class="cta primary" href="https://about.cuvelier.tech"><span data-l="fr">À propos</span><span data-l="en">About</span><span data-l="nl">Over</span><span data-l="de">Über</span></a>
   </section>
 </main>
 
 <footer class="site-footer">
+  <div class="cols">
+    <div class="f-brand">
+      <a class="brand" href="../../index.html" data-home>
+        <svg width="28" height="28" viewBox="0 0 32 32" aria-hidden="true"><rect width="32" height="32" rx="7" fill="#1a5fb4"/><path d="M7 10h18M7 16h12M7 22h15" stroke="#fff" stroke-width="3" stroke-linecap="round"/></svg>
+        <span>Network Protocols Expert</span>
+      </a>
+      <p><span data-l="fr">Fondé sur les RFC et la documentation officielle des vendeurs.</span><span data-l="en">Based on the RFCs and official vendor documentation.</span><span data-l="nl">Gebaseerd op de RFC's en officiële documentatie van de vendors.</span><span data-l="de">Basierend auf den RFCs und der offiziellen Herstellerdokumentation.</span></p>
+      <p class="f-note"><span data-l="fr">Fonctionne hors ligne, sans traceur ni cookie.</span><span data-l="en">Works offline, with no tracker and no cookie.</span><span data-l="nl">Werkt offline, zonder trackers of cookies.</span><span data-l="de">Funktioniert offline, ohne Tracker und ohne Cookies.</span></p>
+    </div>
+    <nav data-aria="footnav" aria-label="Footer">
+      <h2><span data-l="fr">Bibliothèque</span><span data-l="en">Library</span><span data-l="nl">Bibliotheek</span><span data-l="de">Bibliothek</span></h2>
+      <ul>
+        <li><a href="../../index.html#protocols" data-home><span data-l="fr">Protocoles</span><span data-l="en">Protocols</span><span data-l="nl">Protocollen</span><span data-l="de">Protokolle</span></a></li>
+        <li><a href="../../index.html#how" data-home><span data-l="fr">Comment une page enseigne</span><span data-l="en">How a page teaches</span><span data-l="nl">Hoe een pagina lesgeeft</span><span data-l="de">Wie eine Seite lehrt</span></a></li>
+        <li><a href="../../index.html#platforms" data-home><span data-l="fr">Plateformes couvertes</span><span data-l="en">Platforms covered</span><span data-l="nl">Behandelde platformen</span><span data-l="de">Abgedeckte Plattformen</span></a></li>
+      </ul>
+    </nav>
+    <div>
+      <h2><span data-l="fr">Méthode</span><span data-l="en">Method</span><span data-l="nl">Methode</span><span data-l="de">Methode</span></h2>
+      <ul>
+        <li><span data-l="fr">Standards : RFC, IEEE, IANA</span><span data-l="en">Standards: RFC, IEEE, IANA</span><span data-l="nl">Standaarden: RFC, IEEE, IANA</span><span data-l="de">Standards: RFC, IEEE, IANA</span></li>
+        <li><span data-l="fr">Commandes vérifiées sur la documentation des vendeurs</span><span data-l="en">Commands checked against vendor documentation</span><span data-l="nl">Commando's gecontroleerd met de vendordocumentatie</span><span data-l="de">Befehle anhand der Herstellerdokumentation geprüft</span></li>
+        <li><span data-l="fr">Paquets d’exemple générés par script</span><span data-l="en">Sample packets generated by script</span><span data-l="nl">Voorbeeldpakketten gegenereerd door een script</span><span data-l="de">Beispielpakete per Skript erzeugt</span></li>
+      </ul>
+    </div>
+    <div>
+      <h2><span data-l="fr">Projet</span><span data-l="en">Project</span><span data-l="nl">Project</span><span data-l="de">Projekt</span></h2>
+      <ul>
+        <li><a href="https://about.cuvelier.tech"><span data-l="fr">À propos de l’auteur</span><span data-l="en">About the author</span><span data-l="nl">Over de auteur</span><span data-l="de">Über den Autor</span></a></li>
+      </ul>
+    </div>
+  </div>
   <div class="bar">
-    <span>Network Protocols Expert</span>
-    <span><span data-l="fr">Fondé sur les RFC et la documentation officielle des vendeurs.</span><span data-l="en">Based on the RFCs and official vendor documentation.</span><span data-l="nl">Gebaseerd op de RFC's en officiële documentatie van de vendors.</span><span data-l="de">Basierend auf den RFCs und der offiziellen Herstellerdokumentation.</span></span>
+    <span>© 2026 Network Protocols Expert</span>
+    <span><span data-l="fr">Exemples en adresses de documentation (RFC 5737, RFC 3849)</span><span data-l="en">Examples use documentation addresses (RFC 5737, RFC 3849)</span><span data-l="nl">Voorbeelden met documentatieadressen (RFC 5737, RFC 3849)</span><span data-l="de">Beispiele mit Dokumentationsadressen (RFC 5737, RFC 3849)</span></span>
+    <span><span data-l="fr">Version</span><span data-l="en">Version</span><span data-l="nl">Versie</span><span data-l="de">Version</span> <code data-version>local</code></span>
   </div>
 </footer>
 <script>NPE.chrome();</script>

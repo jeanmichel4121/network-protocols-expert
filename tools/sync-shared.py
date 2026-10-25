@@ -7,7 +7,7 @@ index.html and protocols/*/index.html:
   - the pre-paint script (theme + language before first paint),
   - the shared style block (first <style>),
   - the page library (window.NPE),
-  - the site header (<header class="site-header">), keeping each page's home link.
+  - the site header and footer, keeping each page's path to the home page.
 scripts/check_pages.py fails when a page drifts from the template.
 
 Usage: python3 tools/sync-shared.py        (prints the pages updated)
@@ -24,8 +24,10 @@ BLOCKS = [
     re.compile(r"<style>.*?</style>", re.S),
     re.compile(r"<script>\n/\* ===== Page library.*?</script>", re.S),
     re.compile(r'<header class="site-header">.*?</header>', re.S),
+    re.compile(r'<footer class="site-footer">.*?</footer>', re.S),
 ]
-HOME_LINK = re.compile(r'href="[^"]*" data-home')
+# Home links keep the page's own path to the home page and the template's #fragment.
+HOME_LINK = re.compile(r'href="([^"#]*)((?:#[^"]*)?)" data-home')
 
 
 def split_head(text: str):
@@ -45,9 +47,10 @@ def main() -> int:
             if not m:
                 print(f"{page.relative_to(ROOT)}: block not found: {rx.pattern[:40]}")
                 return 1
-            if rx.pattern.startswith("<header"):
-                home = HOME_LINK.search(m.group(0)).group(0)
-                src = HOME_LINK.sub(home, src)
+            home = HOME_LINK.search(m.group(0))
+            if home:
+                base = home.group(1)
+                src = HOME_LINK.sub(lambda h, base=base: f'href="{base}{h.group(2)}" data-home', src)
             text = text[: m.start()] + src + text[m.end() :]
         if text != old:
             page.write_text(pre + text, encoding="utf-8")

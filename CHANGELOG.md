@@ -12,6 +12,8 @@ Versioning rules for this library:
 ## [Unreleased]
 
 ### Added
+- Site footer in columns (library links, method, project, version, documentation
+  addresses) shared by every page; centred closing band on the home page.
 - CI/CD pipeline: lint (YAML, Python, Conventional Commits), tests, secret scanning,
   site build, headless-browser verification, GitLab Pages deploy, tag-based releases.
 - Repository governance: MR and issue templates, CODEOWNERS, contributing guide,
