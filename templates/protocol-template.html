@@ -634,7 +634,10 @@ window.NPE = (function () {
     total();
   }
 
-  /* ---------- Animated network (decorative hero): pausable, off-screen aware, reduced-motion safe ---------- */
+  /* ---------- Animated network (hero): pausable, off-screen aware, reduced-motion safe ----------
+     Flows (JSON in the figure): {kind, path:[node ids], pool?:[node ids], label}. A flow with a
+     pool ends on the next pool member in turn (round-robin load balancing); "{s}" in the label
+     is replaced by the member chosen. Packets move at constant speed; the node they reach pulses. */
   function network(id) {
     var fig = document.getElementById(id);
     if (!fig) return;
@@ -642,35 +645,54 @@ window.NPE = (function () {
         btn = fig.querySelector(".net-toggle"), NS = "http://www.w3.org/2000/svg";
     var flows = JSON.parse(fig.querySelector('script[type="application/json"]').textContent);
     var nodes = {};
-    svg.querySelectorAll("[data-node]").forEach(function (g) { nodes[g.dataset.node] = [+g.dataset.x, +g.dataset.y]; });
+    svg.querySelectorAll("[data-node]").forEach(function (g) { nodes[g.dataset.node] = { x: +g.dataset.x, y: +g.dataset.y, g: g }; });
     var shapes = {
       ospf: '<circle r="7"/>',
       bgp: '<path d="M0-9 9 0 0 9-9 0z"/>',
       tcp: '<rect x="-7" y="-7" width="14" height="14" rx="3"/>',
       esp: '<path d="M-8-4.5 0-9 8-4.5v9L0 9l-8-4.5z"/>'
     };
+    var SPEED = 0.12; // SVG units per millisecond
     var live = [], next = 0, last = 0, wait = 0, raf = 0, running = false, onScreen = true;
+    var turn = flows.map(function () { return 0; });
     var wanted = !matchMedia("(prefers-reduced-motion: reduce)").matches;
-    function spawn(flow, t) {
+    function route(k) {
+      var f = flows[k], path = f.path.slice(), label = f.label;
+      if (f.pool) {
+        var m = f.pool[turn[k]++ % f.pool.length];
+        path.push(m); label = label.replace("{s}", m);
+      }
+      return { path: path, label: label, kind: f.kind };
+    }
+    function hopLength(p) {
+      var a = nodes[p.path[p.hop]], b = nodes[p.path[p.hop + 1]];
+      return Math.max(1, Math.sqrt((b.x - a.x) * (b.x - a.x) + (b.y - a.y) * (b.y - a.y)));
+    }
+    function spawn(r, t) {
       var g = document.createElementNS(NS, "g");
-      g.setAttribute("class", "pkt k-" + flow.kind);
-      g.innerHTML = shapes[flow.kind];
+      g.setAttribute("class", "pkt k-" + r.kind);
+      g.innerHTML = shapes[r.kind];
       layer.appendChild(g);
-      var p = { g: g, path: flow.path, hop: 0, t: t || 0 };
+      var p = { g: g, path: r.path, hop: 0, t: t || 0 };
       live.push(p); place(p);
-      ticker.textContent = flow.label;
+      ticker.textContent = r.label;
     }
     function place(p) {
       var a = nodes[p.path[p.hop]], b = nodes[p.path[p.hop + 1]];
-      p.g.setAttribute("transform", "translate(" + (a[0] + (b[0] - a[0]) * p.t).toFixed(1) + " " + (a[1] + (b[1] - a[1]) * p.t).toFixed(1) + ")");
+      p.g.setAttribute("transform", "translate(" + (a.x + (b.x - a.x) * p.t).toFixed(1) + " " + (a.y + (b.y - a.y) * p.t).toFixed(1) + ")");
+    }
+    function pulse(nodeId) {
+      var g = nodes[nodeId].g;
+      g.classList.add("hit");
+      setTimeout(function () { g.classList.remove("hit"); }, 450);
     }
     function frame(now) {
       var dt = last ? Math.min(now - last, 64) : 16;
       last = now; wait -= dt;
-      if (wait <= 0) { spawn(flows[next++ % flows.length]); wait = 650; }
+      if (wait <= 0) { spawn(route(next++ % flows.length)); wait = 700; }
       live = live.filter(function (p) {
-        p.t += dt / 1600;
-        if (p.t >= 1) { p.hop++; p.t -= 1; }
+        p.t += dt * SPEED / hopLength(p);
+        if (p.t >= 1) { p.hop++; p.t = 0; pulse(p.path[p.hop]); }
         if (p.hop >= p.path.length - 1) { p.g.remove(); return false; }
         place(p); return true;
       });
@@ -687,9 +709,9 @@ window.NPE = (function () {
       if (!go && running) { running = false; cancelAnimationFrame(raf); }
       label();
     }
-    // Static first frame (also what reduced-motion users keep): one packet of each kind mid-link.
-    flows.forEach(function (f) { spawn(f, 0.5); });
-    ticker.textContent = flows[0].label;
+    // Static first frame (also what reduced-motion users keep): one packet of each flow mid-way.
+    flows.forEach(function (f, k) { spawn(route(k), 0.5); });
+    ticker.textContent = flows[0].label.replace("{s}", (flows[0].pool || [""])[0]);
     btn.addEventListener("click", function () { wanted = !running; sync(); });
     document.addEventListener("visibilitychange", sync);
     if ("IntersectionObserver" in window) {

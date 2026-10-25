@@ -35,6 +35,9 @@ Versioning rules for this library:
 - About link in the shared header; `tools/sync-shared.py` propagates the template's shared
   blocks (pre-paint script, styles, page library, header) to every page.
 - CI: axe also runs at 360 px; script-driven animation must stay still under reduced motion.
+- Landing topology: remote sites (CE-A, CE-B), a core backbone (P1–P4), two data centers
+  (firewall, load balancer, three servers each, DCI); TLS sessions spread round robin over the
+  server pool, IPsec tunnels from the sites; nodes pulse when a packet reaches them.
 
 ### Changed
 - Deploy publishes the site publicly on https://learning.cuvelier.tech (NAS, atomic
