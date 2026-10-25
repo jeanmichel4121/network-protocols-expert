@@ -1,6 +1,12 @@
 # Contributing
 
-Authoring rules for the pages are in [`CLAUDE.md`](CLAUDE.md). This file covers the workflow.
+Authoring rules for the pages are in [`CLAUDE.md`](CLAUDE.md), the web and accessibility
+standards in [`docs/web-standards.md`](docs/web-standards.md). This file covers the workflow.
+
+New protocol page: copy `templates/protocol-template.html` to `protocols/<slug>/index.html`,
+fill `#page-meta`, replace every `TEMPLATE` block, add the packet samples to
+`tools/packet-builder.py`, then run `python3 tools/packet-builder.py --update protocols/<slug>/index.html`.
+Preview the published layout with `python3 scripts/build_site.py /tmp/site`.
 
 ## Workflow
 

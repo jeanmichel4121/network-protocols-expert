@@ -1,66 +1,806 @@
 <!doctype html>
+<!-- Network Protocols Expert — home page. The shared style block and the page library are copies
+     of templates/protocol-template.html (scripts/check_pages.py fails if they drift).
+     scripts/build_site.py fills the protocol list and writes one URL per language. -->
 <html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Network Protocols Expert</title>
+<meta name="color-scheme" content="light dark">
+<title>Network Protocols Expert — CCIE-level network protocol library</title>
+<meta name="description" content="Expert-level network protocol library: RFC bit diagrams next to Wireshark trees, animated state machines, sourced configuration for six vendors and CCIE-level quizzes.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%231a5fb4'/%3E%3Cpath d='M7 10h18M7 16h12M7 22h15' stroke='%23fff' stroke-width='3' stroke-linecap='round'/%3E%3C/svg%3E">
+<script type="application/json" id="page-meta">
+{"slug":"","name":"Network Protocols Expert","kind":"home",
+ "title":{"fr":"Network Protocols Expert — protocoles réseau niveau CCIE","en":"Network Protocols Expert — CCIE-level network protocol library","nl":"Network Protocols Expert — netwerkprotocollen op CCIE-niveau","de":"Network Protocols Expert — Netzwerkprotokolle auf CCIE-Niveau"},
+ "description":{"fr":"Bibliothèque de protocoles réseau niveau expert : diagrammes RFC et arbres Wireshark, machines à états animées, configuration sourcée pour six vendeurs et quiz CCIE.","en":"Expert-level network protocol library: RFC bit diagrams next to Wireshark trees, animated state machines, sourced configuration for six vendors and CCIE-level quizzes.","nl":"Bibliotheek over netwerkprotocollen op expertniveau: RFC-bitdiagrammen naast Wireshark-bomen, geanimeerde state machines, configuratie met bronnen voor zes vendors en quizzen op CCIE-niveau.","de":"Bibliothek zu Netzwerkprotokollen auf Expertenniveau: RFC-Bitdiagramme neben Wireshark-Bäumen, animierte Zustandsautomaten, belegte Konfiguration für sechs Hersteller und Quiz auf CCIE-Niveau."}}
+</script>
+<script>
+/* Runs before first paint: theme and language are applied before anything is drawn,
+   so neither causes a flash nor a layout shift. */
+(function () {
+  var r = document.documentElement;
+  function get(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
+  var t = get("theme");
+  if (t === "light" || t === "dark") r.dataset.theme = t;
+  if (!r.hasAttribute("data-built")) {
+    var l = get("lang") || (navigator.language || "en").slice(0, 2).toLowerCase();
+    r.lang = ["fr", "en", "nl", "de"].indexOf(l) < 0 ? "en" : l;
+  }
+})();
+</script>
 <style>
-:root{--bg:#fafaf8;--fg:#1d1d1b;--muted:#5f5e5a;--line:#d3d1c7;--accent:#185fa5;--card:#ffffff}
-@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#1d1d1b;--fg:#f1efe8;--muted:#b4b2a9;--line:#444441;--accent:#85b7eb;--card:#2c2c2a}}
-:root[data-theme="dark"]{--bg:#1d1d1b;--fg:#f1efe8;--muted:#b4b2a9;--line:#444441;--accent:#85b7eb;--card:#2c2c2a}
-*{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.6 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
-header,main{max-width:960px;margin:0 auto;padding:16px}
-header{display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between;border-bottom:1px solid var(--line)}
-h1{font-size:22px;margin:0}
-nav{display:flex;gap:6px;flex-wrap:wrap}
-button{font:inherit;font-size:14px;padding:4px 10px;border:1px solid var(--line);background:var(--card);color:var(--fg);border-radius:6px;cursor:pointer}
-button[aria-pressed="true"]{border-color:var(--accent);color:var(--accent);font-weight:600}
-button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
-.muted{color:var(--muted)}
-.empty{border:1px dashed var(--line);border-radius:12px;padding:24px;text-align:center}
-@media print{nav{display:none}}
+/* ===== Tokens ======================================================== */
+:root {
+  color-scheme: light dark;
+  --bg: light-dark(#fbfaf7, #131312);
+  --surface: light-dark(#ffffff, #1c1c1a);
+  --surface-2: light-dark(#f3f1ec, #252523);
+  --fg: light-dark(#1d1d1b, #ecebe6);
+  --muted: light-dark(#5a5954, #aeaca4);
+  --line: light-dark(#dcd9cf, #3a3936);
+  --accent: light-dark(#1a5fb4, #8ab4f8);
+  --accent-ink: light-dark(#ffffff, #0b1b33);
+  --code-bg: light-dark(#f6f5f1, #0e0e0d);
+  /* Library colour code (CLAUDE.md "Visual standards") — fill / border pairs */
+  --grey-bg: light-dark(#ebe9e3, #2d2c29);     --grey: light-dark(#6b685f, #a3a097);
+  --blue-bg: light-dark(#dbe8fa, #1b3456);     --blue: light-dark(#1a5fb4, #7fb0f5);
+  --teal-bg: light-dark(#d3f0ea, #123e39);     --teal: light-dark(#0f766e, #52c4b5);
+  --purple-bg: light-dark(#ebe1fb, #392a5b);   --purple: light-dark(#6a3dbd, #b49ef2);
+  --orange-bg: light-dark(#fde5cf, #4c2c10);   --orange: light-dark(#8a4006, #f2a660);
+  --green-bg: light-dark(#d9f2de, #173e21);    --green: light-dark(#1d7433, #72d08a);
+  --red-bg: light-dark(#fadedb, #4b1b18);      --red: light-dark(#b42318, #f28b82);
+  --font: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --mono: ui-monospace, "SF Mono", "Cascadia Code", "JetBrains Mono", Menlo, Consolas, monospace;
+  --radius: 12px;
+  --header-h: 3.75rem;
+}
+:root[data-theme="light"] { color-scheme: light; }
+:root[data-theme="dark"] { color-scheme: dark; }
+
+/* ===== Language visibility: one page, four languages ================= */
+html[lang="fr"] [data-l]:not([data-l="fr"]),
+html[lang="en"] [data-l]:not([data-l="en"]),
+html[lang="nl"] [data-l]:not([data-l="nl"]),
+html[lang="de"] [data-l]:not([data-l="de"]) { display: none !important; }
+
+/* ===== Base =========================================================== */
+*, *::before, *::after { box-sizing: border-box; }
+html { scroll-padding-top: calc(var(--header-h) + 1rem); -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+@media (prefers-reduced-motion: no-preference) { html { scroll-behavior: smooth; } }
+body {
+  margin: 0; background: var(--bg); color: var(--fg);
+  font: clamp(1rem, 0.96rem + 0.2vw, 1.0625rem)/1.6 var(--font);
+  text-rendering: optimizeLegibility;
+}
+h1, h2, h3, h4 { line-height: 1.2; text-wrap: balance; margin: 0 0 0.6em; }
+h1 { font-size: clamp(2rem, 1.5rem + 2.2vw, 3rem); letter-spacing: -0.02em; }
+h2 { font-size: clamp(1.5rem, 1.3rem + 0.9vw, 2rem); letter-spacing: -0.01em; }
+h3 { font-size: 1.25rem; }
+p, li, dd { max-width: 72ch; text-wrap: pretty; }
+a { color: var(--accent); text-underline-offset: 0.18em; }
+a:hover { text-decoration-thickness: 2px; }
+code, kbd, pre { font-family: var(--mono); font-size: 0.875em; }
+:not(pre) > code { background: var(--surface-2); padding: 0.1em 0.35em; border-radius: 5px; }
+:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; border-radius: 4px; }
+button { font: inherit; color: inherit; }
+.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
+.skip { position: absolute; left: 1rem; top: -4rem; z-index: 100; background: var(--accent); color: var(--accent-ink); padding: 0.6rem 1rem; border-radius: 8px; }
+.skip:focus { top: 0.75rem; }
+
+/* ===== Header ========================================================= */
+.site-header {
+  position: sticky; top: 0; z-index: 50; height: var(--header-h);
+  background: color-mix(in srgb, var(--bg) 88%, transparent);
+  backdrop-filter: saturate(1.4) blur(10px);
+  border-bottom: 1px solid var(--line);
+}
+.site-header .bar { max-width: 84rem; height: 100%; margin-inline: auto; padding-inline: clamp(1rem, 3vw, 2rem); display: flex; align-items: center; gap: 1rem; }
+.brand { display: flex; align-items: center; gap: 0.6rem; font-weight: 650; color: var(--fg); text-decoration: none; margin-right: auto; min-width: 0; }
+.brand svg { flex: none; }
+.brand span { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.controls { display: flex; align-items: center; gap: 0.5rem; }
+.lang { display: flex; border: 1px solid var(--line); border-radius: 999px; padding: 2px; background: var(--surface); }
+.lang button, .icon-btn {
+  min-width: 2.5rem; min-height: 2.25rem; border: 0; background: transparent; border-radius: 999px;
+  cursor: pointer; font-size: 0.8125rem; font-weight: 600; color: var(--muted);
+}
+.lang button[aria-pressed="true"] { background: var(--accent); color: var(--accent-ink); }
+.icon-btn { border: 1px solid var(--line); background: var(--surface); display: grid; place-items: center; color: var(--fg); }
+.icon-btn .moon { display: none; }
+.icon-btn[aria-pressed="true"] .sun { display: none; }
+.icon-btn[aria-pressed="true"] .moon { display: block; }
+@media (max-width: 30rem) { .brand span { display: none; } }
+
+/* ===== Layout ========================================================= */
+.layout { max-width: 84rem; margin-inline: auto; padding: 0 clamp(1rem, 3vw, 2rem) 4rem; display: grid; gap: 2rem; }
+.layout > main { min-width: 0; }
+.toc { font-size: 0.9rem; }
+.toc summary { cursor: pointer; font-weight: 650; padding: 0.6rem 0; list-style-position: inside; }
+.toc ol { list-style: none; margin: 0; padding: 0 0 0.5rem; border-left: 2px solid var(--line); }
+.toc a { display: block; padding: 0.3rem 0.8rem; margin-left: -2px; border-left: 2px solid transparent; color: var(--muted); text-decoration: none; min-height: 1.5rem; }
+.toc a:hover { color: var(--fg); }
+.toc a[aria-current] { color: var(--accent); border-left-color: var(--accent); font-weight: 600; }
+.toc .n { display: inline-block; min-width: 1.4em; font-variant-numeric: tabular-nums; }
+@media (max-width: 63.99rem) { .toc { border: 1px solid var(--line); border-radius: var(--radius); padding: 0 1rem; background: var(--surface); margin-top: 1rem; } }
+@media (min-width: 64rem) {
+  .layout { grid-template-columns: minmax(0, 1fr) 15rem; gap: 3.5rem; }
+  .toc { grid-column: 2; grid-row: 1; position: sticky; top: calc(var(--header-h) + 1.5rem); align-self: start; max-height: calc(100dvh - var(--header-h) - 3rem); overflow-y: auto; margin-top: 2.5rem; }
+}
+
+/* ===== Hero =========================================================== */
+.crumbs ol { list-style: none; display: flex; flex-wrap: wrap; gap: 0.4rem; padding: 0; margin: 1.75rem 0 1.25rem; font-size: 0.875rem; color: var(--muted); }
+.crumbs li + li::before { content: "/"; margin-right: 0.4rem; color: var(--line); }
+.crumbs a { color: var(--muted); }
+.hero { padding-bottom: 2rem; border-bottom: 1px solid var(--line); margin-bottom: 2.5rem; }
+.eyebrow { font-size: 0.8125rem; font-weight: 650; text-transform: uppercase; letter-spacing: 0.08em; color: var(--accent); margin: 0 0 0.5rem; }
+.lede { font-size: 1.1875rem; color: var(--muted); margin: 0 0 1.5rem; }
+.facts { display: grid; grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr)); gap: 0.75rem; margin: 0; }
+.facts div { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 0.75rem 1rem; }
+.facts dt { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); font-weight: 650; }
+.facts dd { margin: 0.2rem 0 0; font-weight: 550; }
+
+/* ===== Sections ======================================================= */
+.sec { margin-bottom: 3.5rem; }
+.sec > h2, .sec > details > summary h2 { display: flex; align-items: baseline; gap: 0.6rem; }
+.sec .num { font-size: 0.65em; font-weight: 700; color: var(--accent); font-variant-numeric: tabular-nums; border: 1.5px solid currentColor; border-radius: 8px; padding: 0.05em 0.4em; }
+.sec > details > summary { cursor: pointer; list-style: none; }
+.sec > details > summary::-webkit-details-marker { display: none; }
+.sec > details > summary h2::after { content: "▾"; margin-left: auto; font-size: 0.7em; color: var(--muted); transition: transform 0.2s; }
+.sec > details:not([open]) > summary h2::after { transform: rotate(-90deg); }
+.tpl { border: 2px dashed var(--orange); background: var(--orange-bg); border-radius: var(--radius); padding: 0.75rem 1rem; font-size: 0.9375rem; margin: 1rem 0; }
+.tpl strong { color: var(--fg); letter-spacing: 0.04em; }
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 1.25rem; }
+.terms { display: grid; gap: 0.75rem; margin: 1rem 0; }
+.terms div { border-left: 3px solid var(--blue); padding-left: 0.9rem; }
+.terms dt { font-weight: 650; }
+.terms dd { margin: 0.15rem 0 0; color: var(--muted); }
+
+/* Callouts — icon + label, never colour alone */
+.callout { display: grid; grid-template-columns: auto 1fr; gap: 0.75rem; border: 1px solid; border-left-width: 4px; border-radius: 10px; padding: 0.9rem 1rem; margin: 1.25rem 0; }
+.callout > svg { margin-top: 0.15rem; }
+.callout p { margin: 0.2rem 0 0; }
+.callout .label { font-weight: 700; }
+.callout.note { border-color: var(--blue); background: var(--blue-bg); }
+.callout.note .label, .callout.note svg { color: var(--blue); }
+.callout.warn { border-color: var(--red); background: var(--red-bg); }
+.callout.warn .label, .callout.warn svg { color: var(--red); }
+.callout.vendor { border-color: var(--orange); background: var(--orange-bg); }
+.callout.vendor .label, .callout.vendor svg { color: var(--orange); }
+
+/* Tables */
+.table-wrap { overflow-x: auto; border: 1px solid var(--line); border-radius: var(--radius); margin: 1.25rem 0; background: var(--surface); }
+table { border-collapse: collapse; width: 100%; font-size: 0.9375rem; }
+caption { text-align: left; font-weight: 650; padding: 0.8rem 1rem 0.4rem; }
+th, td { text-align: left; vertical-align: top; padding: 0.6rem 1rem; border-top: 1px solid var(--line); }
+th { background: var(--surface-2); font-weight: 650; white-space: nowrap; }
+
+/* ===== Figures: title + legend on every diagram ====================== */
+.diagram { margin: 1.5rem 0; border: 1px solid var(--line); border-radius: var(--radius); background: var(--surface); overflow: hidden; }
+.diagram > figcaption { padding: 0.9rem 1.1rem; border-bottom: 1px solid var(--line); }
+.diagram > figcaption .t { font-weight: 650; display: block; }
+.diagram > figcaption .s { font-size: 0.875rem; color: var(--muted); }
+.diagram .body { padding: 1.1rem; }
+.legend { display: flex; flex-wrap: wrap; gap: 0.5rem 1.25rem; margin: 0; padding: 0.8rem 1.1rem; border-top: 1px solid var(--line); background: var(--surface-2); font-size: 0.8125rem; }
+.legend div { display: flex; align-items: center; gap: 0.45rem; }
+.legend dt { display: flex; }
+.legend dd { margin: 0; }
+.sw { width: 1.4rem; height: 0.95rem; border-radius: 3px; border: 2px solid; display: inline-block; }
+.sw.l-header { background: var(--blue-bg); border-color: var(--blue); }
+.sw.l-body { background: var(--teal-bg); border-color: var(--teal); border-style: dashed; }
+.sw.l-tlv { background: var(--purple-bg); border-color: var(--purple); border-style: dotted; }
+.sw.l-encap { background: var(--grey-bg); border-color: var(--grey); }
+.sw.rep { background: var(--surface); border-color: var(--muted); border-style: dashed; }
+.sw.hl { background: var(--surface); border-color: var(--accent); outline: 2px solid var(--accent); }
+
+/* ===== Packet views =================================================== */
+.packet { margin: 1.5rem 0 3rem; }
+.packet-meta { display: flex; flex-wrap: wrap; gap: 0.5rem; margin: 0 0 1rem; padding: 0; list-style: none; }
+.packet-meta li { font-size: 0.8125rem; background: var(--surface-2); border: 1px solid var(--line); border-radius: 999px; padding: 0.15rem 0.7rem; }
+.views { display: grid; gap: 1rem; }
+.views > * { min-width: 0; }
+@media (min-width: 90rem) { .views { grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr); } }
+.view-title { font-size: 0.8125rem; font-weight: 650; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); margin: 0 0 0.5rem; }
+.scroll-x { overflow-x: auto; padding-bottom: 0.25rem; }
+.ruler, .bitgrid { display: grid; grid-template-columns: repeat(32, minmax(1.15rem, 1fr)); min-width: 37rem; }
+.ruler { font: 0.6875rem/1.3 var(--mono); color: var(--muted); text-align: center; }
+.ruler span:nth-child(-n+32) { text-align: left; }
+.bitgrid { gap: 0; border-left: 1px solid var(--line); border-top: 1px solid var(--line); }
+.bf {
+  min-height: 3.1rem; padding: 0.3rem 0.4rem; border: 0; border-right: 1px solid var(--line); border-bottom: 1px solid var(--line);
+  display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; min-width: 0;
+  border-top: 3px solid; cursor: pointer; font-size: 0.75rem; line-height: 1.25; color: var(--fg);
+  position: relative; /* keeps the .sr-only helpers inside the scroll container */
+}
+.bf .bn { font-weight: 600; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.bf .bv { font-family: var(--mono); font-size: 0.75rem; color: var(--muted); max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.l-header { background: var(--blue-bg); border-top-color: var(--blue); }
+.l-body { background: var(--teal-bg); border-top-color: var(--teal); border-top-style: dashed; }
+.l-tlv { background: var(--purple-bg); border-top-color: var(--purple); border-top-style: dotted; }
+.l-encap { background: var(--grey-bg); border-top-color: var(--grey); }
+.bf.rep { background-image: repeating-linear-gradient(135deg, transparent 0 8px, color-mix(in srgb, var(--fg) 7%, transparent) 8px 9px); }
+.bf.rep .bn::after { content: " …"; }
+.hl { outline: 3px solid var(--accent); outline-offset: -3px; position: relative; z-index: 1; }
+.bf.cont .bn { font-weight: 400; font-style: italic; }
+
+.wstree { font: 0.8125rem/1.55 var(--mono); background: var(--code-bg); border: 1px solid var(--line); border-radius: 10px; padding: 0.6rem 0.4rem; overflow-x: auto; }
+.wstree details { padding-left: 1rem; }
+.wstree > details { padding-left: 0; }
+.wstree summary { cursor: pointer; padding: 0.1rem 0.4rem; border-radius: 4px; white-space: nowrap; }
+.wstree .tl { padding: 0.1rem 0.4rem 0.1rem 1.35rem; border-radius: 4px; white-space: nowrap; cursor: default; }
+.wstree .flt { color: var(--muted); margin-left: 0.75rem; font-size: 0.75rem; }
+.wstree .flt::before { content: "["; } .wstree .flt::after { content: "]"; }
+.wstree .hl { outline-offset: 0; background: color-mix(in srgb, var(--accent) 14%, transparent); }
+
+.fpanel { margin-top: 1rem; border: 1px solid var(--line); border-radius: 10px; background: var(--surface-2); padding: 0.9rem 1rem; min-height: 9.5rem; }
+.fpanel .hint { color: var(--muted); margin: 0; }
+.fpanel h4 { margin: 0 0 0.5rem; font-size: 1rem; }
+.fpanel dl { display: grid; grid-template-columns: max-content 1fr; gap: 0.25rem 1rem; margin: 0; font-size: 0.875rem; }
+.fpanel dt { color: var(--muted); }
+.fpanel dd { margin: 0; }
+
+.hexwrap { margin-top: 1rem; }
+.hexwrap > summary { cursor: pointer; font-weight: 600; font-size: 0.875rem; }
+.hexdump { font: 0.8125rem/1.7 var(--mono); background: var(--code-bg); border: 1px solid var(--line); border-radius: 10px; padding: 0.6rem 0.8rem; overflow-x: auto; margin-top: 0.5rem; }
+.hexdump .hr { white-space: nowrap; }
+.hexdump .ho { color: var(--muted); margin-right: 1rem; }
+.hexdump .hb { display: inline-block; width: 2.3ch; text-align: center; margin-right: 0.35ch; border-radius: 3px; border-top: 2px solid; }
+
+/* ===== Animation ====================================================== */
+.anim .body { overflow-x: auto; }
+.anim svg { width: 100%; min-width: 30rem; height: auto; display: block; max-width: 44rem; margin-inline: auto; }
+.anim svg text { fill: var(--fg); font: 600 16px var(--font); }
+.anim svg .lbl { font: 500 15px var(--mono); fill: var(--fg); }
+.anim .node rect { fill: var(--surface-2); stroke: var(--line); stroke-width: 1.5; }
+.anim .life { stroke: var(--line); stroke-width: 2; stroke-dasharray: 4 5; }
+.anim .msg line { stroke: var(--blue); stroke-width: 2; }
+.anim .msg path { fill: var(--blue); }
+.anim .msg { transition: opacity 0.35s ease; }
+.anim .msg.future { opacity: 0.14; }
+.anim .msg.current line { stroke-width: 3.5; }
+.anim .msg.current .lbl { font-weight: 700; }
+.anim .badge rect { stroke-width: 2; }
+.anim .badge.s-grey rect { fill: var(--grey-bg); stroke: var(--grey); }
+.anim .badge.s-blue rect { fill: var(--blue-bg); stroke: var(--blue); }
+.anim .badge.s-green rect { fill: var(--green-bg); stroke: var(--green); }
+.anim .badge.s-red rect { fill: var(--red-bg); stroke: var(--red); }
+.anim .badge text { font: 600 14px var(--mono); }
+.anim-controls { display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem; padding: 0.8rem 1.1rem; border-top: 1px solid var(--line); }
+.anim-controls button {
+  min-width: 2.75rem; min-height: 2.5rem; border-radius: 10px; border: 1px solid var(--line);
+  background: var(--surface); cursor: pointer; display: inline-grid; place-items: center;
+}
+.anim-controls button[aria-pressed="true"] { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+.anim-controls button:disabled { opacity: 0.4; cursor: not-allowed; }
+.step-now { margin: 0 0 0 0.5rem; font-size: 0.9375rem; flex: 1 1 14rem; }
+.steps { margin: 0; padding: 0.9rem 1.1rem 0.9rem 2.6rem; border-top: 1px solid var(--line); display: grid; gap: 0.5rem; }
+.steps li { color: var(--muted); }
+.steps li::marker { font-weight: 700; }
+.steps li.past { color: var(--fg); }
+.steps li[aria-current="step"] { color: var(--fg); font-weight: 550; }
+.steps li[aria-current="step"]::marker { color: var(--accent); }
+.predict { margin-top: 0.35rem; font-weight: 400; }
+.predict summary { cursor: pointer; color: var(--accent); font-weight: 600; }
+
+/* ===== Vendor tabs & commands ======================================== */
+.tabs [role="tablist"] { display: flex; gap: 0.25rem; overflow-x: auto; border-bottom: 1px solid var(--line); }
+.tabs [role="tab"] {
+  border: 0; background: none; padding: 0.7rem 1rem; min-height: 2.75rem; cursor: pointer; white-space: nowrap;
+  color: var(--muted); font-weight: 600; border-bottom: 3px solid transparent; margin-bottom: -1px;
+}
+.tabs [role="tab"][aria-selected="true"] { color: var(--accent); border-bottom-color: var(--accent); }
+.tabs [role="tabpanel"] { padding-top: 1.25rem; }
+.cmd { border: 1px solid var(--line); border-radius: 10px; overflow: hidden; margin: 1rem 0; background: var(--surface); }
+.cmd-head { display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem; padding: 0.5rem 0.6rem 0.5rem 1rem; border-bottom: 1px solid var(--line); background: var(--surface-2); font-size: 0.875rem; font-weight: 650; }
+.ver { font: 600 0.75rem var(--mono); padding: 0.1rem 0.55rem; border-radius: 999px; border: 1px solid var(--line); background: var(--surface); color: var(--muted); }
+.copy { margin-left: auto; min-height: 2rem; min-width: 4.5rem; border: 1px solid var(--line); background: var(--surface); border-radius: 8px; cursor: pointer; font-size: 0.8125rem; }
+.cmd pre { margin: 0; padding: 0.9rem 1rem; overflow-x: auto; background: var(--code-bg); line-height: 1.55; tab-size: 4; }
+.cmd .src { margin: 0; padding: 0.55rem 1rem; font-size: 0.8125rem; color: var(--muted); border-top: 1px solid var(--line); }
+.cmd.debug { border-color: var(--red); }
+
+/* ===== Troubleshooting tree ========================================== */
+.dtree { list-style: none; padding: 0; margin: 1rem 0; display: grid; gap: 0.75rem; }
+.dtree > li { border: 1px solid var(--line); border-radius: 10px; padding: 0.8rem 1rem; background: var(--surface); }
+.dtree > li:target { outline: 3px solid var(--accent); }
+.dtree .q { font-weight: 650; margin: 0 0 0.5rem; }
+.dtree .q .id { color: var(--accent); margin-right: 0.4rem; }
+.dtree .ans { display: flex; flex-wrap: wrap; gap: 0.5rem; margin: 0; padding: 0; list-style: none; }
+.dtree .ans a { display: inline-flex; align-items: center; gap: 0.3rem; min-height: 2.25rem; padding: 0.2rem 0.8rem; border-radius: 8px; border: 1px solid; text-decoration: none; font-weight: 600; font-size: 0.875rem; }
+.dtree .yes { color: var(--green); border-color: var(--green); background: var(--green-bg); }
+.dtree .no { color: var(--red); border-color: var(--red); background: var(--red-bg); }
+.dtree .leaf { border-left: 4px solid var(--green); }
+
+/* ===== Quiz =========================================================== */
+.quiz-q { border: 1px solid var(--line); border-radius: var(--radius); padding: 1rem 1.25rem 1.25rem; margin: 0 0 1rem; background: var(--surface); }
+.quiz-q legend { font-weight: 650; padding: 0 0.4rem; margin-left: -0.4rem; max-width: 70ch; }
+.quiz-q .opts { display: grid; gap: 0.4rem; margin: 0.75rem 0; }
+.quiz-q label { display: flex; gap: 0.6rem; align-items: flex-start; padding: 0.55rem 0.75rem; border: 1px solid var(--line); border-radius: 8px; cursor: pointer; min-height: 2.75rem; }
+.quiz-q label:has(input:checked) { border-color: var(--accent); background: color-mix(in srgb, var(--accent) 8%, transparent); }
+.quiz-q input { margin-top: 0.3rem; accent-color: var(--accent); width: 1.1rem; height: 1.1rem; flex: none; }
+.quiz-q.ok { border-color: var(--green); }
+.quiz-q.ko { border-color: var(--red); }
+.btn { min-height: 2.5rem; padding: 0.4rem 1rem; border-radius: 8px; border: 1px solid var(--accent); background: var(--accent); color: var(--accent-ink); font-weight: 600; cursor: pointer; }
+.fb { margin: 0.75rem 0 0; font-weight: 650; }
+.quiz-q.ok .fb { color: var(--green); }
+.quiz-q.ko .fb { color: var(--red); }
+.expl { margin-top: 0.5rem; padding: 0.75rem 1rem; border-radius: 8px; background: var(--surface-2); }
+.expl p { margin: 0; }
+.expl .ref { font-size: 0.8125rem; color: var(--muted); margin-top: 0.4rem; }
+.quiz-score { font-weight: 700; font-size: 1.0625rem; }
+
+/* ===== Sources & footer ============================================== */
+.sources li { margin-bottom: 0.5rem; overflow-wrap: anywhere; }
+.sources cite { font-style: normal; font-weight: 600; }
+.ref-link { display: inline-block; min-width: 24px; min-height: 24px; line-height: 24px; text-align: center; font-size: 0.75em; font-weight: 600; text-decoration: none; vertical-align: middle; margin-left: 0.15em; }
+.site-footer { border-top: 1px solid var(--line); color: var(--muted); font-size: 0.875rem; }
+.site-footer .bar { max-width: 84rem; margin-inline: auto; padding: 1.5rem clamp(1rem, 3vw, 2rem); display: flex; flex-wrap: wrap; gap: 0.5rem 1.5rem; justify-content: space-between; }
+
+/* ===== Motion & print ================================================= */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; }
+}
+@media print {
+  :root { color-scheme: light; }
+  body { background: #fff; font-size: 10.5pt; }
+  .site-header, .toc, .skip, .anim-controls, .copy, .quiz-q .btn, .lang, .icon-btn, .tpl { display: none !important; }
+  .layout { display: block; padding: 0; }
+  [role="tabpanel"][hidden], .expl[hidden] { display: block !important; }
+  .tabs [role="tablist"] { display: none; }
+  .diagram, .cmd, .quiz-q, .packet, .dtree > li, table { break-inside: avoid; }
+  .sources a[href^="http"]::after { content: " <" attr(href) ">"; font-size: 0.85em; word-break: break-all; }
+  .anim .msg.future { opacity: 1; }
+  .scroll-x, .table-wrap, .wstree, .hexdump, .cmd pre { overflow: visible; }
+  a { color: inherit; }
+}
 </style>
+<style data-page>
+/* Home-page components (the shared tokens and chrome come from the template block above). */
+.home { max-width: 84rem; margin-inline: auto; padding: 0 clamp(1rem, 3vw, 2rem) 4rem; }
+.home-hero { padding: clamp(2.5rem, 6vw, 5rem) 0 2.5rem; border-bottom: 1px solid var(--line); }
+.home-hero h1 { font-size: clamp(2.25rem, 1.6rem + 3vw, 3.75rem); max-width: 18ch; }
+.home-hero .lede { max-width: 60ch; }
+.chips { display: flex; flex-wrap: wrap; gap: 0.5rem; list-style: none; padding: 0; margin: 0; }
+.chips li { font-size: 0.875rem; font-weight: 600; padding: 0.3rem 0.85rem; border-radius: 999px; border: 1px solid var(--line); background: var(--surface); }
+.features { display: grid; grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr)); gap: 1rem; margin: 2.5rem 0 3.5rem; padding: 0; list-style: none; }
+.features li { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 1.25rem; }
+.features svg { color: var(--accent); margin-bottom: 0.6rem; }
+.features h3 { font-size: 1.0625rem; margin-bottom: 0.35rem; }
+.features p { margin: 0; color: var(--muted); font-size: 0.9375rem; }
+.pcards { display: grid; grid-template-columns: repeat(auto-fill, minmax(17rem, 1fr)); gap: 1rem; padding: 0; margin: 1rem 0 3rem; list-style: none; }
+.pcard { display: flex; flex-direction: column; gap: 0.35rem; height: 100%; padding: 1.25rem; border: 1px solid var(--line); border-radius: var(--radius); background: var(--surface); color: var(--fg); text-decoration: none; transition: border-color 0.15s, transform 0.15s; }
+.pcard:hover { border-color: var(--accent); }
+@media (prefers-reduced-motion: no-preference) { .pcard:hover { transform: translateY(-2px); } }
+.pcard .pname { font-size: 1.375rem; font-weight: 700; color: var(--accent); }
+.pcard .pt { font-weight: 600; }
+.pcard .pd { color: var(--muted); font-size: 0.9375rem; }
+.pcard .tags { display: flex; flex-wrap: wrap; gap: 0.35rem; margin-top: auto; padding-top: 0.5rem; }
+.pcard .tags span { font: 600 0.75rem var(--mono); padding: 0.1rem 0.5rem; border-radius: 6px; background: var(--surface-2); color: var(--muted); }
+.empty { grid-column: 1 / -1; border: 1px dashed var(--line); border-radius: var(--radius); padding: 2rem; text-align: center; color: var(--muted); }
+.vendors { display: flex; flex-wrap: wrap; gap: 0.5rem 1.5rem; padding: 0; margin: 1rem 0 0; list-style: none; font-weight: 650; color: var(--muted); }
+</style>
+<script>
+/* ===== Page library (functions only; called inline after each component) ===== */
+window.NPE = (function () {
+  "use strict";
+  var LANGS = ["fr", "en", "nl", "de"];
+  var UI = {
+    fr: { name: "Nom", offset: "Offset", size: "Taille", value: "Valeur", filter: "Filtre Wireshark", ref: "Référence", role: "Rôle", bits: "bits", bytes: "octets", hint: "Survolez ou sélectionnez un champ (diagramme ou arbre) pour afficher son détail.", cont: "suite", repeat: "répété", step: "Étape", start: "État initial : aucun paquet échangé.", play: "Lecture", pause: "Pause", prev: "Étape précédente", next: "Étape suivante", reset: "Recommencer", copy: "Copier", copied: "Copié ✓", correct: "✓ Correct.", wrong: "✗ Incorrect — la bonne réponse est :", choose: "Choisissez d'abord une réponse.", score: "Score :", crumbs: "Fil d'Ariane", langs: "Langue", vendors: "Vendeurs", bitdiag: "Diagramme de bits RFC", wstree: "Arbre Wireshark", theme: "Thème sombre", toc: "Sur cette page", set: "Activé", notset: "Non activé" },
+    en: { name: "Name", offset: "Offset", size: "Size", value: "Value", filter: "Wireshark filter", ref: "Reference", role: "Role", bits: "bits", bytes: "bytes", hint: "Hover or select a field (diagram or tree) to see its details.", cont: "cont.", repeat: "repeated", step: "Step", start: "Initial state: no packet exchanged yet.", play: "Play", pause: "Pause", prev: "Previous step", next: "Next step", reset: "Restart", copy: "Copy", copied: "Copied ✓", correct: "✓ Correct.", wrong: "✗ Incorrect — the correct answer is:", choose: "Choose an answer first.", score: "Score:", crumbs: "Breadcrumb", langs: "Language", vendors: "Vendors", bitdiag: "RFC bit diagram", wstree: "Wireshark tree", theme: "Dark theme", toc: "On this page", set: "Set", notset: "Not set" },
+    nl: { name: "Naam", offset: "Offset", size: "Grootte", value: "Waarde", filter: "Wireshark-filter", ref: "Referentie", role: "Rol", bits: "bits", bytes: "bytes", hint: "Beweeg over een veld of selecteer het (diagram of boom) om de details te zien.", cont: "vervolg", repeat: "herhaald", step: "Stap", start: "Beginsituatie: nog geen pakket uitgewisseld.", play: "Afspelen", pause: "Pauzeren", prev: "Vorige stap", next: "Volgende stap", reset: "Opnieuw beginnen", copy: "Kopiëren", copied: "Gekopieerd ✓", correct: "✓ Juist.", wrong: "✗ Onjuist — het juiste antwoord is:", choose: "Kies eerst een antwoord.", score: "Score:", crumbs: "Kruimelpad", langs: "Taal", vendors: "Vendors", bitdiag: "RFC-bitdiagram", wstree: "Wireshark-boom", theme: "Donker thema", toc: "Op deze pagina", set: "Ingesteld", notset: "Niet ingesteld" },
+    de: { name: "Name", offset: "Offset", size: "Größe", value: "Wert", filter: "Wireshark-Filter", ref: "Referenz", role: "Funktion", bits: "Bit", bytes: "Byte", hint: "Bewegen Sie den Zeiger über ein Feld oder wählen Sie es aus (Diagramm oder Baum), um Details zu sehen.", cont: "Forts.", repeat: "wiederholt", step: "Schritt", start: "Ausgangszustand: noch kein Paket ausgetauscht.", play: "Abspielen", pause: "Pause", prev: "Vorheriger Schritt", next: "Nächster Schritt", reset: "Neu starten", copy: "Kopieren", copied: "Kopiert ✓", correct: "✓ Richtig.", wrong: "✗ Falsch — richtig ist:", choose: "Wählen Sie zuerst eine Antwort.", score: "Punkte:", crumbs: "Brotkrumennavigation", langs: "Sprache", vendors: "Hersteller", bitdiag: "RFC-Bitdiagramm", wstree: "Wireshark-Baum", theme: "Dunkles Design", toc: "Auf dieser Seite", set: "Gesetzt", notset: "Nicht gesetzt" }
+  };
+  var root = document.documentElement;
+  function lang() { return LANGS.indexOf(root.lang) < 0 ? "en" : root.lang; }
+  function ui(k) { return UI[lang()][k]; }
+  function store(k, v) { try { if (v === undefined) return localStorage.getItem(k); localStorage.setItem(k, v); } catch (e) { return null; } }
+  function esc(s) { return String(s).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); }
+  function json(sel) { var n = document.querySelector(sel); return n ? JSON.parse(n.textContent) : null; }
+  function visibleText(el) {
+    var n = el && el.querySelector('[data-l="' + lang() + '"]');
+    return (n || el).textContent.trim();
+  }
+  var listeners = [];
+  function onLang(fn) { listeners.push(fn); }
+
+  /* Roving tabindex: one Tab stop per widget, arrows move inside (WAI-ARIA APG). */
+  function roving(container, selector) {
+    function items() { return Array.prototype.filter.call(container.querySelectorAll(selector), function (n) { return n.offsetParent !== null; }); }
+    var all = container.querySelectorAll(selector);
+    for (var i = 0; i < all.length; i++) all[i].tabIndex = i === 0 ? 0 : -1;
+    container.addEventListener("keydown", function (e) {
+      var list = items(), i = list.indexOf(document.activeElement), j = -1;
+      if (i < 0) return;
+      if (e.key === "ArrowRight" || e.key === "ArrowDown") j = Math.min(i + 1, list.length - 1);
+      else if (e.key === "ArrowLeft" || e.key === "ArrowUp") j = Math.max(i - 1, 0);
+      else if (e.key === "Home") j = 0;
+      else if (e.key === "End") j = list.length - 1;
+      if (j < 0) return;
+      e.preventDefault();
+      list[i].tabIndex = -1; list[j].tabIndex = 0; list[j].focus();
+    });
+  }
+
+  /* ---------- Packet: RFC bit diagram + Wireshark tree + hex dump, synchronised ---------- */
+  function packet(id) {
+    var el = document.querySelector('.packet[data-packet="' + id + '"]');
+    var data = json('script[data-packet="' + id + '"]');
+    var docs = json('script[data-field-docs="' + id + '"]') || {};
+    if (!el || !data) return;
+    var byId = {};
+    data.fields.forEach(function (f) { byId[f.id] = f; });
+    var chips = el.querySelector(".packet-meta");
+    function paintChips() {
+      if (chips) chips.innerHTML = "<li>" + data.length + " " + ui("bytes") + "</li><li>" + esc(data.encapsulation) + "</li>" +
+        (chips.dataset.ref ? "<li>" + esc(chips.dataset.ref) + "</li>" : "");
+    }
+    var grid = el.querySelector(".bitgrid"), ruler = el.querySelector(".ruler"),
+        tree = el.querySelector(".wstree"), hex = el.querySelector(".hexdump"), panel = el.querySelector(".fpanel");
+
+    var r = "";
+    for (var b = 0; b < 32; b++) r += "<span>" + (b % 10 === 0 ? b / 10 : "") + "</span>";
+    for (b = 0; b < 32; b++) r += "<span>" + (b % 10) + "</span>";
+    ruler.innerHTML = r;
+
+    var g = "";
+    data.fields.forEach(function (f) {
+      var start = f.offset, left = f.bits, first = true;
+      while (left > 0) {
+        var col = start % 32, take = Math.min(left, 32 - col);
+        var cls = "bf l-" + f.layer + (f.repeat ? " rep" : "") + (first ? "" : " cont");
+        var pos = ' style="grid-column:' + (col + 1) + " / span " + take + ";grid-row:" + (Math.floor(start / 32) + 1) + '"';
+        if (first) {
+          g += '<button type="button" class="' + cls + '" data-f="' + f.id + '"' + pos + ">" +
+            '<span class="bn">' + esc(f.name) + '</span><span class="sr-only">: </span><span class="bv">' + esc(f.value) +
+            '</span><span class="sr-only"> (' + f.bits + " bits)</span></button>";
+        } else {
+          g += '<div class="' + cls + '" data-f="' + f.id + '"' + pos + ' aria-hidden="true"><span class="bn">' + esc(f.name) + "</span></div>";
+        }
+        start += take; left -= take; first = false;
+      }
+    });
+    grid.innerHTML = g;
+
+    function mask(m, set, width) {
+      var s = "";
+      for (var k = width - 1; k >= 0; k--) {
+        s += (m >> k) & 1 ? (set ? "1" : "0") : ".";
+        if (k % 4 === 0 && k) s += " ";
+      }
+      return s;
+    }
+    var t = '<details open><summary>' + esc(data.ws_root) + "</summary>";
+    Object.keys(data.ws_layers).forEach(function (layer) {
+      t += '<details open><summary>' + esc(data.ws_layers[layer]) + "</summary>";
+      data.fields.filter(function (f) { return f.layer === layer; }).forEach(function (f) {
+        var line = esc(f.ws_label + ": " + f.value) + '<code class="flt">' + esc(f.ws) + "</code>";
+        if (f.flags) {
+          t += '<details><summary class="tl-s" data-f="' + f.id + '">' + line + "</summary>";
+          f.flags.forEach(function (x) {
+            t += '<div class="tl" data-f="' + f.id + '">' + esc(mask(x.mask, x.set, f.bits) + " = " + x.label + ": ") +
+              '<span data-flag="' + (x.set ? "1" : "0") + '"></span><code class="flt">' + esc(x.ws) + "</code></div>";
+          });
+          t += "</details>";
+        } else {
+          t += '<div class="tl" data-f="' + f.id + '">' + line + "</div>";
+        }
+      });
+      t += "</details>";
+    });
+    tree.innerHTML = t + "</details>";
+
+    if (hex) {
+      var bytes = data.hex.split(" "), owner = [];
+      data.fields.forEach(function (f) { for (var k = f.offset / 8; k < (f.offset + f.bits) / 8; k++) owner[k] = f; });
+      var h = "";
+      for (var row = 0; row < bytes.length; row += 16) {
+        h += '<div class="hr"><span class="ho">' + ("000" + row.toString(16)).slice(-4) + "</span>";
+        for (var c = row; c < Math.min(row + 16, bytes.length); c++) {
+          h += '<span class="hb l-' + owner[c].layer + '" data-f="' + owner[c].id + '">' + bytes[c] + "</span>";
+        }
+        h += "</div>";
+      }
+      hex.innerHTML = h;
+    }
+
+    var active = null;
+    function paintFlags() {
+      el.querySelectorAll("[data-flag]").forEach(function (n) { n.textContent = n.dataset.flag === "1" ? ui("set") : ui("notset"); });
+    }
+    function show(fid) {
+      var f = byId[fid];
+      if (!f) { panel.innerHTML = '<p class="hint">' + esc(ui("hint")) + "</p>"; return; }
+      var d = docs[fid.replace(/\d+$/, "")] || {};
+      panel.innerHTML = "<h4>" + esc(f.name) + "</h4><dl>" +
+        "<dt>" + ui("value") + "</dt><dd><code>" + esc(f.value) + "</code> · <code>" + esc(f.hex) + "</code></dd>" +
+        "<dt>" + ui("offset") + "</dt><dd>" + f.offset + " " + ui("bits") + " (" + f.offset / 8 + " " + ui("bytes") + ")</dd>" +
+        "<dt>" + ui("size") + "</dt><dd>" + f.bits + " " + ui("bits") + " (" + f.bits / 8 + " " + ui("bytes") + ")" + (f.repeat ? " · " + ui("repeat") : "") + "</dd>" +
+        "<dt>" + ui("role") + "</dt><dd>" + esc(d[lang()] || "—") + "</dd>" +
+        "<dt>" + ui("filter") + "</dt><dd><code>" + esc(f.ws) + "</code></dd>" +
+        "<dt>" + ui("ref") + "</dt><dd>" + esc(f.ref) + "</dd></dl>";
+    }
+    function activate(fid) {
+      if (fid === active) return;
+      if (active) el.querySelectorAll('[data-f="' + active + '"]').forEach(function (n) { n.classList.remove("hl"); });
+      active = fid;
+      el.querySelectorAll('[data-f="' + fid + '"]').forEach(function (n) { n.classList.add("hl"); });
+      show(fid);
+    }
+    function pick(e) { var n = e.target.closest && e.target.closest("[data-f]"); if (n && el.contains(n)) activate(n.dataset.f); }
+    el.addEventListener("pointerover", pick);
+    el.addEventListener("focusin", pick);
+    el.addEventListener("click", pick);
+    roving(grid, "button.bf");
+    roving(tree, "summary, .tl");
+    show(null); paintFlags(); paintChips();
+    onLang(function () { show(active); paintFlags(); paintChips(); });
+  }
+
+  /* ---------- Step-by-step exchange: play / pause / previous / next ---------- */
+  function animation(id) {
+    var fig = document.getElementById(id);
+    if (!fig) return;
+    var steps = fig.querySelectorAll(".steps > li"), n = steps.length, i = 0, timer = null;
+    var now = fig.querySelector(".step-now"), svg = fig.querySelector("svg");
+    var btn = {};
+    fig.querySelectorAll("[data-act]").forEach(function (b) { btn[b.dataset.act] = b; });
+    var initial = {};
+    svg.querySelectorAll(".badge").forEach(function (g) { initial[g.id] = { text: g.querySelector("text").textContent, cls: g.getAttribute("class") }; });
+    function render() {
+      svg.querySelectorAll(".msg").forEach(function (g) {
+        var s = +g.dataset.step;
+        g.classList.toggle("future", s > i);
+        g.classList.toggle("current", s === i);
+      });
+      var state = JSON.parse(JSON.stringify(initial));
+      for (var k = 0; k < i; k++) {
+        (steps[k].dataset.set || "").split(";").filter(Boolean).forEach(function (kv) {
+          var p = kv.split("="), v = p[1].split("|");
+          state[p[0]] = { text: v[0], cls: "badge " + v[1] };
+        });
+      }
+      Object.keys(state).forEach(function (bid) {
+        var g = document.getElementById(bid);
+        g.querySelector("text").textContent = state[bid].text;
+        g.setAttribute("class", state[bid].cls);
+      });
+      steps.forEach(function (li, k) {
+        li.classList.toggle("past", k < i - 1);
+        if (k === i - 1) li.setAttribute("aria-current", "step"); else li.removeAttribute("aria-current");
+      });
+      now.textContent = i === 0 ? ui("start") : ui("step") + " " + i + "/" + n + " — " + visibleText(steps[i - 1].querySelector(".txt"));
+      btn.prev.disabled = i === 0; btn.reset.disabled = i === 0; btn.next.disabled = i === n;
+      label();
+    }
+    function label() {
+      btn.play.setAttribute("aria-pressed", timer ? "true" : "false");
+      btn.play.querySelector(".sr-only").textContent = timer ? ui("pause") : ui("play");
+      btn.play.querySelector(".i-play").style.display = timer ? "none" : "";
+      btn.play.querySelector(".i-pause").style.display = timer ? "" : "none";
+      ["prev", "next", "reset"].forEach(function (k) { btn[k].querySelector(".sr-only").textContent = ui(k); });
+    }
+    function stop() { clearInterval(timer); timer = null; label(); }
+    function go(k) { i = Math.max(0, Math.min(n, k)); render(); if (i === n) stop(); }
+    btn.next.addEventListener("click", function () { stop(); go(i + 1); });
+    btn.prev.addEventListener("click", function () { stop(); go(i - 1); });
+    btn.reset.addEventListener("click", function () { stop(); go(0); });
+    btn.play.addEventListener("click", function () {
+      if (timer) { stop(); return; }
+      if (i === n) go(0);
+      timer = setInterval(function () { go(i + 1); }, 2800);
+      go(i + 1);
+    });
+    onLang(render);
+    render();
+  }
+
+  /* ---------- Tabs (WAI-ARIA APG, manual activation on click, automatic on arrows) ---------- */
+  function tabs(id) {
+    var box = document.getElementById(id);
+    if (!box) return;
+    var list = box.querySelector('[role="tablist"]'), all = Array.prototype.slice.call(list.querySelectorAll('[role="tab"]'));
+    function select(t, focus) {
+      all.forEach(function (x) {
+        var on = x === t;
+        x.setAttribute("aria-selected", on ? "true" : "false");
+        x.tabIndex = on ? 0 : -1;
+        document.getElementById(x.getAttribute("aria-controls")).hidden = !on;
+      });
+      if (focus) t.focus();
+    }
+    list.addEventListener("click", function (e) { var t = e.target.closest('[role="tab"]'); if (t) select(t); });
+    list.addEventListener("keydown", function (e) {
+      var i = all.indexOf(document.activeElement), j = -1;
+      if (e.key === "ArrowRight") j = (i + 1) % all.length;
+      else if (e.key === "ArrowLeft") j = (i - 1 + all.length) % all.length;
+      else if (e.key === "Home") j = 0;
+      else if (e.key === "End") j = all.length - 1;
+      if (j < 0) return;
+      e.preventDefault(); select(all[j], true);
+    });
+  }
+
+  /* ---------- Quiz: fieldset/legend, live feedback, explanation + reference ---------- */
+  function quiz(id) {
+    var form = document.getElementById(id);
+    if (!form) return;
+    var qs = form.querySelectorAll(".quiz-q"), score = form.querySelector(".quiz-score");
+    form.addEventListener("submit", function (e) { e.preventDefault(); });
+    function feedback(q) {
+      var fb = q.querySelector(".fb");
+      if (!q.dataset.done) return;
+      if (q.dataset.done === "ok") { fb.textContent = ui("correct"); return; }
+      var right = q.querySelector('input[value="' + q.dataset.answer + '"]').closest("label");
+      fb.textContent = ui("wrong") + " " + visibleText(right.querySelector(".opt"));
+    }
+    function total() {
+      var ok = form.querySelectorAll('.quiz-q[data-done="ok"]').length;
+      score.textContent = ui("score") + " " + ok + " / " + qs.length;
+    }
+    qs.forEach(function (q) {
+      q.querySelector(".btn").addEventListener("click", function () {
+        var sel = q.querySelector("input:checked");
+        if (!sel) { q.querySelector(".fb").textContent = ui("choose"); return; }
+        var ok = sel.value === q.dataset.answer;
+        q.dataset.done = ok ? "ok" : "ko";
+        q.classList.toggle("ok", ok); q.classList.toggle("ko", !ok);
+        q.querySelector(".expl").hidden = false;
+        feedback(q); total();
+      });
+    });
+    onLang(function () { qs.forEach(feedback); total(); });
+    total();
+  }
+
+  /* ---------- Page chrome: language, theme, TOC scroll-spy, copy, print ---------- */
+  function chrome() {
+    var meta = json("#page-meta");
+    function setLang(l, user) {
+      if (LANGS.indexOf(l) < 0) l = "en";
+      root.lang = l;
+      document.querySelectorAll("button[data-lang]").forEach(function (b) { b.setAttribute("aria-pressed", b.dataset.lang === l ? "true" : "false"); });
+      document.querySelectorAll("[data-aria]").forEach(function (n) { n.setAttribute("aria-label", ui(n.dataset.aria)); });
+      if (meta) {
+        document.title = meta.title[l] + (meta.kind === "home" ? "" : " · Network Protocols Expert");
+        var d = document.querySelector('meta[name="description"]');
+        if (d) d.setAttribute("content", meta.description[l]);
+      }
+      if (user) {
+        store("lang", l);
+        if (root.hasAttribute("data-built")) {
+          try {
+            var p = location.pathname.replace(/\/(fr|en|nl|de)\//, "/" + l + "/");
+            if (p !== location.pathname) history.replaceState(null, "", p + location.search + location.hash);
+          } catch (e) { /* file:// or sandboxed: the in-page switch is enough */ }
+        }
+      }
+      listeners.forEach(function (fn) { fn(l); });
+    }
+    document.querySelectorAll("button[data-lang]").forEach(function (b) {
+      b.addEventListener("click", function () { setLang(b.dataset.lang, true); });
+    });
+
+    var themeBtn = document.getElementById("theme");
+    function paintTheme() {
+      var t = root.dataset.theme;
+      var dark = t ? t === "dark" : matchMedia("(prefers-color-scheme: dark)").matches;
+      themeBtn.setAttribute("aria-pressed", dark ? "true" : "false");
+    }
+    if (themeBtn) {
+      themeBtn.addEventListener("click", function () {
+        var n = themeBtn.getAttribute("aria-pressed") === "true" ? "light" : "dark";
+        root.dataset.theme = n; store("theme", n); paintTheme();
+      });
+      matchMedia("(prefers-color-scheme: dark)").addEventListener("change", paintTheme);
+      paintTheme();
+    }
+
+    var links = Array.prototype.slice.call(document.querySelectorAll('.toc a[href^="#"]'));
+    if (links.length && "IntersectionObserver" in window) {
+      var seen = {};
+      var secs = links.map(function (a) { return document.getElementById(a.hash.slice(1)); }).filter(Boolean);
+      var io = new IntersectionObserver(function (es) {
+        es.forEach(function (e) { seen[e.target.id] = e.isIntersecting; });
+        var cur = secs.filter(function (s) { return seen[s.id]; })[0];
+        if (!cur) return;
+        links.forEach(function (a) { if (a.hash === "#" + cur.id) a.setAttribute("aria-current", "location"); else a.removeAttribute("aria-current"); });
+      }, { rootMargin: "-70px 0px -55% 0px" });
+      secs.forEach(function (s) { io.observe(s); });
+    }
+
+    document.querySelectorAll(".copy").forEach(function (b) {
+      b.addEventListener("click", function () {
+        var code = b.closest(".cmd").querySelector("pre code");
+        if (!navigator.clipboard) return;
+        navigator.clipboard.writeText(code.textContent).then(function () {
+          var live = b.querySelector(".copied");
+          live.textContent = ui("copied");
+          setTimeout(function () { live.textContent = ""; }, 1800);
+        });
+      });
+    });
+
+    var opened = [];
+    addEventListener("beforeprint", function () {
+      opened = Array.prototype.filter.call(document.querySelectorAll("details:not([open])"), function (d) { d.open = true; return true; });
+    });
+    addEventListener("afterprint", function () { opened.forEach(function (d) { d.open = false; }); opened = []; });
+
+    setLang(lang(), false);
+  }
+
+  return { packet: packet, animation: animation, tabs: tabs, quiz: quiz, chrome: chrome, onLang: onLang };
+})();
+</script>
 </head>
 <body>
-<header>
-  <h1>Network Protocols Expert</h1>
-  <nav aria-label="Language / theme">
-    <button type="button" data-lang="fr">FR</button>
-    <button type="button" data-lang="en">EN</button>
-    <button type="button" data-lang="nl">NL</button>
-    <button type="button" data-lang="de">DE</button>
-    <button type="button" id="theme" aria-label="Toggle theme">◐</button>
-  </nav>
+<a class="skip" href="#main"><span data-l="fr">Aller au contenu</span><span data-l="en">Skip to content</span><span data-l="nl">Naar de inhoud</span><span data-l="de">Zum Inhalt</span></a>
+
+<header class="site-header">
+  <div class="bar">
+    <a class="brand" href="index.html" data-home>
+      <svg width="28" height="28" viewBox="0 0 32 32" aria-hidden="true"><rect width="32" height="32" rx="7" fill="#1a5fb4"/><path d="M7 10h18M7 16h12M7 22h15" stroke="#fff" stroke-width="3" stroke-linecap="round"/></svg>
+      <span>Network Protocols Expert</span>
+    </a>
+    <div class="controls">
+      <div class="lang" role="group" data-aria="langs" aria-label="Language">
+        <button type="button" data-lang="fr" lang="fr">FR</button>
+        <button type="button" data-lang="en" lang="en">EN</button>
+        <button type="button" data-lang="nl" lang="nl">NL</button>
+        <button type="button" data-lang="de" lang="de">DE</button>
+      </div>
+      <button type="button" id="theme" class="icon-btn" data-aria="theme" aria-label="Dark theme" aria-pressed="false">
+        <svg class="sun" width="18" height="18" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4.5"/><path d="M12 2v2.5M12 19.5V22M2 12h2.5M19.5 12H22M4.9 4.9l1.8 1.8M17.3 17.3l1.8 1.8M4.9 19.1l1.8-1.8M17.3 6.7l1.8-1.8"/></svg>
+        <svg class="moon" width="18" height="18" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M20.5 14.5A8.5 8.5 0 0 1 9.5 3.5a8.5 8.5 0 1 0 11 11z"/></svg>
+      </button>
+    </div>
+  </div>
 </header>
-<main>
-  <p data-i18n="intro" class="muted"></p>
-  <h2 data-i18n="list"></h2>
-  <div class="empty" data-i18n="empty"></div>
+
+<main id="main" class="home" tabindex="-1">
+  <section class="home-hero" aria-labelledby="h-home">
+    <p class="eyebrow"><span data-l="fr">Niveau expert · CCIE</span><span data-l="en">Expert level · CCIE</span><span data-l="nl">Expertniveau · CCIE</span><span data-l="de">Expertenniveau · CCIE</span></p>
+    <h1 id="h-home"><span data-l="fr">Comprendre les protocoles réseau au bit près</span><span data-l="en">Understand network protocols down to the bit</span><span data-l="nl">Netwerkprotocollen tot op de bit begrijpen</span><span data-l="de">Netzwerkprotokolle bis aufs Bit verstehen</span></h1>
+    <p class="lede"><span data-l="fr">Une page par protocole, construite depuis les RFC et la documentation officielle des vendeurs : formats de paquets, machines à états, comportement avancé, configuration multi-vendeurs, dépannage et quiz.</span><span data-l="en">One page per protocol, built from the RFCs and official vendor documentation: packet formats, state machines, advanced behaviour, multi-vendor configuration, troubleshooting and quizzes.</span><span data-l="nl">Eén pagina per protocol, opgebouwd uit de RFC’s en de officiële documentatie van de vendors: pakketformaten, state machines, geavanceerd gedrag, configuratie per vendor, probleemoplossing en quizzen.</span><span data-l="de">Eine Seite pro Protokoll, erstellt aus den RFCs und der offiziellen Herstellerdokumentation: Paketformate, Zustandsautomaten, fortgeschrittenes Verhalten, herstellerübergreifende Konfiguration, Fehlersuche und Quiz.</span></p>
+    <ul class="chips">
+      <li>FR · EN · NL · DE</li>
+      <li><span data-l="fr">RFC cités par section</span><span data-l="en">RFCs cited by section</span><span data-l="nl">RFC’s per sectie geciteerd</span><span data-l="de">RFCs abschnittsgenau zitiert</span></li>
+      <li><span data-l="fr">Fonctionne hors ligne</span><span data-l="en">Works offline</span><span data-l="nl">Werkt offline</span><span data-l="de">Funktioniert offline</span></li>
+    </ul>
+  </section>
+
+  <section aria-labelledby="h-features">
+    <h2 id="h-features" class="sr-only"><span data-l="fr">Contenu de chaque page</span><span data-l="en">What every page contains</span><span data-l="nl">Inhoud van elke pagina</span><span data-l="de">Inhalt jeder Seite</span></h2>
+    <ul class="features">
+      <li><svg width="28" height="28" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="6" rx="1"/><path d="M9 4v6M15 4v6"/><path d="M5 14h14M7 17.5h10M9 21h6"/></svg><h3><span data-l="fr">Paquets bit à bit</span><span data-l="en">Packets bit by bit</span><span data-l="nl">Pakketten bit voor bit</span><span data-l="de">Pakete Bit für Bit</span></h3><p><span data-l="fr">Chaque message en diagramme RFC et en arbre Wireshark synchronisés, avec les noms de filtres.</span><span data-l="en">Every message as a synchronised RFC diagram and Wireshark tree, with filter names.</span><span data-l="nl">Elk bericht als gesynchroniseerd RFC-diagram en Wireshark-boom, met filternamen.</span><span data-l="de">Jede Nachricht als synchrones RFC-Diagramm und Wireshark-Baum, mit Filternamen.</span></p></li>
+      <li><svg width="28" height="28" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="12" r="2.5"/><circle cx="18" cy="6" r="2.5"/><circle cx="18" cy="18" r="2.5"/><path d="M8.3 11l7.4-3.8M8.3 13l7.4 3.8"/></svg><h3><span data-l="fr">Machines à états animées</span><span data-l="en">Animated state machines</span><span data-l="nl">Geanimeerde state machines</span><span data-l="de">Animierte Zustandsautomaten</span></h3><p><span data-l="fr">Les échanges pas à pas, avec lecture, pause et une prédiction à faire avant chaque étape.</span><span data-l="en">Exchanges step by step, with play, pause and a prediction to make before each step.</span><span data-l="nl">Uitwisselingen stap voor stap, met afspelen, pauzeren en een voorspelling vóór elke stap.</span><span data-l="de">Abläufe Schritt für Schritt, mit Abspielen, Pause und einer Vermutung vor jedem Schritt.</span></p></li>
+      <li><svg width="28" height="28" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M7 9l3 3-3 3M12 15h5"/></svg><h3><span data-l="fr">Six vendeurs, chaque commande sourcée</span><span data-l="en">Six vendors, every command sourced</span><span data-l="nl">Zes vendors, elk commando met bron</span><span data-l="de">Sechs Hersteller, jeder Befehl belegt</span></h3><p><span data-l="fr">Configuration, vérification et debug, avec la version testée et le document d’origine.</span><span data-l="en">Configuration, verification and debug, with the version checked and the source document.</span><span data-l="nl">Configuratie, verificatie en debug, met de gecontroleerde versie en het brondocument.</span><span data-l="de">Konfiguration, Verifikation und Debug, mit geprüfter Version und Quelldokument.</span></p></li>
+      <li><svg width="28" height="28" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 9a3 3 0 1 1 4.2 2.8c-.8.4-1.2 1-1.2 1.9V15"/><path d="M12 18.5v.5"/><circle cx="12" cy="12" r="9.5"/></svg><h3><span data-l="fr">Quiz niveau CCIE</span><span data-l="en">CCIE-level quiz</span><span data-l="nl">Quiz op CCIE-niveau</span><span data-l="de">Quiz auf CCIE-Niveau</span></h3><p><span data-l="fr">Scénarios, lecture de paquets, « que se passe-t-il si… », chaque réponse expliquée et référencée.</span><span data-l="en">Scenarios, packet reading, “what breaks if…”, every answer explained and referenced.</span><span data-l="nl">Scenario’s, pakketten lezen, „wat gaat er mis als…”, elk antwoord uitgelegd en met referentie.</span><span data-l="de">Szenarien, Pakete lesen, „was passiert, wenn…“, jede Antwort erklärt und belegt.</span></p></li>
+    </ul>
+  </section>
+
+  <section aria-labelledby="h-protocols">
+    <h2 id="h-protocols"><span data-l="fr">Protocoles</span><span data-l="en">Protocols</span><span data-l="nl">Protocollen</span><span data-l="de">Protokolle</span></h2>
+    <ul class="pcards">
+<!--PROTOCOLS-->
+      <li class="empty"><span data-l="fr">Aucun protocole publié pour l’instant.</span><span data-l="en">No protocol published yet.</span><span data-l="nl">Nog geen protocol gepubliceerd.</span><span data-l="de">Noch kein Protokoll veröffentlicht.</span></li>
+<!--/PROTOCOLS-->
+    </ul>
+  </section>
+
+  <section aria-labelledby="h-platforms">
+    <h2 id="h-platforms"><span data-l="fr">Plateformes couvertes</span><span data-l="en">Platforms covered</span><span data-l="nl">Behandelde platformen</span><span data-l="de">Abgedeckte Plattformen</span></h2>
+    <ul class="vendors">
+      <li>Cisco IOS XE · NX-OS · IOS XR</li><li>Check Point Gaia</li><li>F5 BIG-IP</li><li>Palo Alto PAN-OS</li><li>NetScaler</li><li>FortiGate FortiOS</li>
+    </ul>
+  </section>
 </main>
-<script>
-const T={
- fr:{intro:"Bibliothèque de niveau expert (CCIE) sur les protocoles réseau : schémas RFC bit à bit, arbres Wireshark, configuration multi-vendeurs (Cisco, Check Point, F5, Palo Alto, NetScaler, FortiGate).",list:"Protocoles",empty:"Aucun protocole publié pour l'instant."},
- en:{intro:"Expert-level (CCIE-grade) network protocol library: RFC bit diagrams, Wireshark trees, multi-vendor configuration (Cisco, Check Point, F5, Palo Alto, NetScaler, FortiGate).",list:"Protocols",empty:"No protocol published yet."},
- nl:{intro:"Bibliotheek over netwerkprotocollen op expertniveau (CCIE): RFC-bitdiagrammen, Wireshark-bomen, multivendorconfiguratie (Cisco, Check Point, F5, Palo Alto, NetScaler, FortiGate).",list:"Protocollen",empty:"Nog geen protocol gepubliceerd."},
- de:{intro:"Bibliothek zu Netzwerkprotokollen auf Expertenniveau (CCIE): RFC-Bitdiagramme, Wireshark-Bäume, Multi-Vendor-Konfiguration (Cisco, Check Point, F5, Palo Alto, NetScaler, FortiGate).",list:"Protokolle",empty:"Noch kein Protokoll veröffentlicht."}
-};
-function get(k){try{return localStorage.getItem(k)}catch(e){return null}}
-function set(k,v){try{localStorage.setItem(k,v)}catch(e){}}
-function setLang(l){
-  document.documentElement.lang=l;
-  document.querySelectorAll("[data-i18n]").forEach(e=>{e.textContent=T[l][e.dataset.i18n]});
-  document.querySelectorAll("button[data-lang]").forEach(b=>b.setAttribute("aria-pressed",b.dataset.lang===l));
-  set("lang",l);
-}
-const nav=(navigator.language||"en").slice(0,2);
-setLang(T[get("lang")]?get("lang"):(T[nav]?nav:"en"));
-document.querySelectorAll("button[data-lang]").forEach(b=>b.addEventListener("click",()=>setLang(b.dataset.lang)));
-const th=get("theme");if(th)document.documentElement.dataset.theme=th;
-document.getElementById("theme").addEventListener("click",()=>{
-  const dark=document.documentElement.dataset.theme?document.documentElement.dataset.theme==="dark":matchMedia("(prefers-color-scheme: dark)").matches;
-  const n=dark?"light":"dark";document.documentElement.dataset.theme=n;set("theme",n);
-});
-</script>
+
+<footer class="site-footer">
+  <div class="bar">
+    <span>Network Protocols Expert</span>
+    <span><span data-l="fr">Fondé sur les RFC et la documentation officielle des vendeurs.</span><span data-l="en">Based on the RFCs and official vendor documentation.</span><span data-l="nl">Gebaseerd op de RFC's en officiële documentatie van de vendors.</span><span data-l="de">Basierend auf den RFCs und der offiziellen Herstellerdokumentation.</span></span>
+  </div>
+</footer>
+<script>NPE.chrome();</script>
 </body>
 </html>

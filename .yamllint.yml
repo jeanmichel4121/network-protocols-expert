@@ -2,6 +2,7 @@ extends: default
 ignore: |
   .cache/
   public/
+  .playwright-mcp/
   infra/nas-runner/config/
 rules:
   line-length: {max: 140}

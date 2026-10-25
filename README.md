@@ -16,6 +16,7 @@ in French, English, Dutch and German. Each page contains:
 | Document | Content |
 |---|---|
 | [`CLAUDE.md`](CLAUDE.md) | Authoring rules: page structure, packet views, sources, visuals |
+| [`docs/web-standards.md`](docs/web-standards.md) | Web, accessibility and learning-design standards, with sources |
 | [`CONTRIBUTING.md`](CONTRIBUTING.md) | Branches, Conventional Commits, merge requests, releases |
 | [`CHANGELOG.md`](CHANGELOG.md) | Version history |
 | [`SECURITY.md`](SECURITY.md) | Secrets and confidentiality rules |
@@ -27,8 +28,8 @@ in French, English, Dutch and German. Each page contains:
 | lint | YAML (yamllint), Python (ruff), commit messages (Conventional Commits) |
 | test | packet-builder self-test, static page checks |
 | security | secret scanning (gitleaks) |
-| build | assembles the site in `public/` |
-| verify | headless browser: offline, no console error, 4 languages, 360 px |
+| build | one URL per language (`/fr/` `/en/` `/nl/` `/de/`), hreflang, sitemap, 404 |
+| verify | headless browser: axe WCAG 2.2 AA (light + dark), CLS, reduced motion, hreflang, 360 px, no external request |
 | deploy | https://learning.cuvelier.tech (public), from `main` only, smoke-tested |
 | release | GitLab release from a `vX.Y.Z` tag |
 
