@@ -17,6 +17,11 @@ Versioning rules for this library:
 - Repository governance: MR and issue templates, CODEOWNERS, contributing guide,
   pre-commit hooks, editor and lint configuration.
 
+### Changed
+- Deploy publishes the site publicly on https://learning.cuvelier.tech (NAS, atomic
+  releases, smoke test) instead of GitLab Pages; the runners now live in the homelab
+  stack `learning` (`infra/nas-runner` is a pointer).
+
 ## [0.1.0] - 2026-10-25
 
 ### Added

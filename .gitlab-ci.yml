@@ -1,7 +1,8 @@
 # network-protocols-expert — CI/CD pipeline
 #
-# Runs only on the self-hosted runner on the home NAS (tag `nas`, ARM64, Docker
-# executor). Shared runners are disabled at project level.
+# Runs only on the self-hosted runners on the home NAS (ARM64, Docker executor):
+# tag `nas` for every job, tag `nas-deploy` for the deploy (protected refs only).
+# Shared runners are disabled at project level.
 #
 # Conventions (GitLab "pipeline efficiency" and "pipeline security" guides):
 # - images pinned by tag AND SHA-256 digest, all multi-arch (linux/arm64)
@@ -168,9 +169,16 @@ verify:browser:
     - python3 scripts/smoke_test.py public
 
 # ---------------------------------------------------------------- deploy
-pages:
+# Publishes public/ (from build:site) to https://learning.cuvelier.tech — PUBLIC, no auth.
+# Runs on the dedicated `nas-deploy` runner: gitlab.com only hands it jobs from
+# protected refs, it accepts only official alpine images, and it is the only
+# runner that mounts the site volume (/site) served by the NAS nginx.
+# Layout: /site/releases/<sha>/ + /site/current -> releases/<sha> (atomic swap),
+# the 5 most recent releases are kept.
+deploy:learning:
   stage: deploy
   image: alpine:3.22@sha256:2e0b81d60597f449baa56dc25d355367869d2dca4cd57e866f1e2b52af3eb55f
+  tags: [nas-deploy]
   needs:
     - build:site
     - verify:browser
@@ -181,12 +189,31 @@ pages:
   resource_group: production
   environment:
     name: production
-    url: $CI_PAGES_URL
+    url: https://learning.cuvelier.tech
+  variables:
+    GIT_STRATEGY: none
   script:
     - test -f public/index.html
-  artifacts:
-    paths: [public]
-    expire_in: 30 days
+    - test "$(cat public/version.txt)" = "$CI_COMMIT_SHA"
+    - chmod -R u=rwX,go=rX public
+    - REL="releases/$CI_COMMIT_SHA"
+    - mkdir -p /site/releases
+    - rm -rf "/site/$REL" "/site/$REL.tmp"
+    - cp -a public "/site/$REL.tmp"
+    - mv "/site/$REL.tmp" "/site/$REL"
+    - ln -sfn "$REL" /site/current.new
+    - mv -T /site/current.new /site/current
+    - echo "current -> $(readlink /site/current)"
+    - ls -1t /site/releases | tail -n +6 | while read -r old; do rm -rf "/site/releases/$old"; done
+    # Smoke test through the real ingress (Traefik + TLS).
+    - |
+      for i in 1 2 3 4 5 6; do
+        got=$(wget -qO- https://learning.cuvelier.tech/version.txt 2>/dev/null || true)
+        if [ "$got" = "$CI_COMMIT_SHA" ]; then echo "live: $got"; exit 0; fi
+        sleep 5
+      done
+      echo "smoke test failed: version.txt = '$got'"
+      exit 1
   rules:
     - !reference [.on-default-branch, rules]
 
