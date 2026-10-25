@@ -124,7 +124,11 @@ def localise(text: str, meta: dict, lang: str, path: str, home_href: str) -> str
         head,
         count=1,
     )
-    body = re.sub(r'href="[^"]*" data-home', f'href="{home_href}" data-home', body)
+    body = re.sub(
+        r'href="[^"#]*((?:#[^"]*)?)" data-home', lambda m: f'href="{home_href}{m.group(1)}" data-home', body
+    )
+    sha = os.environ.get("CI_COMMIT_SHA", "local")[:8]
+    body = body.replace("<code data-version>local</code>", f"<code data-version>{esc(sha)}</code>")
     return pre + sep + head + sep2 + body
 
 
