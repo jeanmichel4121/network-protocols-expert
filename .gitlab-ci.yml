@@ -1,0 +1,39 @@
+# All jobs run on the self-hosted runner on the home NAS (ARM64, Docker executor).
+# Images must be multi-arch (linux/arm64). Shared GitLab runners are disabled.
+default:
+  tags: [nas]
+  interruptible: true
+
+stages: [build, validate, deploy]
+
+workflow:
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+    - if: $CI_COMMIT_BRANCH && $CI_OPEN_MERGE_REQUESTS
+      when: never
+    - if: $CI_COMMIT_BRANCH
+
+packet-builder:
+  stage: build
+  image: python:3.12-slim
+  script:
+    - python3 tools/packet-builder.py --self-test
+
+check-pages:
+  stage: validate
+  image: python:3.12-slim
+  script:
+    - python3 scripts/check_pages.py
+
+pages:
+  stage: deploy
+  image: alpine:3.20
+  script:
+    - mkdir -p public
+    - cp index.html public/
+    - if [ -n "$(ls -A protocols 2>/dev/null | grep -v '^.gitkeep$')" ]; then cp -r protocols public/; fi
+    - find public -name 'sources.md' -delete
+  artifacts:
+    paths: [public]
+  rules:
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH

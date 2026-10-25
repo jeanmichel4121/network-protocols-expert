@@ -1,0 +1,29 @@
+# GitLab Runner for network-protocols-expert, on the home NAS (ARM64).
+# 1. cp .env.example .env  and paste the runner authentication token (glrt-...) in .env
+# 2. docker compose run --rm register   (one-shot: writes ./config/config.toml)
+# 3. docker compose up -d runner
+# The runner only makes outbound HTTPS (443) connections to gitlab.com. No inbound port.
+services:
+  runner:
+    image: gitlab/gitlab-runner:alpine
+    container_name: gitlab-runner-npe
+    restart: unless-stopped
+    volumes:
+      - ./config:/etc/gitlab-runner
+      - /var/run/docker.sock:/var/run/docker.sock
+
+  register:
+    image: gitlab/gitlab-runner:alpine
+    profiles: [setup]
+    env_file: .env
+    volumes:
+      - ./config:/etc/gitlab-runner
+    command: >
+      register --non-interactive
+      --url https://gitlab.com
+      --token ${RUNNER_TOKEN}
+      --executor docker
+      --docker-image alpine:3.20
+      --docker-privileged=false
+      --docker-volumes /cache
+      --description nas-arm64

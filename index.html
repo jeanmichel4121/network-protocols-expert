@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Network Protocols Expert</title>
+<style>
+:root{--bg:#fafaf8;--fg:#1d1d1b;--muted:#5f5e5a;--line:#d3d1c7;--accent:#185fa5;--card:#ffffff}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#1d1d1b;--fg:#f1efe8;--muted:#b4b2a9;--line:#444441;--accent:#85b7eb;--card:#2c2c2a}}
+:root[data-theme="dark"]{--bg:#1d1d1b;--fg:#f1efe8;--muted:#b4b2a9;--line:#444441;--accent:#85b7eb;--card:#2c2c2a}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.6 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+header,main{max-width:960px;margin:0 auto;padding:16px}
+header{display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between;border-bottom:1px solid var(--line)}
+h1{font-size:22px;margin:0}
+nav{display:flex;gap:6px;flex-wrap:wrap}
+button{font:inherit;font-size:14px;padding:4px 10px;border:1px solid var(--line);background:var(--card);color:var(--fg);border-radius:6px;cursor:pointer}
+button[aria-pressed="true"]{border-color:var(--accent);color:var(--accent);font-weight:600}
+button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.muted{color:var(--muted)}
+.empty{border:1px dashed var(--line);border-radius:12px;padding:24px;text-align:center}
+@media print{nav{display:none}}
+</style>
+</head>
+<body>
+<header>
+  <h1>Network Protocols Expert</h1>
+  <nav aria-label="Language / theme">
+    <button type="button" data-lang="fr">FR</button>
+    <button type="button" data-lang="en">EN</button>
+    <button type="button" data-lang="nl">NL</button>
+    <button type="button" data-lang="de">DE</button>
+    <button type="button" id="theme" aria-label="Toggle theme">◐</button>
+  </nav>
+</header>
+<main>
+  <p data-i18n="intro" class="muted"></p>
+  <h2 data-i18n="list"></h2>
+  <div class="empty" data-i18n="empty"></div>
+</main>
+<script>
+const T={
+ fr:{intro:"Bibliothèque de niveau expert (CCIE) sur les protocoles réseau : schémas RFC bit à bit, arbres Wireshark, configuration multi-vendeurs (Cisco, Check Point, F5, Palo Alto, NetScaler, FortiGate).",list:"Protocoles",empty:"Aucun protocole publié pour l'instant."},
+ en:{intro:"Expert-level (CCIE-grade) network protocol library: RFC bit diagrams, Wireshark trees, multi-vendor configuration (Cisco, Check Point, F5, Palo Alto, NetScaler, FortiGate).",list:"Protocols",empty:"No protocol published yet."},
+ nl:{intro:"Bibliotheek over netwerkprotocollen op expertniveau (CCIE): RFC-bitdiagrammen, Wireshark-bomen, multivendorconfiguratie (Cisco, Check Point, F5, Palo Alto, NetScaler, FortiGate).",list:"Protocollen",empty:"Nog geen protocol gepubliceerd."},
+ de:{intro:"Bibliothek zu Netzwerkprotokollen auf Expertenniveau (CCIE): RFC-Bitdiagramme, Wireshark-Bäume, Multi-Vendor-Konfiguration (Cisco, Check Point, F5, Palo Alto, NetScaler, FortiGate).",list:"Protokolle",empty:"Noch kein Protokoll veröffentlicht."}
+};
+function get(k){try{return localStorage.getItem(k)}catch(e){return null}}
+function set(k,v){try{localStorage.setItem(k,v)}catch(e){}}
+function setLang(l){
+  document.documentElement.lang=l;
+  document.querySelectorAll("[data-i18n]").forEach(e=>{e.textContent=T[l][e.dataset.i18n]});
+  document.querySelectorAll("button[data-lang]").forEach(b=>b.setAttribute("aria-pressed",b.dataset.lang===l));
+  set("lang",l);
+}
+const nav=(navigator.language||"en").slice(0,2);
+setLang(T[get("lang")]?get("lang"):(T[nav]?nav:"en"));
+document.querySelectorAll("button[data-lang]").forEach(b=>b.addEventListener("click",()=>setLang(b.dataset.lang)));
+const th=get("theme");if(th)document.documentElement.dataset.theme=th;
+document.getElementById("theme").addEventListener("click",()=>{
+  const dark=document.documentElement.dataset.theme?document.documentElement.dataset.theme==="dark":matchMedia("(prefers-color-scheme: dark)").matches;
+  const n=dark?"light":"dark";document.documentElement.dataset.theme=n;set("theme",n);
+});
+</script>
+</body>
+</html>

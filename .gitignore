@@ -1,0 +1,6 @@
+infra/nas-runner/.env
+infra/nas-runner/config/
+public/
+__pycache__/
+*.pyc
+.DS_Store
