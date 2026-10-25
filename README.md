@@ -29,10 +29,11 @@ in French, English, Dutch and German. Each page contains:
 | security | secret scanning (gitleaks) |
 | build | assembles the site in `public/` |
 | verify | headless browser: offline, no console error, 4 languages, 360 px |
-| deploy | GitLab Pages, from `main` only |
+| deploy | https://learning.cuvelier.tech (public), from `main` only, smoke-tested |
 | release | GitLab release from a `vX.Y.Z` tag |
 
-All jobs run on a self-hosted ARM64 runner (tag `nas`), see [`infra/nas-runner`](infra/nas-runner).
+Published at **https://learning.cuvelier.tech** (public, no authentication).
+All jobs run on self-hosted ARM64 runners (tags `nas`, `nas-deploy`), see [`infra/nas-runner`](infra/nas-runner).
 Images are pinned by digest and Python tools by hash.
 
 ## Local checks

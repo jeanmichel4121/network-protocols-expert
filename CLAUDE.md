@@ -16,7 +16,7 @@ each page available in **French, English, Dutch and German**.
 /
 ├── CLAUDE.md
 ├── README.md
-├── .gitlab-ci.yml                  # pipeline: build → validate → deploy (GitLab Pages)
+├── .gitlab-ci.yml                  # pipeline: lint → … → deploy (learning.cuvelier.tech)
 ├── index.html                      # home page: list of all protocols (same 4-language switch)
 ├── templates/
 │   └── protocol-template.html      # the reference page — every protocol page copies it
@@ -30,7 +30,7 @@ each page available in **French, English, Dutch and German**.
 │                                   # check_commits, release_notes, create_release
 ├── requirements/                   # pinned CI tooling (ci.in → ci.txt with hashes)
 ├── infra/
-│   └── nas-runner/                 # docker-compose for the self-hosted runner (no secrets)
+│   └── nas-runner/                 # pointer: runners + web server = homelab stack `learning`
 ├── .gitlab/                        # MR/issue templates, CODEOWNERS
 ├── CHANGELOG.md · CONTRIBUTING.md · SECURITY.md
 └── .pre-commit-config.yaml · .yamllint.yml · pyproject.toml (ruff) · .editorconfig
@@ -41,14 +41,18 @@ each page available in **French, English, Dutch and German**.
 
 ## Git hosting, CI/CD and publication
 - GitLab.com, **private** project "Network Protocols Expert" (`jeanmichel4121/network-protocols-expert`), default branch `main`.
-- All CI jobs run on my **self-hosted runner on my home NAS** (ARM64, Docker executor,
-  tag `nas`). Shared GitLab runners are disabled. Every CI image must exist for
+- All CI jobs run on my **self-hosted runners on my home NAS** (ARM64, Docker executor):
+  tag `nas` for every job, tag `nas-deploy` for the deploy only (protected branches only,
+  official `alpine` images only). Shared GitLab runners are disabled. Every CI image must exist for
   `linux/arm64` (use official multi-arch images: python, alpine, node…).
 - Pipeline stages: `lint` (yamllint, ruff, Conventional Commits) → `test` (packet-builder
   self-test, static page checks) → `security` (gitleaks) → `build` (assemble `public/`)
   → `verify` (Playwright: no external request, no console error, 4 languages, 360 px)
-  → `deploy` (GitLab Pages, `main` only, environment `production`) → `release` (tags).
-  Pages access = project members only.
+  → `deploy` (`main` only, environment `production`) → `release` (tags).
+  The deploy publishes the site **publicly, without authentication**, at
+  **https://learning.cuvelier.tech** and smoke-tests it: anything merged to `main` is
+  visible to everyone. The CSP allows inline JS/CSS and forbids network calls
+  (`connect-src 'none'`).
 - `main` is protected: **no direct push**. Workflow: branch `<type>/<name>` → merge request
   (Default template) → green pipeline + resolved threads → squash merge.
   A page is "done" only when it is published by a green `main` pipeline.
@@ -61,8 +65,8 @@ each page available in **French, English, Dutch and German**.
 - Pin everything: CI images by tag + `@sha256` digest (must support `linux/arm64`),
   Python tools in `requirements/ci.txt` with hashes, pre-commit hooks frozen to SHAs.
 - Run `pre-commit run --all-files` before pushing.
-- Never commit secrets: no tokens, no runner token, no real IPs/hostnames.
-  `infra/nas-runner/.env` is git-ignored.
+- Never commit secrets: no tokens, no runner token, no real IPs/hostnames
+  (the public site name learning.cuvelier.tech is the one exception).
 
 ## Document library (Google Drive)
 - Reference sources (RFC PDFs, vendor guides) live in Google Drive (connector available):
@@ -215,4 +219,4 @@ Rules:
 - [ ] Page opens offline, no console error, no external request
 - [ ] `index.html` updated
 - [ ] Quiz ≥ 15 questions with explanations and references
-- [ ] Merge request merged and the `main` pipeline is green (page published on Pages)
+- [ ] Merge request merged and the `main` pipeline is green (page live on https://learning.cuvelier.tech)
