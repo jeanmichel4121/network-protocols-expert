@@ -29,6 +29,12 @@ Versioning rules for this library:
   hreflang and language-URL checks; static checks for balanced translations, shared
   template blocks, diagram legends and builder-generated packets.
 - `tools/packet-builder.py`: field map output and `--update` to embed samples in a page.
+- Landing page: hero with an animated network topology (OSPF, BGP, TLS, IPsec packets between
+  routers, firewall and load balancer; pausable, paused off-screen, still under reduced motion),
+  key numbers, how a page teaches, platforms and an About band linking to about.cuvelier.tech.
+- About link in the shared header; `tools/sync-shared.py` propagates the template's shared
+  blocks (pre-paint script, styles, page library, header) to every page.
+- CI: axe also runs at 360 px; script-driven animation must stay still under reduced motion.
 
 ### Changed
 - Deploy publishes the site publicly on https://learning.cuvelier.tech (NAS, atomic

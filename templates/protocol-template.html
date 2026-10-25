@@ -115,7 +115,10 @@ button { font: inherit; color: inherit; }
 .icon-btn .moon { display: none; }
 .icon-btn[aria-pressed="true"] .sun { display: none; }
 .icon-btn[aria-pressed="true"] .moon { display: block; }
-@media (max-width: 30rem) { .brand span { display: none; } }
+.nav-link { display: inline-flex; align-items: center; white-space: nowrap; min-height: 2.25rem; padding: 0 0.75rem; border-radius: 999px; color: var(--fg); text-decoration: none; font-size: 0.9rem; font-weight: 600; }
+.nav-link:hover { background: var(--surface-2); }
+/* Small screens: the brand name is hidden visually only — it stays the link's accessible name. */
+@media (max-width: 30rem) { .brand span { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; } .nav-link { padding: 0 0.4rem; } }
 
 /* ===== Layout ========================================================= */
 .layout { max-width: 84rem; margin-inline: auto; padding: 0 clamp(1rem, 3vw, 2rem) 4rem; display: grid; gap: 2rem; }
@@ -631,6 +634,71 @@ window.NPE = (function () {
     total();
   }
 
+  /* ---------- Animated network (decorative hero): pausable, off-screen aware, reduced-motion safe ---------- */
+  function network(id) {
+    var fig = document.getElementById(id);
+    if (!fig) return;
+    var svg = fig.querySelector("svg"), layer = svg.querySelector(".pkts"), ticker = fig.querySelector(".ticker"),
+        btn = fig.querySelector(".net-toggle"), NS = "http://www.w3.org/2000/svg";
+    var flows = JSON.parse(fig.querySelector('script[type="application/json"]').textContent);
+    var nodes = {};
+    svg.querySelectorAll("[data-node]").forEach(function (g) { nodes[g.dataset.node] = [+g.dataset.x, +g.dataset.y]; });
+    var shapes = {
+      ospf: '<circle r="7"/>',
+      bgp: '<path d="M0-9 9 0 0 9-9 0z"/>',
+      tcp: '<rect x="-7" y="-7" width="14" height="14" rx="3"/>',
+      esp: '<path d="M-8-4.5 0-9 8-4.5v9L0 9l-8-4.5z"/>'
+    };
+    var live = [], next = 0, last = 0, wait = 0, raf = 0, running = false, onScreen = true;
+    var wanted = !matchMedia("(prefers-reduced-motion: reduce)").matches;
+    function spawn(flow, t) {
+      var g = document.createElementNS(NS, "g");
+      g.setAttribute("class", "pkt k-" + flow.kind);
+      g.innerHTML = shapes[flow.kind];
+      layer.appendChild(g);
+      var p = { g: g, path: flow.path, hop: 0, t: t || 0 };
+      live.push(p); place(p);
+      ticker.textContent = flow.label;
+    }
+    function place(p) {
+      var a = nodes[p.path[p.hop]], b = nodes[p.path[p.hop + 1]];
+      p.g.setAttribute("transform", "translate(" + (a[0] + (b[0] - a[0]) * p.t).toFixed(1) + " " + (a[1] + (b[1] - a[1]) * p.t).toFixed(1) + ")");
+    }
+    function frame(now) {
+      var dt = last ? Math.min(now - last, 64) : 16;
+      last = now; wait -= dt;
+      if (wait <= 0) { spawn(flows[next++ % flows.length]); wait = 650; }
+      live = live.filter(function (p) {
+        p.t += dt / 1600;
+        if (p.t >= 1) { p.hop++; p.t -= 1; }
+        if (p.hop >= p.path.length - 1) { p.g.remove(); return false; }
+        place(p); return true;
+      });
+      raf = requestAnimationFrame(frame);
+    }
+    function label() {
+      btn.querySelector(".sr-only").textContent = running ? ui("pause") : ui("play");
+      btn.querySelector(".i-play").style.display = running ? "none" : "";
+      btn.querySelector(".i-pause").style.display = running ? "" : "none";
+    }
+    function sync() {
+      var go = wanted && onScreen && !document.hidden;
+      if (go && !running) { running = true; last = 0; raf = requestAnimationFrame(frame); }
+      if (!go && running) { running = false; cancelAnimationFrame(raf); }
+      label();
+    }
+    // Static first frame (also what reduced-motion users keep): one packet of each kind mid-link.
+    flows.forEach(function (f) { spawn(f, 0.5); });
+    ticker.textContent = flows[0].label;
+    btn.addEventListener("click", function () { wanted = !running; sync(); });
+    document.addEventListener("visibilitychange", sync);
+    if ("IntersectionObserver" in window) {
+      new IntersectionObserver(function (es) { onScreen = es[0].isIntersecting; sync(); }).observe(svg);
+    }
+    onLang(label);
+    sync();
+  }
+
   /* ---------- Page chrome: language, theme, TOC scroll-spy, copy, print ---------- */
   function chrome() {
     var meta = json("#page-meta");
@@ -708,7 +776,7 @@ window.NPE = (function () {
     setLang(lang(), false);
   }
 
-  return { packet: packet, animation: animation, tabs: tabs, quiz: quiz, chrome: chrome, onLang: onLang };
+  return { packet: packet, animation: animation, tabs: tabs, quiz: quiz, network: network, chrome: chrome, onLang: onLang };
 })();
 </script>
 </head>
@@ -721,6 +789,7 @@ window.NPE = (function () {
       <svg width="28" height="28" viewBox="0 0 32 32" aria-hidden="true"><rect width="32" height="32" rx="7" fill="#1a5fb4"/><path d="M7 10h18M7 16h12M7 22h15" stroke="#fff" stroke-width="3" stroke-linecap="round"/></svg>
       <span>Network Protocols Expert</span>
     </a>
+    <a class="nav-link" href="https://about.cuvelier.tech"><span data-l="fr">À propos</span><span data-l="en">About</span><span data-l="nl">Over</span><span data-l="de">Über</span></a>
     <div class="controls">
       <div class="lang" role="group" data-aria="langs" aria-label="Language">
         <button type="button" data-lang="fr" lang="fr">FR</button>
@@ -871,7 +940,7 @@ window.NPE = (function () {
         <span class="t" id="anim-2way-t"><span data-l="fr">Séquence — de Down à 2-Way entre R1 et R2 (segment broadcast)</span><span data-l="en">Sequence — from Down to 2-Way between R1 and R2 (broadcast segment)</span><span data-l="nl">Sequentie — van Down naar 2-Way tussen R1 en R2 (broadcastsegment)</span><span data-l="de">Ablauf — von Down zu 2-Way zwischen R1 und R2 (Broadcast-Segment)</span></span>
         <span class="s"><span data-l="fr">Machine à états du voisin, RFC 2328 §10.1, §10.3, §10.5. Faites une prédiction avant chaque étape.</span><span data-l="en">Neighbor state machine, RFC 2328 §10.1, §10.3, §10.5. Make a prediction before each step.</span><span data-l="nl">Neighbor state machine, RFC 2328 §10.1, §10.3, §10.5. Maak een voorspelling vóór elke stap.</span><span data-l="de">Nachbar-Zustandsautomat, RFC 2328 §10.1, §10.3, §10.5. Stellen Sie vor jedem Schritt eine Vermutung auf.</span></span>
       </figcaption>
-      <div class="body">
+      <div class="body" tabindex="0">
         <svg viewBox="0 0 640 330" role="img" aria-labelledby="anim-2way-t anim-2way-now">
           <g class="node"><rect x="50" y="12" width="180" height="44" rx="8"/><text x="140" y="40" text-anchor="middle">R1 · 1.1.1.1</text></g>
           <g class="node"><rect x="410" y="12" width="180" height="44" rx="8"/><text x="500" y="40" text-anchor="middle">R2 · 2.2.2.2</text></g>
@@ -908,7 +977,7 @@ window.NPE = (function () {
     </figure>
     <script>NPE.animation("anim-2way");</script>
 
-    <div class="table-wrap">
+    <div class="table-wrap" tabindex="0">
       <table>
         <caption><span data-l="fr">Temporisateurs et valeurs par défaut</span><span data-l="en">Timers and defaults</span><span data-l="nl">Timers en standaardwaarden</span><span data-l="de">Timer und Standardwerte</span></caption>
         <thead><tr><th scope="col">Timer</th><th scope="col"><span data-l="fr">Valeur</span><span data-l="en">Value</span><span data-l="nl">Waarde</span><span data-l="de">Wert</span></th><th scope="col"><span data-l="fr">Référence</span><span data-l="en">Reference</span><span data-l="nl">Referentie</span><span data-l="de">Referenz</span></th></tr></thead>
@@ -960,13 +1029,13 @@ window.NPE = (function () {
           <div class="cmd">
             <div class="cmd-head"><span data-l="fr">Configuration</span><span data-l="en">Configuration</span><span data-l="nl">Configuratie</span><span data-l="de">Konfiguration</span><span class="ver">IOS XE ⟨version⟩</span>
               <button type="button" class="copy"><span data-l="fr">Copier</span><span data-l="en">Copy</span><span data-l="nl">Kopiëren</span><span data-l="de">Kopieren</span><span class="copied sr-only" aria-live="polite"></span></button></div>
-            <pre><code>⟨TEMPLATE: configuration copied from the cited vendor document⟩</code></pre>
+            <pre tabindex="0"><code>⟨TEMPLATE: configuration copied from the cited vendor document⟩</code></pre>
             <p class="src"><span data-l="fr">Source</span><span data-l="en">Source</span><span data-l="nl">Bron</span><span data-l="de">Quelle</span> : ⟨document title · version · section · URL⟩</p>
           </div>
           <div class="cmd">
             <div class="cmd-head"><span data-l="fr">Vérification</span><span data-l="en">Verification</span><span data-l="nl">Verificatie</span><span data-l="de">Verifikation</span><span class="ver">IOS XE ⟨version⟩</span>
               <button type="button" class="copy"><span data-l="fr">Copier</span><span data-l="en">Copy</span><span data-l="nl">Kopiëren</span><span data-l="de">Kopieren</span><span class="copied sr-only" aria-live="polite"></span></button></div>
-            <pre><code>⟨TEMPLATE: verification command + expected output⟩</code></pre>
+            <pre tabindex="0"><code>⟨TEMPLATE: verification command + expected output⟩</code></pre>
             <p class="src"><span data-l="fr">Source</span><span data-l="en">Source</span><span data-l="nl">Bron</span><span data-l="de">Quelle</span> : ⟨document title · version · section · URL⟩</p>
           </div>
           <div class="callout warn"><svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M12 3 2 20h20z"/><path d="M12 10v4M12 17v.5" stroke-linecap="round"/></svg>
@@ -975,7 +1044,7 @@ window.NPE = (function () {
           <div class="cmd debug">
             <div class="cmd-head">Debug<span class="ver">IOS XE ⟨version⟩</span>
               <button type="button" class="copy"><span data-l="fr">Copier</span><span data-l="en">Copy</span><span data-l="nl">Kopiëren</span><span data-l="de">Kopieren</span><span class="copied sr-only" aria-live="polite"></span></button></div>
-            <pre><code>⟨TEMPLATE: debug command⟩</code></pre>
+            <pre tabindex="0"><code>⟨TEMPLATE: debug command⟩</code></pre>
             <p class="src"><span data-l="fr">Source</span><span data-l="en">Source</span><span data-l="nl">Bron</span><span data-l="de">Quelle</span> : ⟨document title · version · section · URL⟩</p>
           </div>
         </div>
@@ -1002,7 +1071,7 @@ window.NPE = (function () {
         <li id="dt-3" class="leaf"><p class="q"><span class="id">Q3</span><span data-l="fr">Vérifiez la couche 2, les ACL et la concordance de HelloInterval, RouterDeadInterval, masque et zone.</span><span data-l="en">Check layer 2, ACLs and that HelloInterval, RouterDeadInterval, mask and area match.</span><span data-l="nl">Controleer laag 2, ACL's en of HelloInterval, RouterDeadInterval, masker en area overeenkomen.</span><span data-l="de">Prüfen Sie Schicht 2, ACLs und ob HelloInterval, RouterDeadInterval, Maske und Area übereinstimmen.</span></p>
           <p class="tpl" data-tpl><strong>TEMPLATE</strong> <span data-l="fr">— commandes de vérification par vendeur, avec source.</span><span data-l="en">— verification commands per vendor, with source.</span><span data-l="nl">— verificatiecommando's per vendor, met bron.</span><span data-l="de">— Verifikationsbefehle je Hersteller, mit Quelle.</span></p></li>
       </ol>
-      <div class="table-wrap">
+      <div class="table-wrap" tabindex="0">
         <table>
           <caption><span data-l="fr">Pannes fréquentes</span><span data-l="en">Common faults</span><span data-l="nl">Veelvoorkomende fouten</span><span data-l="de">Häufige Fehler</span></caption>
           <thead><tr>

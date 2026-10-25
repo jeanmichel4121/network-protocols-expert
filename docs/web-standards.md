@@ -31,7 +31,7 @@ Last reviewed: 2026-10-25.
 ## 2. Accessibility — WCAG 2.2 level AA
 
 Target: WCAG 2.2 AA [W1]. axe-core checks every built page in the light and the dark
-theme (tags `wcag2a`, `wcag2aa`, `wcag21a`, `wcag21aa`, `wcag22aa`). **[CI]**
+theme and at 360 px (tags `wcag2a`, `wcag2aa`, `wcag21a`, `wcag21aa`, `wcag22aa`). **[CI]**
 
 | Criterion | What it means here |
 |---|---|
@@ -42,6 +42,7 @@ theme (tags `wcag2a`, `wcag2aa`, `wcag21a`, `wcag21aa`, `wcag22aa`). **[CI]**
 | 1.4.3 Contrast | Text ≥ 4.5:1 in both themes (palette tokens are checked by axe in light and dark). **[CI]** |
 | 1.4.1 Use of Color | Colour is always paired with text, a symbol (✓ ✗ ▶) or a line style (solid / dashed / dotted). |
 | 1.4.4 / 1.4.10 Resize, Reflow | Relative units, no horizontal page scroll at 360 px; wide diagrams scroll inside their own container. **[CI]** |
+| 2.1.1 Keyboard (scroll areas) | Every container that can scroll on its own (tables, code blocks, diagrams on small screens) has `tabindex="0"` so keyboard users can scroll it. **[CI]** |
 | 2.1.1 Keyboard | Every widget works with the keyboard: roving tabindex + arrow keys in the bit diagram, the Wireshark tree and the tabs (WAI-ARIA APG pattern). |
 | 2.4.1 Bypass Blocks | "Skip to content" link. |
 | 3.1.1 / 3.1.2 Language | `<html lang>` follows the switch; translated blocks carry their own `lang`. |

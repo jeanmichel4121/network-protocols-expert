@@ -172,11 +172,20 @@ def check_page(browser, base: str, rel: str, axe: str) -> list:
     )
     if running:
         errors.append(f"{running} animation(s) running at load with prefers-reduced-motion: reduce")
+    # Script-driven motion (e.g. the hero topology) must stay still too.
+    probe = (
+        "[...document.querySelectorAll('svg [transform]')].map(n => n.getAttribute('transform')).join('|')"
+    )
+    before = page.evaluate(probe)
+    page.wait_for_timeout(700)
+    if page.evaluate(probe) != before:
+        errors.append("script animation moves with prefers-reduced-motion: reduce")
     ctx.close()
 
-    # Mobile: no horizontal page scroll at 360 px.
+    # Mobile: no horizontal page scroll at 360 px, and axe again (the layout changes).
     ctx, page = new_page(browser, base, errors, viewport={"width": 360, "height": 780})
     page.goto(f"{base}/{rel}", wait_until="load")
+    errors += run_axe(page, axe, "mobile")
     overflow = page.evaluate("document.documentElement.scrollWidth - document.documentElement.clientWidth")
     if overflow > 0:
         errors.append(f"horizontal scroll at 360 px ({overflow} px overflow)")
