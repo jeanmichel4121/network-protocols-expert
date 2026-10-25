@@ -26,8 +26,10 @@ each page available in **French, English, Dutch and German**.
 │       └── sources.md              # every source used, with section numbers and links
 ├── tools/
 │   └── packet-builder.py           # builds sample packets, computes checksums/lengths
-├── scripts/                        # CI scripts: check_pages, smoke_test (browser),
-│                                   # check_commits, release_notes, create_release
+├── scripts/                        # build_site (one URL per language), check_pages,
+│                                   # smoke_test (browser + axe), check_commits, releases
+├── docs/
+│   └── web-standards.md            # web, accessibility and learning-design standards (sourced)
 ├── requirements/                   # pinned CI tooling (ci.in → ci.txt with hashes)
 ├── infra/
 │   └── nas-runner/                 # pointer: runners + web server = homelab stack `learning`
@@ -78,6 +80,9 @@ each page available in **French, English, Dutch and German**.
   Cite the document used (title + link) and its version.
 
 ## HTML technical rules (mandatory)
+Full rationale and sources: [`docs/web-standards.md`](docs/web-standards.md). Start every
+page from `templates/protocol-template.html`; its shared style block and page library are
+copied verbatim (CI fails if a page drifts — change the template, then propagate).
 - **One self-contained file per page**: CSS, JS and SVG inline. No CDN, no external
   font, no external image, no network call. The page must open offline by double-click.
 - Vanilla HTML/CSS/JS only (no framework, no build step).
@@ -86,16 +91,26 @@ each page available in **French, English, Dutch and German**.
   inside their own container).
 - `localStorage` only for per-viewer conveniences (chosen language, theme), always wrapped
   in try/catch; the page must work without it.
-- Accessible: semantic headings, `alt`/`aria-label`, keyboard-usable interactive elements,
-  visible focus, WCAG AA contrast.
+- Accessible: **WCAG 2.2 AA** (axe-core in CI, light and dark theme): semantic headings,
+  keyboard-usable widgets (roving tabindex + arrow keys), visible focus not hidden by the
+  sticky header, targets ≥ 24×24 px, accessible name = visible text, live regions for
+  feedback, contrast ≥ 4.5:1 in both themes.
+- Motion: Play always has Pause; `prefers-reduced-motion` turns animation off.
+- No layout shift (CLS < 0.1): theme/language set in `<head>` before paint; each widget
+  rendered by an inline call right after its markup.
 - Printable: a print stylesheet that shows the current language only and expands all
   collapsible sections.
 
 ## Multilingual rules
-- **One page, a language switch FR | EN | NL | DE** in the header. The four language
-  versions are all inside the page (e.g. `<span lang="fr">…</span>` blocks or an inline
-  JS dictionary); switching language never reloads the page.
-- Default language: the browser language if it is fr/en/nl/de, else EN.
+- **One source page, a language switch FR | EN | NL | DE** in the header. The four language
+  versions are all inside the page as `data-l="fr|en|nl|de"` blocks (plus the template's
+  UI dictionary for generated text); switching language never reloads the page.
+- **Published with one URL per language** (`/fr/<slug>/`, `/en/<slug>/`…), built by
+  `scripts/build_site.py` with `hreflang`, canonical, Open Graph and JSON-LD per language
+  (Google indexes one language per URL). The switch rewrites the URL to the matching
+  language without reloading. Title and description per language live in `#page-meta`.
+- Default language: the URL's language on the published site; for a source file opened
+  locally, the saved choice, else the browser language if fr/en/nl/de, else EN.
   Remember the choice in `localStorage`. Set `<html lang>` on switch.
 - **Always kept in English in all 4 languages**: protocol field names (Router ID,
   Packet length…), states and events (2-Way, ExStart, Established…), message names
@@ -147,7 +162,10 @@ Optional complements, only when they add value:
 Correctness rules for sample packets:
 - **Never hand-write values or hex.** Generate every sample packet with
   `tools/packet-builder.py` (Python, struct or scapy) so lengths, checksums, padding
-  and flags are correct, and take the displayed values from its output.
+  and flags are correct. The builder also emits the field map (offset, size, value,
+  Wireshark label and filter, RFC section); the page embeds it with
+  `python3 tools/packet-builder.py --update protocols/<slug>/index.html` and both views
+  are rendered from it. CI fails if an embedded packet differs from the builder output.
 - All views of a packet describe the same packet: values in the bit diagram, the tree
   and any optional view must match.
 
@@ -210,13 +228,16 @@ Rules:
 - Ask me only when unsure of the request or when you lack the permission to do the task.
 
 ## Definition of done (check before saying a page is finished)
-- [ ] Same section order as the template; all 4 languages complete and switchable
+- [ ] Same section order as the template; all 4 languages complete and switchable;
+      `#page-meta` title/description in 4 languages; no `TEMPLATE` placeholder left
 - [ ] Every message type has BOTH the RFC bit diagram and the Wireshark tree, synchronised;
       sample packet generated by script
 - [ ] Every vendor covered (or explicitly "not supported" with source); versions stated
 - [ ] Every command block and every RFC fact has a citation; `sources.md` updated
 - [ ] Every diagram has a title and a complete legend; light/dark/print checked
 - [ ] Page opens offline, no console error, no external request
+- [ ] `verify:browser` green: axe WCAG 2.2 AA (light + dark), CLS < 0.1, reduced motion,
+      hreflang/canonical, 360 px
 - [ ] `index.html` updated
 - [ ] Quiz ≥ 15 questions with explanations and references
 - [ ] Merge request merged and the `main` pipeline is green (page live on https://learning.cuvelier.tech)

@@ -1,0 +1,1089 @@
+<!doctype html>
+<!--
+  Network Protocols Expert — reference page template.
+  Copy this file to protocols/<slug>/index.html, then replace every block marked
+  TEMPLATE. Rules: CLAUDE.md + docs/web-standards.md. Demo content: OSPFv2 Hello.
+  scripts/build_site.py rewrites <html lang>, <title>, the description, canonical,
+  hreflang, Open Graph and JSON-LD for each language URL (/fr/<slug>/ …) from #page-meta.
+-->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light dark">
+<title>Protocol page template · Network Protocols Expert</title>
+<meta name="description" content="Reference template for every protocol page of the Network Protocols Expert library.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%231a5fb4'/%3E%3Cpath d='M7 10h18M7 16h12M7 22h15' stroke='%23fff' stroke-width='3' stroke-linecap='round'/%3E%3C/svg%3E">
+<script type="application/json" id="page-meta">
+{"slug":"_template","name":"OSPFv2","kind":"protocol","updated":"2026-10-25",
+ "title":{"fr":"Modèle de page protocole","en":"Protocol page template","nl":"Sjabloon voor protocolpagina","de":"Vorlage für Protokollseiten"},
+ "description":{"fr":"Modèle de référence de chaque page protocole de la bibliothèque Network Protocols Expert.","en":"Reference template for every protocol page of the Network Protocols Expert library.","nl":"Referentiesjabloon voor elke protocolpagina van de bibliotheek Network Protocols Expert.","de":"Referenzvorlage für jede Protokollseite der Bibliothek Network Protocols Expert."},
+ "tags":["IGP","link-state","IPv4"],"standards":["RFC 2328"]}
+</script>
+<script>
+/* Runs before first paint: theme and language are applied before anything is drawn,
+   so neither causes a flash nor a layout shift. */
+(function () {
+  var r = document.documentElement;
+  function get(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
+  var t = get("theme");
+  if (t === "light" || t === "dark") r.dataset.theme = t;
+  if (!r.hasAttribute("data-built")) {
+    var l = get("lang") || (navigator.language || "en").slice(0, 2).toLowerCase();
+    r.lang = ["fr", "en", "nl", "de"].indexOf(l) < 0 ? "en" : l;
+  }
+})();
+</script>
+<style>
+/* ===== Tokens ======================================================== */
+:root {
+  color-scheme: light dark;
+  --bg: light-dark(#fbfaf7, #131312);
+  --surface: light-dark(#ffffff, #1c1c1a);
+  --surface-2: light-dark(#f3f1ec, #252523);
+  --fg: light-dark(#1d1d1b, #ecebe6);
+  --muted: light-dark(#5a5954, #aeaca4);
+  --line: light-dark(#dcd9cf, #3a3936);
+  --accent: light-dark(#1a5fb4, #8ab4f8);
+  --accent-ink: light-dark(#ffffff, #0b1b33);
+  --code-bg: light-dark(#f6f5f1, #0e0e0d);
+  /* Library colour code (CLAUDE.md "Visual standards") — fill / border pairs */
+  --grey-bg: light-dark(#ebe9e3, #2d2c29);     --grey: light-dark(#6b685f, #a3a097);
+  --blue-bg: light-dark(#dbe8fa, #1b3456);     --blue: light-dark(#1a5fb4, #7fb0f5);
+  --teal-bg: light-dark(#d3f0ea, #123e39);     --teal: light-dark(#0f766e, #52c4b5);
+  --purple-bg: light-dark(#ebe1fb, #392a5b);   --purple: light-dark(#6a3dbd, #b49ef2);
+  --orange-bg: light-dark(#fde5cf, #4c2c10);   --orange: light-dark(#8a4006, #f2a660);
+  --green-bg: light-dark(#d9f2de, #173e21);    --green: light-dark(#1d7433, #72d08a);
+  --red-bg: light-dark(#fadedb, #4b1b18);      --red: light-dark(#b42318, #f28b82);
+  --font: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --mono: ui-monospace, "SF Mono", "Cascadia Code", "JetBrains Mono", Menlo, Consolas, monospace;
+  --radius: 12px;
+  --header-h: 3.75rem;
+}
+:root[data-theme="light"] { color-scheme: light; }
+:root[data-theme="dark"] { color-scheme: dark; }
+
+/* ===== Language visibility: one page, four languages ================= */
+html[lang="fr"] [data-l]:not([data-l="fr"]),
+html[lang="en"] [data-l]:not([data-l="en"]),
+html[lang="nl"] [data-l]:not([data-l="nl"]),
+html[lang="de"] [data-l]:not([data-l="de"]) { display: none !important; }
+
+/* ===== Base =========================================================== */
+*, *::before, *::after { box-sizing: border-box; }
+html { scroll-padding-top: calc(var(--header-h) + 1rem); -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+@media (prefers-reduced-motion: no-preference) { html { scroll-behavior: smooth; } }
+body {
+  margin: 0; background: var(--bg); color: var(--fg);
+  font: clamp(1rem, 0.96rem + 0.2vw, 1.0625rem)/1.6 var(--font);
+  text-rendering: optimizeLegibility;
+}
+h1, h2, h3, h4 { line-height: 1.2; text-wrap: balance; margin: 0 0 0.6em; }
+h1 { font-size: clamp(2rem, 1.5rem + 2.2vw, 3rem); letter-spacing: -0.02em; }
+h2 { font-size: clamp(1.5rem, 1.3rem + 0.9vw, 2rem); letter-spacing: -0.01em; }
+h3 { font-size: 1.25rem; }
+p, li, dd { max-width: 72ch; text-wrap: pretty; }
+a { color: var(--accent); text-underline-offset: 0.18em; }
+a:hover { text-decoration-thickness: 2px; }
+code, kbd, pre { font-family: var(--mono); font-size: 0.875em; }
+:not(pre) > code { background: var(--surface-2); padding: 0.1em 0.35em; border-radius: 5px; }
+:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; border-radius: 4px; }
+button { font: inherit; color: inherit; }
+.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
+.skip { position: absolute; left: 1rem; top: -4rem; z-index: 100; background: var(--accent); color: var(--accent-ink); padding: 0.6rem 1rem; border-radius: 8px; }
+.skip:focus { top: 0.75rem; }
+
+/* ===== Header ========================================================= */
+.site-header {
+  position: sticky; top: 0; z-index: 50; height: var(--header-h);
+  background: color-mix(in srgb, var(--bg) 88%, transparent);
+  backdrop-filter: saturate(1.4) blur(10px);
+  border-bottom: 1px solid var(--line);
+}
+.site-header .bar { max-width: 84rem; height: 100%; margin-inline: auto; padding-inline: clamp(1rem, 3vw, 2rem); display: flex; align-items: center; gap: 1rem; }
+.brand { display: flex; align-items: center; gap: 0.6rem; font-weight: 650; color: var(--fg); text-decoration: none; margin-right: auto; min-width: 0; }
+.brand svg { flex: none; }
+.brand span { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.controls { display: flex; align-items: center; gap: 0.5rem; }
+.lang { display: flex; border: 1px solid var(--line); border-radius: 999px; padding: 2px; background: var(--surface); }
+.lang button, .icon-btn {
+  min-width: 2.5rem; min-height: 2.25rem; border: 0; background: transparent; border-radius: 999px;
+  cursor: pointer; font-size: 0.8125rem; font-weight: 600; color: var(--muted);
+}
+.lang button[aria-pressed="true"] { background: var(--accent); color: var(--accent-ink); }
+.icon-btn { border: 1px solid var(--line); background: var(--surface); display: grid; place-items: center; color: var(--fg); }
+.icon-btn .moon { display: none; }
+.icon-btn[aria-pressed="true"] .sun { display: none; }
+.icon-btn[aria-pressed="true"] .moon { display: block; }
+@media (max-width: 30rem) { .brand span { display: none; } }
+
+/* ===== Layout ========================================================= */
+.layout { max-width: 84rem; margin-inline: auto; padding: 0 clamp(1rem, 3vw, 2rem) 4rem; display: grid; gap: 2rem; }
+.layout > main { min-width: 0; }
+.toc { font-size: 0.9rem; }
+.toc summary { cursor: pointer; font-weight: 650; padding: 0.6rem 0; list-style-position: inside; }
+.toc ol { list-style: none; margin: 0; padding: 0 0 0.5rem; border-left: 2px solid var(--line); }
+.toc a { display: block; padding: 0.3rem 0.8rem; margin-left: -2px; border-left: 2px solid transparent; color: var(--muted); text-decoration: none; min-height: 1.5rem; }
+.toc a:hover { color: var(--fg); }
+.toc a[aria-current] { color: var(--accent); border-left-color: var(--accent); font-weight: 600; }
+.toc .n { display: inline-block; min-width: 1.4em; font-variant-numeric: tabular-nums; }
+@media (max-width: 63.99rem) { .toc { border: 1px solid var(--line); border-radius: var(--radius); padding: 0 1rem; background: var(--surface); margin-top: 1rem; } }
+@media (min-width: 64rem) {
+  .layout { grid-template-columns: minmax(0, 1fr) 15rem; gap: 3.5rem; }
+  .toc { grid-column: 2; grid-row: 1; position: sticky; top: calc(var(--header-h) + 1.5rem); align-self: start; max-height: calc(100dvh - var(--header-h) - 3rem); overflow-y: auto; margin-top: 2.5rem; }
+}
+
+/* ===== Hero =========================================================== */
+.crumbs ol { list-style: none; display: flex; flex-wrap: wrap; gap: 0.4rem; padding: 0; margin: 1.75rem 0 1.25rem; font-size: 0.875rem; color: var(--muted); }
+.crumbs li + li::before { content: "/"; margin-right: 0.4rem; color: var(--line); }
+.crumbs a { color: var(--muted); }
+.hero { padding-bottom: 2rem; border-bottom: 1px solid var(--line); margin-bottom: 2.5rem; }
+.eyebrow { font-size: 0.8125rem; font-weight: 650; text-transform: uppercase; letter-spacing: 0.08em; color: var(--accent); margin: 0 0 0.5rem; }
+.lede { font-size: 1.1875rem; color: var(--muted); margin: 0 0 1.5rem; }
+.facts { display: grid; grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr)); gap: 0.75rem; margin: 0; }
+.facts div { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 0.75rem 1rem; }
+.facts dt { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); font-weight: 650; }
+.facts dd { margin: 0.2rem 0 0; font-weight: 550; }
+
+/* ===== Sections ======================================================= */
+.sec { margin-bottom: 3.5rem; }
+.sec > h2, .sec > details > summary h2 { display: flex; align-items: baseline; gap: 0.6rem; }
+.sec .num { font-size: 0.65em; font-weight: 700; color: var(--accent); font-variant-numeric: tabular-nums; border: 1.5px solid currentColor; border-radius: 8px; padding: 0.05em 0.4em; }
+.sec > details > summary { cursor: pointer; list-style: none; }
+.sec > details > summary::-webkit-details-marker { display: none; }
+.sec > details > summary h2::after { content: "▾"; margin-left: auto; font-size: 0.7em; color: var(--muted); transition: transform 0.2s; }
+.sec > details:not([open]) > summary h2::after { transform: rotate(-90deg); }
+.tpl { border: 2px dashed var(--orange); background: var(--orange-bg); border-radius: var(--radius); padding: 0.75rem 1rem; font-size: 0.9375rem; margin: 1rem 0; }
+.tpl strong { color: var(--fg); letter-spacing: 0.04em; }
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 1.25rem; }
+.terms { display: grid; gap: 0.75rem; margin: 1rem 0; }
+.terms div { border-left: 3px solid var(--blue); padding-left: 0.9rem; }
+.terms dt { font-weight: 650; }
+.terms dd { margin: 0.15rem 0 0; color: var(--muted); }
+
+/* Callouts — icon + label, never colour alone */
+.callout { display: grid; grid-template-columns: auto 1fr; gap: 0.75rem; border: 1px solid; border-left-width: 4px; border-radius: 10px; padding: 0.9rem 1rem; margin: 1.25rem 0; }
+.callout > svg { margin-top: 0.15rem; }
+.callout p { margin: 0.2rem 0 0; }
+.callout .label { font-weight: 700; }
+.callout.note { border-color: var(--blue); background: var(--blue-bg); }
+.callout.note .label, .callout.note svg { color: var(--blue); }
+.callout.warn { border-color: var(--red); background: var(--red-bg); }
+.callout.warn .label, .callout.warn svg { color: var(--red); }
+.callout.vendor { border-color: var(--orange); background: var(--orange-bg); }
+.callout.vendor .label, .callout.vendor svg { color: var(--orange); }
+
+/* Tables */
+.table-wrap { overflow-x: auto; border: 1px solid var(--line); border-radius: var(--radius); margin: 1.25rem 0; background: var(--surface); }
+table { border-collapse: collapse; width: 100%; font-size: 0.9375rem; }
+caption { text-align: left; font-weight: 650; padding: 0.8rem 1rem 0.4rem; }
+th, td { text-align: left; vertical-align: top; padding: 0.6rem 1rem; border-top: 1px solid var(--line); }
+th { background: var(--surface-2); font-weight: 650; white-space: nowrap; }
+
+/* ===== Figures: title + legend on every diagram ====================== */
+.diagram { margin: 1.5rem 0; border: 1px solid var(--line); border-radius: var(--radius); background: var(--surface); overflow: hidden; }
+.diagram > figcaption { padding: 0.9rem 1.1rem; border-bottom: 1px solid var(--line); }
+.diagram > figcaption .t { font-weight: 650; display: block; }
+.diagram > figcaption .s { font-size: 0.875rem; color: var(--muted); }
+.diagram .body { padding: 1.1rem; }
+.legend { display: flex; flex-wrap: wrap; gap: 0.5rem 1.25rem; margin: 0; padding: 0.8rem 1.1rem; border-top: 1px solid var(--line); background: var(--surface-2); font-size: 0.8125rem; }
+.legend div { display: flex; align-items: center; gap: 0.45rem; }
+.legend dt { display: flex; }
+.legend dd { margin: 0; }
+.sw { width: 1.4rem; height: 0.95rem; border-radius: 3px; border: 2px solid; display: inline-block; }
+.sw.l-header { background: var(--blue-bg); border-color: var(--blue); }
+.sw.l-body { background: var(--teal-bg); border-color: var(--teal); border-style: dashed; }
+.sw.l-tlv { background: var(--purple-bg); border-color: var(--purple); border-style: dotted; }
+.sw.l-encap { background: var(--grey-bg); border-color: var(--grey); }
+.sw.rep { background: var(--surface); border-color: var(--muted); border-style: dashed; }
+.sw.hl { background: var(--surface); border-color: var(--accent); outline: 2px solid var(--accent); }
+
+/* ===== Packet views =================================================== */
+.packet { margin: 1.5rem 0 3rem; }
+.packet-meta { display: flex; flex-wrap: wrap; gap: 0.5rem; margin: 0 0 1rem; padding: 0; list-style: none; }
+.packet-meta li { font-size: 0.8125rem; background: var(--surface-2); border: 1px solid var(--line); border-radius: 999px; padding: 0.15rem 0.7rem; }
+.views { display: grid; gap: 1rem; }
+.views > * { min-width: 0; }
+@media (min-width: 90rem) { .views { grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr); } }
+.view-title { font-size: 0.8125rem; font-weight: 650; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); margin: 0 0 0.5rem; }
+.scroll-x { overflow-x: auto; padding-bottom: 0.25rem; }
+.ruler, .bitgrid { display: grid; grid-template-columns: repeat(32, minmax(1.15rem, 1fr)); min-width: 37rem; }
+.ruler { font: 0.6875rem/1.3 var(--mono); color: var(--muted); text-align: center; }
+.ruler span:nth-child(-n+32) { text-align: left; }
+.bitgrid { gap: 0; border-left: 1px solid var(--line); border-top: 1px solid var(--line); }
+.bf {
+  min-height: 3.1rem; padding: 0.3rem 0.4rem; border: 0; border-right: 1px solid var(--line); border-bottom: 1px solid var(--line);
+  display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; min-width: 0;
+  border-top: 3px solid; cursor: pointer; font-size: 0.75rem; line-height: 1.25; color: var(--fg);
+  position: relative; /* keeps the .sr-only helpers inside the scroll container */
+}
+.bf .bn { font-weight: 600; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.bf .bv { font-family: var(--mono); font-size: 0.75rem; color: var(--muted); max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.l-header { background: var(--blue-bg); border-top-color: var(--blue); }
+.l-body { background: var(--teal-bg); border-top-color: var(--teal); border-top-style: dashed; }
+.l-tlv { background: var(--purple-bg); border-top-color: var(--purple); border-top-style: dotted; }
+.l-encap { background: var(--grey-bg); border-top-color: var(--grey); }
+.bf.rep { background-image: repeating-linear-gradient(135deg, transparent 0 8px, color-mix(in srgb, var(--fg) 7%, transparent) 8px 9px); }
+.bf.rep .bn::after { content: " …"; }
+.hl { outline: 3px solid var(--accent); outline-offset: -3px; position: relative; z-index: 1; }
+.bf.cont .bn { font-weight: 400; font-style: italic; }
+
+.wstree { font: 0.8125rem/1.55 var(--mono); background: var(--code-bg); border: 1px solid var(--line); border-radius: 10px; padding: 0.6rem 0.4rem; overflow-x: auto; }
+.wstree details { padding-left: 1rem; }
+.wstree > details { padding-left: 0; }
+.wstree summary { cursor: pointer; padding: 0.1rem 0.4rem; border-radius: 4px; white-space: nowrap; }
+.wstree .tl { padding: 0.1rem 0.4rem 0.1rem 1.35rem; border-radius: 4px; white-space: nowrap; cursor: default; }
+.wstree .flt { color: var(--muted); margin-left: 0.75rem; font-size: 0.75rem; }
+.wstree .flt::before { content: "["; } .wstree .flt::after { content: "]"; }
+.wstree .hl { outline-offset: 0; background: color-mix(in srgb, var(--accent) 14%, transparent); }
+
+.fpanel { margin-top: 1rem; border: 1px solid var(--line); border-radius: 10px; background: var(--surface-2); padding: 0.9rem 1rem; min-height: 9.5rem; }
+.fpanel .hint { color: var(--muted); margin: 0; }
+.fpanel h4 { margin: 0 0 0.5rem; font-size: 1rem; }
+.fpanel dl { display: grid; grid-template-columns: max-content 1fr; gap: 0.25rem 1rem; margin: 0; font-size: 0.875rem; }
+.fpanel dt { color: var(--muted); }
+.fpanel dd { margin: 0; }
+
+.hexwrap { margin-top: 1rem; }
+.hexwrap > summary { cursor: pointer; font-weight: 600; font-size: 0.875rem; }
+.hexdump { font: 0.8125rem/1.7 var(--mono); background: var(--code-bg); border: 1px solid var(--line); border-radius: 10px; padding: 0.6rem 0.8rem; overflow-x: auto; margin-top: 0.5rem; }
+.hexdump .hr { white-space: nowrap; }
+.hexdump .ho { color: var(--muted); margin-right: 1rem; }
+.hexdump .hb { display: inline-block; width: 2.3ch; text-align: center; margin-right: 0.35ch; border-radius: 3px; border-top: 2px solid; }
+
+/* ===== Animation ====================================================== */
+.anim .body { overflow-x: auto; }
+.anim svg { width: 100%; min-width: 30rem; height: auto; display: block; max-width: 44rem; margin-inline: auto; }
+.anim svg text { fill: var(--fg); font: 600 16px var(--font); }
+.anim svg .lbl { font: 500 15px var(--mono); fill: var(--fg); }
+.anim .node rect { fill: var(--surface-2); stroke: var(--line); stroke-width: 1.5; }
+.anim .life { stroke: var(--line); stroke-width: 2; stroke-dasharray: 4 5; }
+.anim .msg line { stroke: var(--blue); stroke-width: 2; }
+.anim .msg path { fill: var(--blue); }
+.anim .msg { transition: opacity 0.35s ease; }
+.anim .msg.future { opacity: 0.14; }
+.anim .msg.current line { stroke-width: 3.5; }
+.anim .msg.current .lbl { font-weight: 700; }
+.anim .badge rect { stroke-width: 2; }
+.anim .badge.s-grey rect { fill: var(--grey-bg); stroke: var(--grey); }
+.anim .badge.s-blue rect { fill: var(--blue-bg); stroke: var(--blue); }
+.anim .badge.s-green rect { fill: var(--green-bg); stroke: var(--green); }
+.anim .badge.s-red rect { fill: var(--red-bg); stroke: var(--red); }
+.anim .badge text { font: 600 14px var(--mono); }
+.anim-controls { display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem; padding: 0.8rem 1.1rem; border-top: 1px solid var(--line); }
+.anim-controls button {
+  min-width: 2.75rem; min-height: 2.5rem; border-radius: 10px; border: 1px solid var(--line);
+  background: var(--surface); cursor: pointer; display: inline-grid; place-items: center;
+}
+.anim-controls button[aria-pressed="true"] { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+.anim-controls button:disabled { opacity: 0.4; cursor: not-allowed; }
+.step-now { margin: 0 0 0 0.5rem; font-size: 0.9375rem; flex: 1 1 14rem; }
+.steps { margin: 0; padding: 0.9rem 1.1rem 0.9rem 2.6rem; border-top: 1px solid var(--line); display: grid; gap: 0.5rem; }
+.steps li { color: var(--muted); }
+.steps li::marker { font-weight: 700; }
+.steps li.past { color: var(--fg); }
+.steps li[aria-current="step"] { color: var(--fg); font-weight: 550; }
+.steps li[aria-current="step"]::marker { color: var(--accent); }
+.predict { margin-top: 0.35rem; font-weight: 400; }
+.predict summary { cursor: pointer; color: var(--accent); font-weight: 600; }
+
+/* ===== Vendor tabs & commands ======================================== */
+.tabs [role="tablist"] { display: flex; gap: 0.25rem; overflow-x: auto; border-bottom: 1px solid var(--line); }
+.tabs [role="tab"] {
+  border: 0; background: none; padding: 0.7rem 1rem; min-height: 2.75rem; cursor: pointer; white-space: nowrap;
+  color: var(--muted); font-weight: 600; border-bottom: 3px solid transparent; margin-bottom: -1px;
+}
+.tabs [role="tab"][aria-selected="true"] { color: var(--accent); border-bottom-color: var(--accent); }
+.tabs [role="tabpanel"] { padding-top: 1.25rem; }
+.cmd { border: 1px solid var(--line); border-radius: 10px; overflow: hidden; margin: 1rem 0; background: var(--surface); }
+.cmd-head { display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem; padding: 0.5rem 0.6rem 0.5rem 1rem; border-bottom: 1px solid var(--line); background: var(--surface-2); font-size: 0.875rem; font-weight: 650; }
+.ver { font: 600 0.75rem var(--mono); padding: 0.1rem 0.55rem; border-radius: 999px; border: 1px solid var(--line); background: var(--surface); color: var(--muted); }
+.copy { margin-left: auto; min-height: 2rem; min-width: 4.5rem; border: 1px solid var(--line); background: var(--surface); border-radius: 8px; cursor: pointer; font-size: 0.8125rem; }
+.cmd pre { margin: 0; padding: 0.9rem 1rem; overflow-x: auto; background: var(--code-bg); line-height: 1.55; tab-size: 4; }
+.cmd .src { margin: 0; padding: 0.55rem 1rem; font-size: 0.8125rem; color: var(--muted); border-top: 1px solid var(--line); }
+.cmd.debug { border-color: var(--red); }
+
+/* ===== Troubleshooting tree ========================================== */
+.dtree { list-style: none; padding: 0; margin: 1rem 0; display: grid; gap: 0.75rem; }
+.dtree > li { border: 1px solid var(--line); border-radius: 10px; padding: 0.8rem 1rem; background: var(--surface); }
+.dtree > li:target { outline: 3px solid var(--accent); }
+.dtree .q { font-weight: 650; margin: 0 0 0.5rem; }
+.dtree .q .id { color: var(--accent); margin-right: 0.4rem; }
+.dtree .ans { display: flex; flex-wrap: wrap; gap: 0.5rem; margin: 0; padding: 0; list-style: none; }
+.dtree .ans a { display: inline-flex; align-items: center; gap: 0.3rem; min-height: 2.25rem; padding: 0.2rem 0.8rem; border-radius: 8px; border: 1px solid; text-decoration: none; font-weight: 600; font-size: 0.875rem; }
+.dtree .yes { color: var(--green); border-color: var(--green); background: var(--green-bg); }
+.dtree .no { color: var(--red); border-color: var(--red); background: var(--red-bg); }
+.dtree .leaf { border-left: 4px solid var(--green); }
+
+/* ===== Quiz =========================================================== */
+.quiz-q { border: 1px solid var(--line); border-radius: var(--radius); padding: 1rem 1.25rem 1.25rem; margin: 0 0 1rem; background: var(--surface); }
+.quiz-q legend { font-weight: 650; padding: 0 0.4rem; margin-left: -0.4rem; max-width: 70ch; }
+.quiz-q .opts { display: grid; gap: 0.4rem; margin: 0.75rem 0; }
+.quiz-q label { display: flex; gap: 0.6rem; align-items: flex-start; padding: 0.55rem 0.75rem; border: 1px solid var(--line); border-radius: 8px; cursor: pointer; min-height: 2.75rem; }
+.quiz-q label:has(input:checked) { border-color: var(--accent); background: color-mix(in srgb, var(--accent) 8%, transparent); }
+.quiz-q input { margin-top: 0.3rem; accent-color: var(--accent); width: 1.1rem; height: 1.1rem; flex: none; }
+.quiz-q.ok { border-color: var(--green); }
+.quiz-q.ko { border-color: var(--red); }
+.btn { min-height: 2.5rem; padding: 0.4rem 1rem; border-radius: 8px; border: 1px solid var(--accent); background: var(--accent); color: var(--accent-ink); font-weight: 600; cursor: pointer; }
+.fb { margin: 0.75rem 0 0; font-weight: 650; }
+.quiz-q.ok .fb { color: var(--green); }
+.quiz-q.ko .fb { color: var(--red); }
+.expl { margin-top: 0.5rem; padding: 0.75rem 1rem; border-radius: 8px; background: var(--surface-2); }
+.expl p { margin: 0; }
+.expl .ref { font-size: 0.8125rem; color: var(--muted); margin-top: 0.4rem; }
+.quiz-score { font-weight: 700; font-size: 1.0625rem; }
+
+/* ===== Sources & footer ============================================== */
+.sources li { margin-bottom: 0.5rem; overflow-wrap: anywhere; }
+.sources cite { font-style: normal; font-weight: 600; }
+.ref-link { display: inline-block; min-width: 24px; min-height: 24px; line-height: 24px; text-align: center; font-size: 0.75em; font-weight: 600; text-decoration: none; vertical-align: middle; margin-left: 0.15em; }
+.site-footer { border-top: 1px solid var(--line); color: var(--muted); font-size: 0.875rem; }
+.site-footer .bar { max-width: 84rem; margin-inline: auto; padding: 1.5rem clamp(1rem, 3vw, 2rem); display: flex; flex-wrap: wrap; gap: 0.5rem 1.5rem; justify-content: space-between; }
+
+/* ===== Motion & print ================================================= */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; }
+}
+@media print {
+  :root { color-scheme: light; }
+  body { background: #fff; font-size: 10.5pt; }
+  .site-header, .toc, .skip, .anim-controls, .copy, .quiz-q .btn, .lang, .icon-btn, .tpl { display: none !important; }
+  .layout { display: block; padding: 0; }
+  [role="tabpanel"][hidden], .expl[hidden] { display: block !important; }
+  .tabs [role="tablist"] { display: none; }
+  .diagram, .cmd, .quiz-q, .packet, .dtree > li, table { break-inside: avoid; }
+  .sources a[href^="http"]::after { content: " <" attr(href) ">"; font-size: 0.85em; word-break: break-all; }
+  .anim .msg.future { opacity: 1; }
+  .scroll-x, .table-wrap, .wstree, .hexdump, .cmd pre { overflow: visible; }
+  a { color: inherit; }
+}
+</style>
+<script>
+/* ===== Page library (functions only; called inline after each component) ===== */
+window.NPE = (function () {
+  "use strict";
+  var LANGS = ["fr", "en", "nl", "de"];
+  var UI = {
+    fr: { name: "Nom", offset: "Offset", size: "Taille", value: "Valeur", filter: "Filtre Wireshark", ref: "Référence", role: "Rôle", bits: "bits", bytes: "octets", hint: "Survolez ou sélectionnez un champ (diagramme ou arbre) pour afficher son détail.", cont: "suite", repeat: "répété", step: "Étape", start: "État initial : aucun paquet échangé.", play: "Lecture", pause: "Pause", prev: "Étape précédente", next: "Étape suivante", reset: "Recommencer", copy: "Copier", copied: "Copié ✓", correct: "✓ Correct.", wrong: "✗ Incorrect — la bonne réponse est :", choose: "Choisissez d'abord une réponse.", score: "Score :", crumbs: "Fil d'Ariane", langs: "Langue", vendors: "Vendeurs", bitdiag: "Diagramme de bits RFC", wstree: "Arbre Wireshark", theme: "Thème sombre", toc: "Sur cette page", set: "Activé", notset: "Non activé" },
+    en: { name: "Name", offset: "Offset", size: "Size", value: "Value", filter: "Wireshark filter", ref: "Reference", role: "Role", bits: "bits", bytes: "bytes", hint: "Hover or select a field (diagram or tree) to see its details.", cont: "cont.", repeat: "repeated", step: "Step", start: "Initial state: no packet exchanged yet.", play: "Play", pause: "Pause", prev: "Previous step", next: "Next step", reset: "Restart", copy: "Copy", copied: "Copied ✓", correct: "✓ Correct.", wrong: "✗ Incorrect — the correct answer is:", choose: "Choose an answer first.", score: "Score:", crumbs: "Breadcrumb", langs: "Language", vendors: "Vendors", bitdiag: "RFC bit diagram", wstree: "Wireshark tree", theme: "Dark theme", toc: "On this page", set: "Set", notset: "Not set" },
+    nl: { name: "Naam", offset: "Offset", size: "Grootte", value: "Waarde", filter: "Wireshark-filter", ref: "Referentie", role: "Rol", bits: "bits", bytes: "bytes", hint: "Beweeg over een veld of selecteer het (diagram of boom) om de details te zien.", cont: "vervolg", repeat: "herhaald", step: "Stap", start: "Beginsituatie: nog geen pakket uitgewisseld.", play: "Afspelen", pause: "Pauzeren", prev: "Vorige stap", next: "Volgende stap", reset: "Opnieuw beginnen", copy: "Kopiëren", copied: "Gekopieerd ✓", correct: "✓ Juist.", wrong: "✗ Onjuist — het juiste antwoord is:", choose: "Kies eerst een antwoord.", score: "Score:", crumbs: "Kruimelpad", langs: "Taal", vendors: "Vendors", bitdiag: "RFC-bitdiagram", wstree: "Wireshark-boom", theme: "Donker thema", toc: "Op deze pagina", set: "Ingesteld", notset: "Niet ingesteld" },
+    de: { name: "Name", offset: "Offset", size: "Größe", value: "Wert", filter: "Wireshark-Filter", ref: "Referenz", role: "Funktion", bits: "Bit", bytes: "Byte", hint: "Bewegen Sie den Zeiger über ein Feld oder wählen Sie es aus (Diagramm oder Baum), um Details zu sehen.", cont: "Forts.", repeat: "wiederholt", step: "Schritt", start: "Ausgangszustand: noch kein Paket ausgetauscht.", play: "Abspielen", pause: "Pause", prev: "Vorheriger Schritt", next: "Nächster Schritt", reset: "Neu starten", copy: "Kopieren", copied: "Kopiert ✓", correct: "✓ Richtig.", wrong: "✗ Falsch — richtig ist:", choose: "Wählen Sie zuerst eine Antwort.", score: "Punkte:", crumbs: "Brotkrumennavigation", langs: "Sprache", vendors: "Hersteller", bitdiag: "RFC-Bitdiagramm", wstree: "Wireshark-Baum", theme: "Dunkles Design", toc: "Auf dieser Seite", set: "Gesetzt", notset: "Nicht gesetzt" }
+  };
+  var root = document.documentElement;
+  function lang() { return LANGS.indexOf(root.lang) < 0 ? "en" : root.lang; }
+  function ui(k) { return UI[lang()][k]; }
+  function store(k, v) { try { if (v === undefined) return localStorage.getItem(k); localStorage.setItem(k, v); } catch (e) { return null; } }
+  function esc(s) { return String(s).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); }
+  function json(sel) { var n = document.querySelector(sel); return n ? JSON.parse(n.textContent) : null; }
+  function visibleText(el) {
+    var n = el && el.querySelector('[data-l="' + lang() + '"]');
+    return (n || el).textContent.trim();
+  }
+  var listeners = [];
+  function onLang(fn) { listeners.push(fn); }
+
+  /* Roving tabindex: one Tab stop per widget, arrows move inside (WAI-ARIA APG). */
+  function roving(container, selector) {
+    function items() { return Array.prototype.filter.call(container.querySelectorAll(selector), function (n) { return n.offsetParent !== null; }); }
+    var all = container.querySelectorAll(selector);
+    for (var i = 0; i < all.length; i++) all[i].tabIndex = i === 0 ? 0 : -1;
+    container.addEventListener("keydown", function (e) {
+      var list = items(), i = list.indexOf(document.activeElement), j = -1;
+      if (i < 0) return;
+      if (e.key === "ArrowRight" || e.key === "ArrowDown") j = Math.min(i + 1, list.length - 1);
+      else if (e.key === "ArrowLeft" || e.key === "ArrowUp") j = Math.max(i - 1, 0);
+      else if (e.key === "Home") j = 0;
+      else if (e.key === "End") j = list.length - 1;
+      if (j < 0) return;
+      e.preventDefault();
+      list[i].tabIndex = -1; list[j].tabIndex = 0; list[j].focus();
+    });
+  }
+
+  /* ---------- Packet: RFC bit diagram + Wireshark tree + hex dump, synchronised ---------- */
+  function packet(id) {
+    var el = document.querySelector('.packet[data-packet="' + id + '"]');
+    var data = json('script[data-packet="' + id + '"]');
+    var docs = json('script[data-field-docs="' + id + '"]') || {};
+    if (!el || !data) return;
+    var byId = {};
+    data.fields.forEach(function (f) { byId[f.id] = f; });
+    var chips = el.querySelector(".packet-meta");
+    function paintChips() {
+      if (chips) chips.innerHTML = "<li>" + data.length + " " + ui("bytes") + "</li><li>" + esc(data.encapsulation) + "</li>" +
+        (chips.dataset.ref ? "<li>" + esc(chips.dataset.ref) + "</li>" : "");
+    }
+    var grid = el.querySelector(".bitgrid"), ruler = el.querySelector(".ruler"),
+        tree = el.querySelector(".wstree"), hex = el.querySelector(".hexdump"), panel = el.querySelector(".fpanel");
+
+    var r = "";
+    for (var b = 0; b < 32; b++) r += "<span>" + (b % 10 === 0 ? b / 10 : "") + "</span>";
+    for (b = 0; b < 32; b++) r += "<span>" + (b % 10) + "</span>";
+    ruler.innerHTML = r;
+
+    var g = "";
+    data.fields.forEach(function (f) {
+      var start = f.offset, left = f.bits, first = true;
+      while (left > 0) {
+        var col = start % 32, take = Math.min(left, 32 - col);
+        var cls = "bf l-" + f.layer + (f.repeat ? " rep" : "") + (first ? "" : " cont");
+        var pos = ' style="grid-column:' + (col + 1) + " / span " + take + ";grid-row:" + (Math.floor(start / 32) + 1) + '"';
+        if (first) {
+          g += '<button type="button" class="' + cls + '" data-f="' + f.id + '"' + pos + ">" +
+            '<span class="bn">' + esc(f.name) + '</span><span class="sr-only">: </span><span class="bv">' + esc(f.value) +
+            '</span><span class="sr-only"> (' + f.bits + " bits)</span></button>";
+        } else {
+          g += '<div class="' + cls + '" data-f="' + f.id + '"' + pos + ' aria-hidden="true"><span class="bn">' + esc(f.name) + "</span></div>";
+        }
+        start += take; left -= take; first = false;
+      }
+    });
+    grid.innerHTML = g;
+
+    function mask(m, set, width) {
+      var s = "";
+      for (var k = width - 1; k >= 0; k--) {
+        s += (m >> k) & 1 ? (set ? "1" : "0") : ".";
+        if (k % 4 === 0 && k) s += " ";
+      }
+      return s;
+    }
+    var t = '<details open><summary>' + esc(data.ws_root) + "</summary>";
+    Object.keys(data.ws_layers).forEach(function (layer) {
+      t += '<details open><summary>' + esc(data.ws_layers[layer]) + "</summary>";
+      data.fields.filter(function (f) { return f.layer === layer; }).forEach(function (f) {
+        var line = esc(f.ws_label + ": " + f.value) + '<code class="flt">' + esc(f.ws) + "</code>";
+        if (f.flags) {
+          t += '<details><summary class="tl-s" data-f="' + f.id + '">' + line + "</summary>";
+          f.flags.forEach(function (x) {
+            t += '<div class="tl" data-f="' + f.id + '">' + esc(mask(x.mask, x.set, f.bits) + " = " + x.label + ": ") +
+              '<span data-flag="' + (x.set ? "1" : "0") + '"></span><code class="flt">' + esc(x.ws) + "</code></div>";
+          });
+          t += "</details>";
+        } else {
+          t += '<div class="tl" data-f="' + f.id + '">' + line + "</div>";
+        }
+      });
+      t += "</details>";
+    });
+    tree.innerHTML = t + "</details>";
+
+    if (hex) {
+      var bytes = data.hex.split(" "), owner = [];
+      data.fields.forEach(function (f) { for (var k = f.offset / 8; k < (f.offset + f.bits) / 8; k++) owner[k] = f; });
+      var h = "";
+      for (var row = 0; row < bytes.length; row += 16) {
+        h += '<div class="hr"><span class="ho">' + ("000" + row.toString(16)).slice(-4) + "</span>";
+        for (var c = row; c < Math.min(row + 16, bytes.length); c++) {
+          h += '<span class="hb l-' + owner[c].layer + '" data-f="' + owner[c].id + '">' + bytes[c] + "</span>";
+        }
+        h += "</div>";
+      }
+      hex.innerHTML = h;
+    }
+
+    var active = null;
+    function paintFlags() {
+      el.querySelectorAll("[data-flag]").forEach(function (n) { n.textContent = n.dataset.flag === "1" ? ui("set") : ui("notset"); });
+    }
+    function show(fid) {
+      var f = byId[fid];
+      if (!f) { panel.innerHTML = '<p class="hint">' + esc(ui("hint")) + "</p>"; return; }
+      var d = docs[fid.replace(/\d+$/, "")] || {};
+      panel.innerHTML = "<h4>" + esc(f.name) + "</h4><dl>" +
+        "<dt>" + ui("value") + "</dt><dd><code>" + esc(f.value) + "</code> · <code>" + esc(f.hex) + "</code></dd>" +
+        "<dt>" + ui("offset") + "</dt><dd>" + f.offset + " " + ui("bits") + " (" + f.offset / 8 + " " + ui("bytes") + ")</dd>" +
+        "<dt>" + ui("size") + "</dt><dd>" + f.bits + " " + ui("bits") + " (" + f.bits / 8 + " " + ui("bytes") + ")" + (f.repeat ? " · " + ui("repeat") : "") + "</dd>" +
+        "<dt>" + ui("role") + "</dt><dd>" + esc(d[lang()] || "—") + "</dd>" +
+        "<dt>" + ui("filter") + "</dt><dd><code>" + esc(f.ws) + "</code></dd>" +
+        "<dt>" + ui("ref") + "</dt><dd>" + esc(f.ref) + "</dd></dl>";
+    }
+    function activate(fid) {
+      if (fid === active) return;
+      if (active) el.querySelectorAll('[data-f="' + active + '"]').forEach(function (n) { n.classList.remove("hl"); });
+      active = fid;
+      el.querySelectorAll('[data-f="' + fid + '"]').forEach(function (n) { n.classList.add("hl"); });
+      show(fid);
+    }
+    function pick(e) { var n = e.target.closest && e.target.closest("[data-f]"); if (n && el.contains(n)) activate(n.dataset.f); }
+    el.addEventListener("pointerover", pick);
+    el.addEventListener("focusin", pick);
+    el.addEventListener("click", pick);
+    roving(grid, "button.bf");
+    roving(tree, "summary, .tl");
+    show(null); paintFlags(); paintChips();
+    onLang(function () { show(active); paintFlags(); paintChips(); });
+  }
+
+  /* ---------- Step-by-step exchange: play / pause / previous / next ---------- */
+  function animation(id) {
+    var fig = document.getElementById(id);
+    if (!fig) return;
+    var steps = fig.querySelectorAll(".steps > li"), n = steps.length, i = 0, timer = null;
+    var now = fig.querySelector(".step-now"), svg = fig.querySelector("svg");
+    var btn = {};
+    fig.querySelectorAll("[data-act]").forEach(function (b) { btn[b.dataset.act] = b; });
+    var initial = {};
+    svg.querySelectorAll(".badge").forEach(function (g) { initial[g.id] = { text: g.querySelector("text").textContent, cls: g.getAttribute("class") }; });
+    function render() {
+      svg.querySelectorAll(".msg").forEach(function (g) {
+        var s = +g.dataset.step;
+        g.classList.toggle("future", s > i);
+        g.classList.toggle("current", s === i);
+      });
+      var state = JSON.parse(JSON.stringify(initial));
+      for (var k = 0; k < i; k++) {
+        (steps[k].dataset.set || "").split(";").filter(Boolean).forEach(function (kv) {
+          var p = kv.split("="), v = p[1].split("|");
+          state[p[0]] = { text: v[0], cls: "badge " + v[1] };
+        });
+      }
+      Object.keys(state).forEach(function (bid) {
+        var g = document.getElementById(bid);
+        g.querySelector("text").textContent = state[bid].text;
+        g.setAttribute("class", state[bid].cls);
+      });
+      steps.forEach(function (li, k) {
+        li.classList.toggle("past", k < i - 1);
+        if (k === i - 1) li.setAttribute("aria-current", "step"); else li.removeAttribute("aria-current");
+      });
+      now.textContent = i === 0 ? ui("start") : ui("step") + " " + i + "/" + n + " — " + visibleText(steps[i - 1].querySelector(".txt"));
+      btn.prev.disabled = i === 0; btn.reset.disabled = i === 0; btn.next.disabled = i === n;
+      label();
+    }
+    function label() {
+      btn.play.setAttribute("aria-pressed", timer ? "true" : "false");
+      btn.play.querySelector(".sr-only").textContent = timer ? ui("pause") : ui("play");
+      btn.play.querySelector(".i-play").style.display = timer ? "none" : "";
+      btn.play.querySelector(".i-pause").style.display = timer ? "" : "none";
+      ["prev", "next", "reset"].forEach(function (k) { btn[k].querySelector(".sr-only").textContent = ui(k); });
+    }
+    function stop() { clearInterval(timer); timer = null; label(); }
+    function go(k) { i = Math.max(0, Math.min(n, k)); render(); if (i === n) stop(); }
+    btn.next.addEventListener("click", function () { stop(); go(i + 1); });
+    btn.prev.addEventListener("click", function () { stop(); go(i - 1); });
+    btn.reset.addEventListener("click", function () { stop(); go(0); });
+    btn.play.addEventListener("click", function () {
+      if (timer) { stop(); return; }
+      if (i === n) go(0);
+      timer = setInterval(function () { go(i + 1); }, 2800);
+      go(i + 1);
+    });
+    onLang(render);
+    render();
+  }
+
+  /* ---------- Tabs (WAI-ARIA APG, manual activation on click, automatic on arrows) ---------- */
+  function tabs(id) {
+    var box = document.getElementById(id);
+    if (!box) return;
+    var list = box.querySelector('[role="tablist"]'), all = Array.prototype.slice.call(list.querySelectorAll('[role="tab"]'));
+    function select(t, focus) {
+      all.forEach(function (x) {
+        var on = x === t;
+        x.setAttribute("aria-selected", on ? "true" : "false");
+        x.tabIndex = on ? 0 : -1;
+        document.getElementById(x.getAttribute("aria-controls")).hidden = !on;
+      });
+      if (focus) t.focus();
+    }
+    list.addEventListener("click", function (e) { var t = e.target.closest('[role="tab"]'); if (t) select(t); });
+    list.addEventListener("keydown", function (e) {
+      var i = all.indexOf(document.activeElement), j = -1;
+      if (e.key === "ArrowRight") j = (i + 1) % all.length;
+      else if (e.key === "ArrowLeft") j = (i - 1 + all.length) % all.length;
+      else if (e.key === "Home") j = 0;
+      else if (e.key === "End") j = all.length - 1;
+      if (j < 0) return;
+      e.preventDefault(); select(all[j], true);
+    });
+  }
+
+  /* ---------- Quiz: fieldset/legend, live feedback, explanation + reference ---------- */
+  function quiz(id) {
+    var form = document.getElementById(id);
+    if (!form) return;
+    var qs = form.querySelectorAll(".quiz-q"), score = form.querySelector(".quiz-score");
+    form.addEventListener("submit", function (e) { e.preventDefault(); });
+    function feedback(q) {
+      var fb = q.querySelector(".fb");
+      if (!q.dataset.done) return;
+      if (q.dataset.done === "ok") { fb.textContent = ui("correct"); return; }
+      var right = q.querySelector('input[value="' + q.dataset.answer + '"]').closest("label");
+      fb.textContent = ui("wrong") + " " + visibleText(right.querySelector(".opt"));
+    }
+    function total() {
+      var ok = form.querySelectorAll('.quiz-q[data-done="ok"]').length;
+      score.textContent = ui("score") + " " + ok + " / " + qs.length;
+    }
+    qs.forEach(function (q) {
+      q.querySelector(".btn").addEventListener("click", function () {
+        var sel = q.querySelector("input:checked");
+        if (!sel) { q.querySelector(".fb").textContent = ui("choose"); return; }
+        var ok = sel.value === q.dataset.answer;
+        q.dataset.done = ok ? "ok" : "ko";
+        q.classList.toggle("ok", ok); q.classList.toggle("ko", !ok);
+        q.querySelector(".expl").hidden = false;
+        feedback(q); total();
+      });
+    });
+    onLang(function () { qs.forEach(feedback); total(); });
+    total();
+  }
+
+  /* ---------- Page chrome: language, theme, TOC scroll-spy, copy, print ---------- */
+  function chrome() {
+    var meta = json("#page-meta");
+    function setLang(l, user) {
+      if (LANGS.indexOf(l) < 0) l = "en";
+      root.lang = l;
+      document.querySelectorAll("button[data-lang]").forEach(function (b) { b.setAttribute("aria-pressed", b.dataset.lang === l ? "true" : "false"); });
+      document.querySelectorAll("[data-aria]").forEach(function (n) { n.setAttribute("aria-label", ui(n.dataset.aria)); });
+      if (meta) {
+        document.title = meta.title[l] + (meta.kind === "home" ? "" : " · Network Protocols Expert");
+        var d = document.querySelector('meta[name="description"]');
+        if (d) d.setAttribute("content", meta.description[l]);
+      }
+      if (user) {
+        store("lang", l);
+        if (root.hasAttribute("data-built")) {
+          try {
+            var p = location.pathname.replace(/\/(fr|en|nl|de)\//, "/" + l + "/");
+            if (p !== location.pathname) history.replaceState(null, "", p + location.search + location.hash);
+          } catch (e) { /* file:// or sandboxed: the in-page switch is enough */ }
+        }
+      }
+      listeners.forEach(function (fn) { fn(l); });
+    }
+    document.querySelectorAll("button[data-lang]").forEach(function (b) {
+      b.addEventListener("click", function () { setLang(b.dataset.lang, true); });
+    });
+
+    var themeBtn = document.getElementById("theme");
+    function paintTheme() {
+      var t = root.dataset.theme;
+      var dark = t ? t === "dark" : matchMedia("(prefers-color-scheme: dark)").matches;
+      themeBtn.setAttribute("aria-pressed", dark ? "true" : "false");
+    }
+    if (themeBtn) {
+      themeBtn.addEventListener("click", function () {
+        var n = themeBtn.getAttribute("aria-pressed") === "true" ? "light" : "dark";
+        root.dataset.theme = n; store("theme", n); paintTheme();
+      });
+      matchMedia("(prefers-color-scheme: dark)").addEventListener("change", paintTheme);
+      paintTheme();
+    }
+
+    var links = Array.prototype.slice.call(document.querySelectorAll('.toc a[href^="#"]'));
+    if (links.length && "IntersectionObserver" in window) {
+      var seen = {};
+      var secs = links.map(function (a) { return document.getElementById(a.hash.slice(1)); }).filter(Boolean);
+      var io = new IntersectionObserver(function (es) {
+        es.forEach(function (e) { seen[e.target.id] = e.isIntersecting; });
+        var cur = secs.filter(function (s) { return seen[s.id]; })[0];
+        if (!cur) return;
+        links.forEach(function (a) { if (a.hash === "#" + cur.id) a.setAttribute("aria-current", "location"); else a.removeAttribute("aria-current"); });
+      }, { rootMargin: "-70px 0px -55% 0px" });
+      secs.forEach(function (s) { io.observe(s); });
+    }
+
+    document.querySelectorAll(".copy").forEach(function (b) {
+      b.addEventListener("click", function () {
+        var code = b.closest(".cmd").querySelector("pre code");
+        if (!navigator.clipboard) return;
+        navigator.clipboard.writeText(code.textContent).then(function () {
+          var live = b.querySelector(".copied");
+          live.textContent = ui("copied");
+          setTimeout(function () { live.textContent = ""; }, 1800);
+        });
+      });
+    });
+
+    var opened = [];
+    addEventListener("beforeprint", function () {
+      opened = Array.prototype.filter.call(document.querySelectorAll("details:not([open])"), function (d) { d.open = true; return true; });
+    });
+    addEventListener("afterprint", function () { opened.forEach(function (d) { d.open = false; }); opened = []; });
+
+    setLang(lang(), false);
+  }
+
+  return { packet: packet, animation: animation, tabs: tabs, quiz: quiz, chrome: chrome, onLang: onLang };
+})();
+</script>
+</head>
+<body>
+<a class="skip" href="#main"><span data-l="fr">Aller au contenu</span><span data-l="en">Skip to content</span><span data-l="nl">Naar de inhoud</span><span data-l="de">Zum Inhalt</span></a>
+
+<header class="site-header">
+  <div class="bar">
+    <a class="brand" href="../../index.html" data-home>
+      <svg width="28" height="28" viewBox="0 0 32 32" aria-hidden="true"><rect width="32" height="32" rx="7" fill="#1a5fb4"/><path d="M7 10h18M7 16h12M7 22h15" stroke="#fff" stroke-width="3" stroke-linecap="round"/></svg>
+      <span>Network Protocols Expert</span>
+    </a>
+    <div class="controls">
+      <div class="lang" role="group" data-aria="langs" aria-label="Language">
+        <button type="button" data-lang="fr" lang="fr">FR</button>
+        <button type="button" data-lang="en" lang="en">EN</button>
+        <button type="button" data-lang="nl" lang="nl">NL</button>
+        <button type="button" data-lang="de" lang="de">DE</button>
+      </div>
+      <button type="button" id="theme" class="icon-btn" data-aria="theme" aria-label="Dark theme" aria-pressed="false">
+        <svg class="sun" width="18" height="18" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4.5"/><path d="M12 2v2.5M12 19.5V22M2 12h2.5M19.5 12H22M4.9 4.9l1.8 1.8M17.3 17.3l1.8 1.8M4.9 19.1l1.8-1.8M17.3 6.7l1.8-1.8"/></svg>
+        <svg class="moon" width="18" height="18" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M20.5 14.5A8.5 8.5 0 0 1 9.5 3.5a8.5 8.5 0 1 0 11 11z"/></svg>
+      </button>
+    </div>
+  </div>
+</header>
+
+<div class="layout">
+<main id="main" tabindex="-1">
+
+  <nav class="crumbs" data-aria="crumbs" aria-label="Breadcrumb">
+    <ol>
+      <li><a href="../../index.html" data-home><span data-l="fr">Bibliothèque</span><span data-l="en">Library</span><span data-l="nl">Bibliotheek</span><span data-l="de">Bibliothek</span></a></li>
+      <li aria-current="page">OSPFv2</li>
+    </ol>
+  </nav>
+
+  <!-- ===== 1. Header ===== -->
+  <header class="hero">
+    <p class="eyebrow"><span data-l="fr">Protocole de routage · IGP à état de liens</span><span data-l="en">Routing protocol · link-state IGP</span><span data-l="nl">Routeringsprotocol · link-state-IGP</span><span data-l="de">Routing-Protokoll · Link-State-IGP</span></p>
+    <h1>OSPFv2 <span class="sr-only">— Open Shortest Path First version 2</span></h1>
+    <p class="lede">
+      <span data-l="fr">Protocole de routage intérieur à état de liens : chaque routeur d'une zone construit la même base topologique et calcule ses routes avec l'algorithme SPF de Dijkstra.</span>
+      <span data-l="en">Link-state interior gateway protocol: every router in an area builds the same topology database and computes its routes with Dijkstra's SPF algorithm.</span>
+      <span data-l="nl">Link-state interior gateway protocol: elke router in een area bouwt dezelfde topologiedatabase op en berekent zijn routes met het SPF-algoritme van Dijkstra.</span>
+      <span data-l="de">Link-State-Interior-Gateway-Protokoll: Jeder Router einer Area baut dieselbe Topologiedatenbank auf und berechnet seine Routen mit dem SPF-Algorithmus von Dijkstra.</span>
+    </p>
+    <div class="tpl" data-tpl>
+      <strong>TEMPLATE</strong>
+      <span data-l="fr">— contenu de démonstration (OSPFv2 Hello, partiel). Remplacez chaque bloc marqué TEMPLATE ; gardez l'ordre des sections et les quatre langues.</span>
+      <span data-l="en">— demo content (OSPFv2 Hello, partial). Replace every block marked TEMPLATE; keep the section order and the four languages.</span>
+      <span data-l="nl">— democontent (OSPFv2 Hello, gedeeltelijk). Vervang elk blok gemarkeerd met TEMPLATE; behoud de volgorde van de secties en de vier talen.</span>
+      <span data-l="de">— Demo-Inhalt (OSPFv2 Hello, unvollständig). Ersetzen Sie jeden mit TEMPLATE markierten Block; Reihenfolge der Abschnitte und die vier Sprachen beibehalten.</span>
+    </div>
+    <dl class="facts">
+      <div><dt><span data-l="fr">Couche OSI</span><span data-l="en">OSI layer</span><span data-l="nl">OSI-laag</span><span data-l="de">OSI-Schicht</span></dt>
+        <dd><span data-l="fr">3 — réseau</span><span data-l="en">3 — network</span><span data-l="nl">3 — netwerk</span><span data-l="de">3 — Vermittlung</span></dd></div>
+      <div><dt><span data-l="fr">Encapsulation</span><span data-l="en">Encapsulation</span><span data-l="nl">Encapsulatie</span><span data-l="de">Kapselung</span></dt>
+        <dd>IPv4, protocol 89</dd></div>
+      <div><dt><span data-l="fr">Destinations</span><span data-l="en">Destinations</span><span data-l="nl">Bestemmingen</span><span data-l="de">Ziele</span></dt>
+        <dd>224.0.0.5 · 224.0.0.6</dd></div>
+      <div><dt>Standards</dt>
+        <dd><a href="https://www.rfc-editor.org/rfc/rfc2328">RFC 2328</a><a class="ref-link" href="#src-1">[1]</a></dd></div>
+    </dl>
+  </header>
+
+  <!-- ===== 2. Concepts ===== -->
+  <section class="sec" id="concepts" aria-labelledby="h-concepts">
+    <h2 id="h-concepts"><span class="num">1</span><span data-l="fr">Concepts</span><span data-l="en">Concepts</span><span data-l="nl">Concepten</span><span data-l="de">Konzepte</span></h2>
+    <div class="tpl" data-tpl><strong>TEMPLATE</strong>
+      <span data-l="fr">— rôle, place dans la pile, terminologie, compromis de conception, versions et différences. Une idée par paragraphe ; une phrase précise vaut mieux qu'un long paragraphe.</span>
+      <span data-l="en">— purpose, place in the stack, terminology, design trade-offs, versions and differences. One idea per paragraph; one precise sentence beats a long paragraph.</span>
+      <span data-l="nl">— doel, plaats in de stack, terminologie, ontwerpafwegingen, versies en verschillen. Eén idee per alinea; één precieze zin is beter dan een lange alinea.</span>
+      <span data-l="de">— Zweck, Einordnung im Stack, Terminologie, Designabwägungen, Versionen und Unterschiede. Ein Gedanke pro Absatz; ein präziser Satz ist besser als ein langer Absatz.</span>
+    </div>
+    <dl class="terms">
+      <div><dt>Router ID</dt>
+        <dd><span data-l="fr">Identifiant 32 bits unique du routeur dans le domaine OSPF, écrit comme une adresse IPv4.</span><span data-l="en">32-bit identifier, unique per router in the OSPF domain, written like an IPv4 address.</span><span data-l="nl">32-bits identificatie, uniek per router in het OSPF-domein, genoteerd als een IPv4-adres.</span><span data-l="de">32-Bit-Kennung, im OSPF-Bereich je Router eindeutig, geschrieben wie eine IPv4-Adresse.</span><a class="ref-link" href="#src-1">[1]</a></dd></div>
+      <div><dt>Hello</dt>
+        <dd><span data-l="fr">Paquet de type 1 qui découvre les voisins, maintient la relation et vérifie la communication bidirectionnelle.</span><span data-l="en">Type 1 packet that discovers neighbors, keeps the relationship alive and checks bidirectional communication.</span><span data-l="nl">Pakket van type 1 dat buren ontdekt, de relatie onderhoudt en bidirectionele communicatie controleert.</span><span data-l="de">Paket vom Typ 1, das Nachbarn erkennt, die Beziehung aufrechterhält und die bidirektionale Kommunikation prüft.</span><a class="ref-link" href="#src-1">[1]</a></dd></div>
+    </dl>
+  </section>
+
+  <!-- ===== 3. Packet formats ===== -->
+  <section class="sec" id="packets" aria-labelledby="h-packets">
+    <h2 id="h-packets"><span class="num">2</span><span data-l="fr">Formats de paquets</span><span data-l="en">Packet formats</span><span data-l="nl">Pakketformaten</span><span data-l="de">Paketformate</span></h2>
+    <p>
+      <span data-l="fr">Chaque type de message est montré deux fois : en diagramme de bits façon RFC et en arbre façon Wireshark. Survolez ou sélectionnez un champ dans l'une des vues : il s'illumine dans l'autre et son détail s'affiche.</span>
+      <span data-l="en">Every message type is shown twice: as an RFC-style bit diagram and as a Wireshark-style tree. Hover or select a field in either view: it lights up in the other and its details appear.</span>
+      <span data-l="nl">Elk berichttype wordt twee keer getoond: als bitdiagram in RFC-stijl en als boom in Wireshark-stijl. Beweeg over een veld of selecteer het in een van beide weergaven: het licht op in de andere en de details verschijnen.</span>
+      <span data-l="de">Jeder Nachrichtentyp wird zweimal gezeigt: als Bitdiagramm im RFC-Stil und als Baum im Wireshark-Stil. Zeigen Sie auf ein Feld oder wählen Sie es in einer der Ansichten aus: Es wird in der anderen hervorgehoben und seine Details erscheinen.</span>
+    </p>
+
+    <article class="packet" data-packet="ospf-hello" aria-labelledby="h-pkt-hello">
+      <h3 id="h-pkt-hello">Hello <small>(Type 1)</small></h3>
+      <ul class="packet-meta" data-ref="RFC 2328 §A.3.2"></ul>
+      <figure class="diagram">
+        <figcaption>
+          <span class="t"><span data-l="fr">Paquet OSPFv2 Hello — diagramme de bits RFC et arbre Wireshark synchronisés</span><span data-l="en">OSPFv2 Hello packet — synchronised RFC bit diagram and Wireshark tree</span><span data-l="nl">OSPFv2 Hello-pakket — gesynchroniseerd RFC-bitdiagram en Wireshark-boom</span><span data-l="de">OSPFv2-Hello-Paket — synchronisiertes RFC-Bitdiagramm und Wireshark-Baum</span></span>
+          <span class="s"><span data-l="fr">Exemple généré par tools/packet-builder.py : R1 (1.1.1.1), zone 0, un voisin (2.2.2.2).</span><span data-l="en">Sample generated by tools/packet-builder.py: R1 (1.1.1.1), area 0, one neighbor (2.2.2.2).</span><span data-l="nl">Voorbeeld gegenereerd door tools/packet-builder.py: R1 (1.1.1.1), area 0, één buur (2.2.2.2).</span><span data-l="de">Beispiel erzeugt mit tools/packet-builder.py: R1 (1.1.1.1), Area 0, ein Nachbar (2.2.2.2).</span></span>
+        </figcaption>
+        <div class="body">
+          <div class="views">
+            <div>
+              <p class="view-title"><span data-l="fr">Diagramme de bits (RFC)</span><span data-l="en">Bit diagram (RFC)</span><span data-l="nl">Bitdiagram (RFC)</span><span data-l="de">Bitdiagramm (RFC)</span></p>
+              <div class="scroll-x">
+                <div class="ruler" aria-hidden="true"></div>
+                <div class="bitgrid" role="group" data-aria="bitdiag" aria-label="RFC bit diagram"></div>
+              </div>
+            </div>
+            <div>
+              <p class="view-title"><span data-l="fr">Arbre Wireshark</span><span data-l="en">Wireshark tree</span><span data-l="nl">Wireshark-boom</span><span data-l="de">Wireshark-Baum</span></p>
+              <div class="wstree" role="group" data-aria="wstree" aria-label="Wireshark tree"></div>
+            </div>
+          </div>
+          <div class="fpanel" aria-live="polite"></div>
+          <details class="hexwrap">
+            <summary><span data-l="fr">Dump hexadécimal (couverture du checksum : tout sauf le champ Authentication)</span><span data-l="en">Hex dump (checksum coverage: everything except the Authentication field)</span><span data-l="nl">Hexdump (checksumdekking: alles behalve het Authentication-veld)</span><span data-l="de">Hexdump (Prüfsummenabdeckung: alles außer dem Feld Authentication)</span></summary>
+            <div class="hexdump" aria-hidden="true"></div>
+          </details>
+        </div>
+        <dl class="legend">
+          <div><dt><span class="sw l-header"></span></dt><dd><span data-l="fr">En-tête commun OSPF (bleu, trait plein)</span><span data-l="en">OSPF common header (blue, solid)</span><span data-l="nl">Gemeenschappelijke OSPF-header (blauw, doorgetrokken)</span><span data-l="de">Gemeinsamer OSPF-Header (blau, durchgezogen)</span></dd></div>
+          <div><dt><span class="sw l-body"></span></dt><dd><span data-l="fr">Corps du message Hello (sarcelle, tirets)</span><span data-l="en">Hello message body (teal, dashed)</span><span data-l="nl">Hello-berichtinhoud (blauwgroen, gestreept)</span><span data-l="de">Hello-Nachrichtenrumpf (petrol, gestrichelt)</span></dd></div>
+          <div><dt><span class="sw rep"></span></dt><dd><span data-l="fr">Champ répété (hachuré, « … ») : un Neighbor par voisin</span><span data-l="en">Repeated field (hatched, "…"): one Neighbor per neighbor</span><span data-l="nl">Herhaald veld (gearceerd, „…"): één Neighbor per buur</span><span data-l="de">Wiederholtes Feld (schraffiert, „…"): ein Neighbor je Nachbar</span></dd></div>
+          <div><dt><span class="sw hl"></span></dt><dd><span data-l="fr">Champ sélectionné, synchronisé dans les vues</span><span data-l="en">Selected field, synchronised across views</span><span data-l="nl">Geselecteerd veld, gesynchroniseerd in alle weergaven</span><span data-l="de">Ausgewähltes Feld, in allen Ansichten synchron</span></dd></div>
+          <div><dt><code>[ospf.*]</code></dt><dd><span data-l="fr">Nom du filtre d'affichage Wireshark</span><span data-l="en">Wireshark display filter name</span><span data-l="nl">Naam van het Wireshark-weergavefilter</span><span data-l="de">Name des Wireshark-Anzeigefilters</span></dd></div>
+        </dl>
+      </figure>
+      <!-- Generated: python3 tools/packet-builder.py --update templates/protocol-template.html -->
+      <script type="application/json" data-packet="ospf-hello">{"id":"ospf-hello","protocol":"OSPFv2","message":"Hello","encapsulation":"IPv4, protocol 89, destination 224.0.0.5 (AllSPFRouters)","ws_root":"Open Shortest Path First","ws_layers":{"header":"OSPF Header","body":"OSPF Hello Packet"},"length":48,"checksum":"0x7290","hex":"02 01 00 30 01 01 01 01 00 00 00 00 72 90 00 00 00 00 00 00 00 00 00 00 ff ff ff 00 00 0a 02 01 00 00 00 28 c0 00 02 02 c0 00 02 01 02 02 02 02","fields":[{"id":"version","name":"Version #","layer":"header","offset":0,"bits":8,"value":"2","hex":"02","ws":"ospf.version","ws_label":"Version","ref":"RFC 2328 §A.3.1"},{"id":"type","name":"Type","layer":"header","offset":8,"bits":8,"value":"1 (Hello)","hex":"01","ws":"ospf.msg","ws_label":"Message Type","ref":"RFC 2328 §A.3.1"},{"id":"length","name":"Packet length","layer":"header","offset":16,"bits":16,"value":"48","hex":"00 30","ws":"ospf.packet_length","ws_label":"Packet Length","ref":"RFC 2328 §A.3.1"},{"id":"router_id","name":"Router ID","layer":"header","offset":32,"bits":32,"value":"1.1.1.1","hex":"01 01 01 01","ws":"ospf.srcrouter","ws_label":"Source OSPF Router","ref":"RFC 2328 §A.3.1"},{"id":"area_id","name":"Area ID","layer":"header","offset":64,"bits":32,"value":"0.0.0.0","hex":"00 00 00 00","ws":"ospf.area_id","ws_label":"Area ID","ref":"RFC 2328 §A.3.1"},{"id":"checksum","name":"Checksum","layer":"header","offset":96,"bits":16,"value":"0x7290","hex":"72 90","ws":"ospf.checksum","ws_label":"Checksum","ref":"RFC 2328 §A.3.1, §D.4.1"},{"id":"autype","name":"AuType","layer":"header","offset":112,"bits":16,"value":"0 (Null)","hex":"00 00","ws":"ospf.auth.type","ws_label":"Auth Type","ref":"RFC 2328 §A.3.1, §D.4"},{"id":"auth","name":"Authentication","layer":"header","offset":128,"bits":64,"value":"00 00 00 00 00 00 00 00","hex":"00 00 00 00 00 00 00 00","ws":"ospf.auth.none","ws_label":"Auth Data (none)","ref":"RFC 2328 §D.4"},{"id":"mask","name":"Network Mask","layer":"body","offset":192,"bits":32,"value":"255.255.255.0","hex":"ff ff ff 00","ws":"ospf.hello.network_mask","ws_label":"Network Mask","ref":"RFC 2328 §A.3.2"},{"id":"hello","name":"HelloInterval","layer":"body","offset":224,"bits":16,"value":"10 s","hex":"00 0a","ws":"ospf.hello.hello_interval","ws_label":"Hello Interval [sec]","ref":"RFC 2328 §A.3.2"},{"id":"options","name":"Options","layer":"body","offset":240,"bits":8,"value":"0x02","hex":"02","ws":"ospf.v2.options","ws_label":"Options","ref":"RFC 2328 §A.2","flags":[{"label":"DN","mask":128,"set":false,"ws":"ospf.v2.options.dn","ref":"RFC 4576"},{"label":"(O) Opaque","mask":64,"set":false,"ws":"ospf.v2.options.o","ref":"RFC 5250"},{"label":"(DC) Demand Circuits","mask":32,"set":false,"ws":"ospf.v2.options.dc","ref":"RFC 1793"},{"label":"(L) LLS Data block","mask":16,"set":false,"ws":"ospf.v2.options.l","ref":"RFC 5613"},{"label":"(N) NSSA","mask":8,"set":false,"ws":"ospf.v2.options.n","ref":"RFC 3101"},{"label":"(MC) Multicast","mask":4,"set":false,"ws":"ospf.v2.options.mc","ref":"RFC 5110"},{"label":"(E) External Routing","mask":2,"set":true,"ws":"ospf.v2.options.e","ref":"RFC 2328 §A.2"},{"label":"(MT) Multi-Topology Routing","mask":1,"set":false,"ws":"ospf.v2.options.mt","ref":"RFC 4915"}]},{"id":"priority","name":"Rtr Pri","layer":"body","offset":248,"bits":8,"value":"1","hex":"01","ws":"ospf.hello.router_priority","ws_label":"Router Priority","ref":"RFC 2328 §A.3.2"},{"id":"dead","name":"RouterDeadInterval","layer":"body","offset":256,"bits":32,"value":"40 s","hex":"00 00 00 28","ws":"ospf.hello.router_dead_interval","ws_label":"Router Dead Interval [sec]","ref":"RFC 2328 §A.3.2"},{"id":"dr","name":"Designated Router","layer":"body","offset":288,"bits":32,"value":"192.0.2.2","hex":"c0 00 02 02","ws":"ospf.hello.designated_router","ws_label":"Designated Router","ref":"RFC 2328 §A.3.2"},{"id":"bdr","name":"Backup Designated Router","layer":"body","offset":320,"bits":32,"value":"192.0.2.1","hex":"c0 00 02 01","ws":"ospf.hello.backup_designated_router","ws_label":"Backup Designated Router","ref":"RFC 2328 §A.3.2"},{"id":"neighbor1","name":"Neighbor","layer":"body","offset":352,"bits":32,"value":"2.2.2.2","hex":"02 02 02 02","ws":"ospf.hello.active_neighbor","ws_label":"Active Neighbor","ref":"RFC 2328 §A.3.2","repeat":true}]}</script>
+      <script type="application/json" data-field-docs="ospf-hello">
+{"version":{"fr":"Numéro de version OSPF ; 2 pour OSPFv2.","en":"OSPF version number; 2 for OSPFv2.","nl":"OSPF-versienummer; 2 voor OSPFv2.","de":"OSPF-Versionsnummer; 2 für OSPFv2."},
+ "type":{"fr":"Type de paquet : 1 Hello, 2 DD, 3 LSR, 4 LSU, 5 LSAck.","en":"Packet type: 1 Hello, 2 DD, 3 LSR, 4 LSU, 5 LSAck.","nl":"Pakkettype: 1 Hello, 2 DD, 3 LSR, 4 LSU, 5 LSAck.","de":"Pakettyp: 1 Hello, 2 DD, 3 LSR, 4 LSU, 5 LSAck."},
+ "length":{"fr":"Longueur du paquet OSPF en octets, en-tête compris.","en":"Length of the OSPF packet in bytes, header included.","nl":"Lengte van het OSPF-pakket in bytes, header inbegrepen.","de":"Länge des OSPF-Pakets in Byte, einschließlich Header."},
+ "router_id":{"fr":"Router ID de l'émetteur du paquet.","en":"Router ID of the packet's source.","nl":"Router ID van de afzender van het pakket.","de":"Router ID des Absenders des Pakets."},
+ "area_id":{"fr":"Zone à laquelle appartient le paquet ; 0.0.0.0 est le backbone.","en":"Area the packet belongs to; 0.0.0.0 is the backbone.","nl":"Area waartoe het pakket behoort; 0.0.0.0 is de backbone.","de":"Area, zu der das Paket gehört; 0.0.0.0 ist das Backbone."},
+ "checksum":{"fr":"Checksum de type IP sur tout le paquet, champ Authentication exclu.","en":"IP-style checksum over the whole packet, Authentication field excluded.","nl":"IP-checksum over het hele pakket, zonder het Authentication-veld.","de":"IP-Prüfsumme über das ganze Paket, ohne das Feld Authentication."},
+ "autype":{"fr":"Procédure d'authentification : 0 Null, 1 Simple, 2 Cryptographic.","en":"Authentication procedure: 0 Null, 1 Simple, 2 Cryptographic.","nl":"Authenticatieprocedure: 0 Null, 1 Simple, 2 Cryptographic.","de":"Authentifizierungsverfahren: 0 Null, 1 Simple, 2 Cryptographic."},
+ "auth":{"fr":"64 bits réservés au schéma d'authentification ; non examinés avec AuType 0 (Null).","en":"64 bits for the authentication scheme; not examined with AuType 0 (Null).","nl":"64 bits voor het authenticatieschema; niet gecontroleerd bij AuType 0 (Null).","de":"64 Bit für das Authentifizierungsverfahren; bei AuType 0 (Null) nicht geprüft."},
+ "mask":{"fr":"Masque de réseau de l'interface émettrice.","en":"Network mask of the sending interface.","nl":"Netwerkmasker van de verzendende interface.","de":"Netzmaske der sendenden Schnittstelle."},
+ "hello":{"fr":"Secondes entre deux Hello ; doit être identique entre voisins.","en":"Seconds between Hellos; must match between neighbors.","nl":"Seconden tussen twee Hello's; moet gelijk zijn tussen buren.","de":"Sekunden zwischen zwei Hellos; muss bei Nachbarn übereinstimmen."},
+ "options":{"fr":"Capacités optionnelles du routeur, un bit par fonction ; ici seul E (External Routing) est activé.","en":"Optional router capabilities, one bit per feature; here only E (External Routing) is set.","nl":"Optionele mogelijkheden van de router, één bit per functie; hier is alleen E (External Routing) ingesteld.","de":"Optionale Fähigkeiten des Routers, ein Bit je Funktion; hier ist nur E (External Routing) gesetzt."},
+ "priority":{"fr":"Priorité pour l'élection DR/BDR ; 0 = jamais élu.","en":"Priority for the DR/BDR election; 0 = never elected.","nl":"Prioriteit voor de DR/BDR-verkiezing; 0 = nooit verkozen.","de":"Priorität für die DR/BDR-Wahl; 0 = wird nie gewählt."},
+ "dead":{"fr":"Secondes sans Hello avant de déclarer le voisin mort ; doit être identique entre voisins.","en":"Seconds without a Hello before the neighbor is declared down; must match between neighbors.","nl":"Seconden zonder Hello voordat de buur als down wordt beschouwd; moet gelijk zijn tussen buren.","de":"Sekunden ohne Hello, bevor der Nachbar als ausgefallen gilt; muss bei Nachbarn übereinstimmen."},
+ "dr":{"fr":"Adresse IP d'interface du DR selon l'émetteur ; 0.0.0.0 si aucun.","en":"Sender's view of the DR interface IP address; 0.0.0.0 if none.","nl":"IP-adres van de DR-interface volgens de afzender; 0.0.0.0 als er geen is.","de":"IP-Adresse der DR-Schnittstelle aus Sicht des Absenders; 0.0.0.0, falls keiner."},
+ "bdr":{"fr":"Adresse IP d'interface du BDR selon l'émetteur ; 0.0.0.0 si aucun.","en":"Sender's view of the BDR interface IP address; 0.0.0.0 if none.","nl":"IP-adres van de BDR-interface volgens de afzender; 0.0.0.0 als er geen is.","de":"IP-Adresse der BDR-Schnittstelle aus Sicht des Absenders; 0.0.0.0, falls keiner."},
+ "neighbor":{"fr":"Router ID d'un voisin dont un Hello valide a été reçu pendant le dernier RouterDeadInterval.","en":"Router ID of a neighbor whose valid Hello was seen within the last RouterDeadInterval.","nl":"Router ID van een buur waarvan binnen het laatste RouterDeadInterval een geldige Hello werd ontvangen.","de":"Router ID eines Nachbarn, von dem innerhalb des letzten RouterDeadInterval ein gültiges Hello empfangen wurde."}}
+      </script>
+      <script>NPE.packet("ospf-hello");</script>
+    </article>
+  </section>
+
+  <!-- ===== 4. Operation (animated) ===== -->
+  <section class="sec" id="operation" aria-labelledby="h-operation">
+    <h2 id="h-operation"><span class="num">3</span><span data-l="fr">Fonctionnement</span><span data-l="en">Operation</span><span data-l="nl">Werking</span><span data-l="de">Funktionsweise</span></h2>
+
+    <figure class="diagram anim" id="anim-2way" aria-labelledby="anim-2way-t">
+      <figcaption>
+        <span class="t" id="anim-2way-t"><span data-l="fr">Séquence — de Down à 2-Way entre R1 et R2 (segment broadcast)</span><span data-l="en">Sequence — from Down to 2-Way between R1 and R2 (broadcast segment)</span><span data-l="nl">Sequentie — van Down naar 2-Way tussen R1 en R2 (broadcastsegment)</span><span data-l="de">Ablauf — von Down zu 2-Way zwischen R1 und R2 (Broadcast-Segment)</span></span>
+        <span class="s"><span data-l="fr">Machine à états du voisin, RFC 2328 §10.1, §10.3, §10.5. Faites une prédiction avant chaque étape.</span><span data-l="en">Neighbor state machine, RFC 2328 §10.1, §10.3, §10.5. Make a prediction before each step.</span><span data-l="nl">Neighbor state machine, RFC 2328 §10.1, §10.3, §10.5. Maak een voorspelling vóór elke stap.</span><span data-l="de">Nachbar-Zustandsautomat, RFC 2328 §10.1, §10.3, §10.5. Stellen Sie vor jedem Schritt eine Vermutung auf.</span></span>
+      </figcaption>
+      <div class="body">
+        <svg viewBox="0 0 640 330" role="img" aria-labelledby="anim-2way-t anim-2way-now">
+          <g class="node"><rect x="50" y="12" width="180" height="44" rx="8"/><text x="140" y="40" text-anchor="middle">R1 · 1.1.1.1</text></g>
+          <g class="node"><rect x="410" y="12" width="180" height="44" rx="8"/><text x="500" y="40" text-anchor="middle">R2 · 2.2.2.2</text></g>
+          <g class="badge s-grey" id="b-r1"><rect x="60" y="64" width="160" height="30" rx="15"/><text x="140" y="84" text-anchor="middle">R2: Down</text></g>
+          <g class="badge s-grey" id="b-r2"><rect x="420" y="64" width="160" height="30" rx="15"/><text x="500" y="84" text-anchor="middle">R1: Down</text></g>
+          <line class="life" x1="140" y1="100" x2="140" y2="318"/>
+          <line class="life" x1="500" y1="100" x2="500" y2="318"/>
+          <g class="msg future" data-step="1"><text class="lbl" x="320" y="140" text-anchor="middle">① Hello · Neighbor: —</text><line x1="146" y1="152" x2="486" y2="152"/><path d="M494 152l-12-6v12z"/></g>
+          <g class="msg future" data-step="2"><text class="lbl" x="320" y="210" text-anchor="middle">② Hello · Neighbor: 1.1.1.1</text><line x1="494" y1="222" x2="154" y2="222"/><path d="M146 222l12-6v12z"/></g>
+          <g class="msg future" data-step="3"><text class="lbl" x="320" y="280" text-anchor="middle">③ Hello · Neighbor: 2.2.2.2</text><line x1="146" y1="292" x2="486" y2="292"/><path d="M494 292l-12-6v12z"/></g>
+        </svg>
+      </div>
+      <div class="anim-controls">
+        <button type="button" data-act="reset"><span class="sr-only">Restart</span><svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true" fill="currentColor"><path d="M6 5h2v14H6zM9.5 12 19 5v14z"/></svg></button>
+        <button type="button" data-act="prev"><span class="sr-only">Previous step</span><svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true" fill="currentColor"><path d="M15.5 5v14L6 12z"/></svg></button>
+        <button type="button" data-act="play" aria-pressed="false"><span class="sr-only">Play</span><svg class="i-play" width="18" height="18" viewBox="0 0 24 24" aria-hidden="true" fill="currentColor"><path d="M8 5v14l11-7z"/></svg><svg class="i-pause" style="display:none" width="18" height="18" viewBox="0 0 24 24" aria-hidden="true" fill="currentColor"><path d="M7 5h3.5v14H7zM13.5 5H17v14h-3.5z"/></svg></button>
+        <button type="button" data-act="next"><span class="sr-only">Next step</span><svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true" fill="currentColor"><path d="M8.5 5v14l9.5-7z"/></svg></button>
+        <p class="step-now" id="anim-2way-now" aria-live="polite"></p>
+      </div>
+      <ol class="steps">
+        <li data-set="b-r2=R1: Init|s-blue"><span class="txt"><span data-l="fr">R1 émet un Hello vers 224.0.0.5 avec une liste Neighbor vide. R2 traite l'événement HelloReceived : son voisin R1 passe de Down à Init.</span><span data-l="en">R1 sends a Hello to 224.0.0.5 with an empty Neighbor list. R2 runs the HelloReceived event: its neighbor R1 moves from Down to Init.</span><span data-l="nl">R1 stuurt een Hello naar 224.0.0.5 met een lege Neighbor-lijst. R2 verwerkt het event HelloReceived: zijn buur R1 gaat van Down naar Init.</span><span data-l="de">R1 sendet ein Hello an 224.0.0.5 mit leerer Neighbor-Liste. R2 verarbeitet das Ereignis HelloReceived: Sein Nachbar R1 wechselt von Down zu Init.</span></span></li>
+        <li data-set="b-r1=R2: 2-Way|s-green"><span class="txt"><span data-l="fr">R2 répond avec un Hello qui liste 1.1.1.1. R1 y voit son propre Router ID : événement 2-WayReceived, R2 passe à 2-Way chez R1.</span><span data-l="en">R2 replies with a Hello that lists 1.1.1.1. R1 sees its own Router ID in it: event 2-WayReceived, R2 reaches 2-Way on R1.</span><span data-l="nl">R2 antwoordt met een Hello die 1.1.1.1 vermeldt. R1 ziet er zijn eigen Router ID in: event 2-WayReceived, R2 bereikt 2-Way op R1.</span><span data-l="de">R2 antwortet mit einem Hello, das 1.1.1.1 enthält. R1 sieht darin seine eigene Router ID: Ereignis 2-WayReceived, R2 erreicht auf R1 den Zustand 2-Way.</span></span>
+          <details class="predict"><summary><span data-l="fr">Prédire : et si 1.1.1.1 n'était pas listé ?</span><span data-l="en">Predict: what if 1.1.1.1 were not listed?</span><span data-l="nl">Voorspel: wat als 1.1.1.1 niet vermeld werd?</span><span data-l="de">Vermuten Sie: Was, wenn 1.1.1.1 nicht aufgeführt wäre?</span></summary>
+            <span data-l="fr">L'événement serait 1-WayReceived et R2 resterait en Init chez R1 (RFC 2328 §10.5).</span><span data-l="en">The event would be 1-WayReceived and R2 would stay in Init on R1 (RFC 2328 §10.5).</span><span data-l="nl">Het event zou 1-WayReceived zijn en R2 zou op R1 in Init blijven (RFC 2328 §10.5).</span><span data-l="de">Das Ereignis wäre 1-WayReceived und R2 bliebe auf R1 im Zustand Init (RFC 2328 §10.5).</span></details></li>
+        <li data-set="b-r2=R1: 2-Way|s-green"><span class="txt"><span data-l="fr">Le Hello suivant de R1 liste 2.2.2.2 : R2 se voit à son tour et passe R1 en 2-Way. La communication est bidirectionnelle.</span><span data-l="en">R1's next Hello lists 2.2.2.2: R2 now sees itself and moves R1 to 2-Way. Communication is bidirectional.</span><span data-l="nl">De volgende Hello van R1 vermeldt 2.2.2.2: R2 ziet zichzelf nu ook en zet R1 op 2-Way. De communicatie is bidirectioneel.</span><span data-l="de">Das nächste Hello von R1 enthält 2.2.2.2: Nun sieht sich auch R2 und setzt R1 auf 2-Way. Die Kommunikation ist bidirektional.</span></span></li>
+      </ol>
+      <dl class="legend">
+        <div><dt><svg width="28" height="10" aria-hidden="true"><line x1="0" y1="5" x2="22" y2="5" stroke="var(--blue)" stroke-width="2"/><path d="M28 5l-7-4v8z" fill="var(--blue)"/></svg></dt><dd><span data-l="fr">Hello multicast vers 224.0.0.5, sens de la flèche = émetteur → récepteur</span><span data-l="en">Hello multicast to 224.0.0.5, arrow = sender → receiver</span><span data-l="nl">Hello-multicast naar 224.0.0.5, pijl = afzender → ontvanger</span><span data-l="de">Hello-Multicast an 224.0.0.5, Pfeil = Sender → Empfänger</span></dd></div>
+        <div><dt><svg width="28" height="10" aria-hidden="true" opacity=".2"><line x1="0" y1="5" x2="28" y2="5" stroke="var(--blue)" stroke-width="2"/></svg></dt><dd><span data-l="fr">Message pas encore envoyé (estompé)</span><span data-l="en">Message not sent yet (faded)</span><span data-l="nl">Bericht nog niet verzonden (vervaagd)</span><span data-l="de">Nachricht noch nicht gesendet (blass)</span></dd></div>
+        <div><dt><span class="sw" style="background:var(--grey-bg);border-color:var(--grey);border-radius:99px"></span></dt><dd><span data-l="fr">État du voisin vu par ce routeur : Down</span><span data-l="en">Neighbor state as seen by this router: Down</span><span data-l="nl">Status van de buur volgens deze router: Down</span><span data-l="de">Nachbarzustand aus Sicht dieses Routers: Down</span></dd></div>
+        <div><dt><span class="sw" style="background:var(--blue-bg);border-color:var(--blue);border-radius:99px"></span></dt><dd>Init</dd></div>
+        <div><dt><span class="sw" style="background:var(--green-bg);border-color:var(--green);border-radius:99px"></span></dt><dd><span data-l="fr">2-Way ✓ (l'adjacence éventuelle — ExStart — est décidée ensuite, §10.4)</span><span data-l="en">2-Way ✓ (whether to form an adjacency — ExStart — is decided next, §10.4)</span><span data-l="nl">2-Way ✓ (of er een adjacency — ExStart — komt, wordt daarna beslist, §10.4)</span><span data-l="de">2-Way ✓ (ob eine Adjacency — ExStart — entsteht, wird danach entschieden, §10.4)</span></dd></div>
+      </dl>
+    </figure>
+    <script>NPE.animation("anim-2way");</script>
+
+    <div class="table-wrap">
+      <table>
+        <caption><span data-l="fr">Temporisateurs et valeurs par défaut</span><span data-l="en">Timers and defaults</span><span data-l="nl">Timers en standaardwaarden</span><span data-l="de">Timer und Standardwerte</span></caption>
+        <thead><tr><th scope="col">Timer</th><th scope="col"><span data-l="fr">Valeur</span><span data-l="en">Value</span><span data-l="nl">Waarde</span><span data-l="de">Wert</span></th><th scope="col"><span data-l="fr">Référence</span><span data-l="en">Reference</span><span data-l="nl">Referentie</span><span data-l="de">Referenz</span></th></tr></thead>
+        <tbody>
+          <tr><td>HelloInterval</td><td><span data-l="fr">10 s (valeur d'exemple pour un LAN)</span><span data-l="en">10 s (sample value for a LAN)</span><span data-l="nl">10 s (voorbeeldwaarde voor een LAN)</span><span data-l="de">10 s (Beispielwert für ein LAN)</span></td><td>RFC 2328 §C.3</td></tr>
+          <tr><td>RouterDeadInterval</td><td><span data-l="fr">Multiple de HelloInterval (« disons 4 ») → 40 s</span><span data-l="en">Multiple of HelloInterval ("say 4") → 40 s</span><span data-l="nl">Veelvoud van HelloInterval („zeg 4") → 40 s</span><span data-l="de">Vielfaches von HelloInterval („etwa 4") → 40 s</span></td><td>RFC 2328 §C.3</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ===== 5. Advanced behaviour (collapsible, open by default) ===== -->
+  <section class="sec" id="advanced" aria-labelledby="h-advanced">
+    <details open>
+      <summary><h2 id="h-advanced"><span class="num">4</span><span data-l="fr">Comportement avancé</span><span data-l="en">Advanced behaviour</span><span data-l="nl">Geavanceerd gedrag</span><span data-l="de">Fortgeschrittenes Verhalten</span></h2></summary>
+      <div class="tpl" data-tpl><strong>TEMPLATE</strong>
+        <span data-l="fr">— cas limites, interopérabilité, limites d'échelle, sécurité (attaques et protections), réglages, convergence, ambiguïtés des RFC. Utilisez les encadrés ci-dessous.</span>
+        <span data-l="en">— edge cases, interoperability, scaling limits, security (attacks and protections), tuning, convergence, RFC ambiguities. Use the callouts below.</span>
+        <span data-l="nl">— randgevallen, interoperabiliteit, schaalgrenzen, beveiliging (aanvallen en bescherming), tuning, convergentie, dubbelzinnigheden in RFC's. Gebruik de kaders hieronder.</span>
+        <span data-l="de">— Grenzfälle, Interoperabilität, Skalierungsgrenzen, Sicherheit (Angriffe und Schutz), Tuning, Konvergenz, Mehrdeutigkeiten der RFCs. Verwenden Sie die Hinweisboxen unten.</span>
+      </div>
+      <div class="callout note"><svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9.5"/><path d="M12 11v6M12 7.5v.5" stroke-linecap="round"/></svg>
+        <div><span class="label"><span data-l="fr">À retenir</span><span data-l="en">Key point</span><span data-l="nl">Kernpunt</span><span data-l="de">Merke</span></span>
+          <p><span data-l="fr">HelloInterval et RouterDeadInterval doivent être identiques des deux côtés, sinon le Hello est rejeté.</span><span data-l="en">HelloInterval and RouterDeadInterval must match on both sides, otherwise the Hello is rejected.</span><span data-l="nl">HelloInterval en RouterDeadInterval moeten aan beide kanten gelijk zijn, anders wordt de Hello verworpen.</span><span data-l="de">HelloInterval und RouterDeadInterval müssen auf beiden Seiten übereinstimmen, sonst wird das Hello verworfen.</span><a class="ref-link" href="#src-1">[1]</a></p></div></div>
+      <div class="callout warn"><svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M12 3 2 20h20z"/><path d="M12 10v4M12 17v.5" stroke-linecap="round"/></svg>
+        <div><span class="label"><span data-l="fr">Sécurité</span><span data-l="en">Security</span><span data-l="nl">Beveiliging</span><span data-l="de">Sicherheit</span></span>
+          <p><span data-l="fr">TEMPLATE — attaque, impact, protection, avec référence.</span><span data-l="en">TEMPLATE — attack, impact, protection, with a reference.</span><span data-l="nl">TEMPLATE — aanval, impact, bescherming, met referentie.</span><span data-l="de">TEMPLATE — Angriff, Auswirkung, Schutz, mit Referenz.</span></p></div></div>
+      <div class="callout vendor"><svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 7h16M4 12h10M4 17h13" stroke-linecap="round"/></svg>
+        <div><span class="label"><span data-l="fr">Écart vendeur / RFC</span><span data-l="en">Vendor deviation from the RFC</span><span data-l="nl">Afwijking van de vendor t.o.v. de RFC</span><span data-l="de">Herstellerabweichung vom RFC</span></span>
+          <p><span data-l="fr">TEMPLATE — comportement RFC, comportement vendeur, lequel s'applique, sources des deux.</span><span data-l="en">TEMPLATE — RFC behaviour, vendor behaviour, which one applies, sources for both.</span><span data-l="nl">TEMPLATE — gedrag volgens de RFC, gedrag van de vendor, welk van toepassing is, bronnen voor beide.</span><span data-l="de">TEMPLATE — Verhalten laut RFC, Verhalten des Herstellers, was gilt, Quellen für beides.</span></p></div></div>
+    </details>
+  </section>
+
+  <!-- ===== 6. Multi-vendor configuration and verification ===== -->
+  <section class="sec" id="vendors" aria-labelledby="h-vendors">
+    <details open>
+      <summary><h2 id="h-vendors"><span class="num">5</span><span data-l="fr">Configuration et vérification multi-vendeurs</span><span data-l="en">Multi-vendor configuration and verification</span><span data-l="nl">Configuratie en verificatie per vendor</span><span data-l="de">Herstellerübergreifende Konfiguration und Verifikation</span></h2></summary>
+      <div class="tabs" id="vendor-tabs">
+        <div role="tablist" data-aria="vendors" aria-label="Vendors">
+          <button type="button" role="tab" id="t-cisco" aria-controls="p-cisco" aria-selected="true">Cisco</button>
+          <button type="button" role="tab" id="t-checkpoint" aria-controls="p-checkpoint" aria-selected="false" tabindex="-1">Check Point</button>
+          <button type="button" role="tab" id="t-f5" aria-controls="p-f5" aria-selected="false" tabindex="-1">F5 BIG-IP</button>
+          <button type="button" role="tab" id="t-paloalto" aria-controls="p-paloalto" aria-selected="false" tabindex="-1">Palo Alto</button>
+          <button type="button" role="tab" id="t-netscaler" aria-controls="p-netscaler" aria-selected="false" tabindex="-1">NetScaler</button>
+          <button type="button" role="tab" id="t-fortigate" aria-controls="p-fortigate" aria-selected="false" tabindex="-1">FortiGate</button>
+        </div>
+        <div role="tabpanel" id="p-cisco" aria-labelledby="t-cisco" tabindex="0">
+          <h3 class="sr-only">Cisco</h3>
+          <div class="cmd">
+            <div class="cmd-head"><span data-l="fr">Configuration</span><span data-l="en">Configuration</span><span data-l="nl">Configuratie</span><span data-l="de">Konfiguration</span><span class="ver">IOS XE ⟨version⟩</span>
+              <button type="button" class="copy"><span data-l="fr">Copier</span><span data-l="en">Copy</span><span data-l="nl">Kopiëren</span><span data-l="de">Kopieren</span><span class="copied sr-only" aria-live="polite"></span></button></div>
+            <pre><code>⟨TEMPLATE: configuration copied from the cited vendor document⟩</code></pre>
+            <p class="src"><span data-l="fr">Source</span><span data-l="en">Source</span><span data-l="nl">Bron</span><span data-l="de">Quelle</span> : ⟨document title · version · section · URL⟩</p>
+          </div>
+          <div class="cmd">
+            <div class="cmd-head"><span data-l="fr">Vérification</span><span data-l="en">Verification</span><span data-l="nl">Verificatie</span><span data-l="de">Verifikation</span><span class="ver">IOS XE ⟨version⟩</span>
+              <button type="button" class="copy"><span data-l="fr">Copier</span><span data-l="en">Copy</span><span data-l="nl">Kopiëren</span><span data-l="de">Kopieren</span><span class="copied sr-only" aria-live="polite"></span></button></div>
+            <pre><code>⟨TEMPLATE: verification command + expected output⟩</code></pre>
+            <p class="src"><span data-l="fr">Source</span><span data-l="en">Source</span><span data-l="nl">Bron</span><span data-l="de">Quelle</span> : ⟨document title · version · section · URL⟩</p>
+          </div>
+          <div class="callout warn"><svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M12 3 2 20h20z"/><path d="M12 10v4M12 17v.5" stroke-linecap="round"/></svg>
+            <div><span class="label"><span data-l="fr">Debug en production</span><span data-l="en">Debug in production</span><span data-l="nl">Debug in productie</span><span data-l="de">Debug im Produktivbetrieb</span></span>
+              <p><span data-l="fr">Les commandes debug consomment du CPU : limitez-les (filtre, durée) et désactivez-les aussitôt.</span><span data-l="en">Debug commands consume CPU: scope them (filter, duration) and turn them off straight away.</span><span data-l="nl">Debugcommando's verbruiken CPU: beperk ze (filter, duur) en schakel ze meteen weer uit.</span><span data-l="de">Debug-Befehle belasten die CPU: Begrenzen Sie sie (Filter, Dauer) und schalten Sie sie sofort wieder ab.</span></p></div></div>
+          <div class="cmd debug">
+            <div class="cmd-head">Debug<span class="ver">IOS XE ⟨version⟩</span>
+              <button type="button" class="copy"><span data-l="fr">Copier</span><span data-l="en">Copy</span><span data-l="nl">Kopiëren</span><span data-l="de">Kopieren</span><span class="copied sr-only" aria-live="polite"></span></button></div>
+            <pre><code>⟨TEMPLATE: debug command⟩</code></pre>
+            <p class="src"><span data-l="fr">Source</span><span data-l="en">Source</span><span data-l="nl">Bron</span><span data-l="de">Quelle</span> : ⟨document title · version · section · URL⟩</p>
+          </div>
+        </div>
+        <div role="tabpanel" id="p-checkpoint" aria-labelledby="t-checkpoint" tabindex="0" hidden><h3 class="sr-only">Check Point</h3><p class="tpl" data-tpl><strong>TEMPLATE</strong> <span data-l="fr">— même structure que Cisco (Gaia clish, mode expert).</span><span data-l="en">— same structure as Cisco (Gaia clish, expert mode).</span><span data-l="nl">— zelfde structuur als Cisco (Gaia clish, expertmodus).</span><span data-l="de">— gleicher Aufbau wie bei Cisco (Gaia clish, Expert-Modus).</span></p></div>
+        <div role="tabpanel" id="p-f5" aria-labelledby="t-f5" tabindex="0" hidden><h3 class="sr-only">F5 BIG-IP</h3><p class="tpl" data-tpl><strong>TEMPLATE</strong> <span data-l="fr">— TMOS tmsh ; ZebOS imish pour le routage dynamique.</span><span data-l="en">— TMOS tmsh; ZebOS imish for dynamic routing.</span><span data-l="nl">— TMOS tmsh; ZebOS imish voor dynamische routering.</span><span data-l="de">— TMOS tmsh; ZebOS imish für dynamisches Routing.</span></p></div>
+        <div role="tabpanel" id="p-paloalto" aria-labelledby="t-paloalto" tabindex="0" hidden><h3 class="sr-only">Palo Alto</h3><p class="tpl" data-tpl><strong>TEMPLATE</strong> <span data-l="fr">— PAN-OS : commandes set et commandes opérationnelles.</span><span data-l="en">— PAN-OS: set commands and operational commands.</span><span data-l="nl">— PAN-OS: set-commando's en operationele commando's.</span><span data-l="de">— PAN-OS: set-Befehle und operative Befehle.</span></p></div>
+        <div role="tabpanel" id="p-netscaler" aria-labelledby="t-netscaler" tabindex="0" hidden><h3 class="sr-only">NetScaler</h3><p class="tpl" data-tpl><strong>TEMPLATE</strong> <span data-l="fr">— CLI NetScaler ; ZebOS VTYSH pour le routage dynamique.</span><span data-l="en">— NetScaler CLI; ZebOS VTYSH for dynamic routing.</span><span data-l="nl">— NetScaler-CLI; ZebOS VTYSH voor dynamische routering.</span><span data-l="de">— NetScaler-CLI; ZebOS VTYSH für dynamisches Routing.</span></p></div>
+        <div role="tabpanel" id="p-fortigate" aria-labelledby="t-fortigate" tabindex="0" hidden><h3 class="sr-only">FortiGate</h3><p class="tpl" data-tpl><strong>TEMPLATE</strong> <span data-l="fr">— CLI FortiOS.</span><span data-l="en">— FortiOS CLI.</span><span data-l="nl">— FortiOS-CLI.</span><span data-l="de">— FortiOS-CLI.</span></p></div>
+      </div>
+      <noscript><style>[role="tabpanel"][hidden] { display: block; }</style></noscript>
+      <script>NPE.tabs("vendor-tabs");</script>
+    </details>
+  </section>
+
+  <!-- ===== 7. Troubleshooting ===== -->
+  <section class="sec" id="troubleshooting" aria-labelledby="h-troubleshooting">
+    <details open>
+      <summary><h2 id="h-troubleshooting"><span class="num">6</span><span data-l="fr">Dépannage</span><span data-l="en">Troubleshooting</span><span data-l="nl">Probleemoplossing</span><span data-l="de">Fehlersuche</span></h2></summary>
+      <h3><span data-l="fr">Arbre de décision : voisin bloqué avant 2-Way</span><span data-l="en">Decision tree: neighbor stuck before 2-Way</span><span data-l="nl">Beslisboom: buur blijft steken vóór 2-Way</span><span data-l="de">Entscheidungsbaum: Nachbar bleibt vor 2-Way hängen</span></h3>
+      <ol class="dtree">
+        <li id="dt-1"><p class="q"><span class="id">Q1</span><span data-l="fr">Chaque routeur voit-il son voisin, même en Init ?</span><span data-l="en">Does each router see its neighbor, even in Init?</span><span data-l="nl">Ziet elke router zijn buur, al is het in Init?</span><span data-l="de">Sieht jeder Router seinen Nachbarn, wenn auch nur in Init?</span></p>
+          <ul class="ans"><li><a class="yes" href="#dt-2">✓ <span data-l="fr">Oui → Q2</span><span data-l="en">Yes → Q2</span><span data-l="nl">Ja → Q2</span><span data-l="de">Ja → Q2</span></a></li><li><a class="no" href="#dt-3">✗ <span data-l="fr">Non → Q3</span><span data-l="en">No → Q3</span><span data-l="nl">Nee → Q3</span><span data-l="de">Nein → Q3</span></a></li></ul></li>
+        <li id="dt-2"><p class="q"><span class="id">Q2</span><span data-l="fr">Un côté reste-t-il en Init ? Son Router ID manque dans le Hello reçu (1-WayReceived, RFC 2328 §10.5) : cherchez un filtrage multicast dans un seul sens.</span><span data-l="en">Does one side stay in Init? Its Router ID is missing from the Hello it receives (1-WayReceived, RFC 2328 §10.5): look for multicast filtering in one direction.</span><span data-l="nl">Blijft één kant in Init? Zijn Router ID ontbreekt in de ontvangen Hello (1-WayReceived, RFC 2328 §10.5): zoek naar multicastfiltering in één richting.</span><span data-l="de">Bleibt eine Seite in Init? Ihre Router ID fehlt im empfangenen Hello (1-WayReceived, RFC 2328 §10.5): Suchen Sie nach Multicast-Filterung in einer Richtung.</span></p></li>
+        <li id="dt-3" class="leaf"><p class="q"><span class="id">Q3</span><span data-l="fr">Vérifiez la couche 2, les ACL et la concordance de HelloInterval, RouterDeadInterval, masque et zone.</span><span data-l="en">Check layer 2, ACLs and that HelloInterval, RouterDeadInterval, mask and area match.</span><span data-l="nl">Controleer laag 2, ACL's en of HelloInterval, RouterDeadInterval, masker en area overeenkomen.</span><span data-l="de">Prüfen Sie Schicht 2, ACLs und ob HelloInterval, RouterDeadInterval, Maske und Area übereinstimmen.</span></p>
+          <p class="tpl" data-tpl><strong>TEMPLATE</strong> <span data-l="fr">— commandes de vérification par vendeur, avec source.</span><span data-l="en">— verification commands per vendor, with source.</span><span data-l="nl">— verificatiecommando's per vendor, met bron.</span><span data-l="de">— Verifikationsbefehle je Hersteller, mit Quelle.</span></p></li>
+      </ol>
+      <div class="table-wrap">
+        <table>
+          <caption><span data-l="fr">Pannes fréquentes</span><span data-l="en">Common faults</span><span data-l="nl">Veelvoorkomende fouten</span><span data-l="de">Häufige Fehler</span></caption>
+          <thead><tr>
+            <th scope="col"><span data-l="fr">Symptôme</span><span data-l="en">Symptom</span><span data-l="nl">Symptoom</span><span data-l="de">Symptom</span></th>
+            <th scope="col"><span data-l="fr">Cause</span><span data-l="en">Cause</span><span data-l="nl">Oorzaak</span><span data-l="de">Ursache</span></th>
+            <th scope="col"><span data-l="fr">Commande</span><span data-l="en">Command</span><span data-l="nl">Commando</span><span data-l="de">Befehl</span></th>
+            <th scope="col"><span data-l="fr">Sortie attendue</span><span data-l="en">Expected output</span><span data-l="nl">Verwachte uitvoer</span><span data-l="de">Erwartete Ausgabe</span></th>
+            <th scope="col"><span data-l="fr">Correction</span><span data-l="en">Fix</span><span data-l="nl">Oplossing</span><span data-l="de">Behebung</span></th>
+          </tr></thead>
+          <tbody><tr>
+            <td><span data-l="fr">Voisin bloqué en Init</span><span data-l="en">Neighbor stuck in Init</span><span data-l="nl">Buur blijft in Init</span><span data-l="de">Nachbar bleibt in Init</span></td>
+            <td><span data-l="fr">Communication à sens unique (RFC 2328 §10.5)</span><span data-l="en">One-way communication (RFC 2328 §10.5)</span><span data-l="nl">Communicatie in één richting (RFC 2328 §10.5)</span><span data-l="de">Einseitige Kommunikation (RFC 2328 §10.5)</span></td>
+            <td>⟨TEMPLATE⟩</td><td>⟨TEMPLATE⟩</td><td>⟨TEMPLATE⟩</td>
+          </tr></tbody>
+        </table>
+      </div>
+    </details>
+  </section>
+
+  <!-- ===== 8. Quiz ===== -->
+  <section class="sec" id="quiz" aria-labelledby="h-quiz">
+    <details open>
+      <summary><h2 id="h-quiz"><span class="num">7</span>Quiz</h2></summary>
+      <p class="tpl" data-tpl><strong>TEMPLATE</strong> <span data-l="fr">— au moins 15 questions niveau CCIE (scénario, lecture de paquet, « que se passe-t-il si… »), chacune avec explication et référence.</span><span data-l="en">— at least 15 CCIE-level questions (scenario, packet reading, "what breaks if…"), each with an explanation and a reference.</span><span data-l="nl">— minstens 15 vragen op CCIE-niveau (scenario, pakket lezen, „wat gaat er mis als…"), elk met uitleg en referentie.</span><span data-l="de">— mindestens 15 Fragen auf CCIE-Niveau (Szenario, Paket lesen, „was passiert, wenn…"), jeweils mit Erklärung und Referenz.</span></p>
+      <form id="quiz-form" novalidate>
+        <fieldset class="quiz-q" data-answer="c">
+          <legend>1. <span data-l="fr">R1 (1.1.1.1) reçoit de R2 un Hello dont le champ Neighbor contient 1.1.1.1. Quel événement R1 exécute-t-il pour R2 ?</span><span data-l="en">R1 (1.1.1.1) receives a Hello from R2 whose Neighbor field contains 1.1.1.1. Which event does R1 execute for R2?</span><span data-l="nl">R1 (1.1.1.1) ontvangt van R2 een Hello waarvan het Neighbor-veld 1.1.1.1 bevat. Welk event voert R1 uit voor R2?</span><span data-l="de">R1 (1.1.1.1) empfängt von R2 ein Hello, dessen Feld Neighbor 1.1.1.1 enthält. Welches Ereignis führt R1 für R2 aus?</span></legend>
+          <div class="opts">
+            <label><input type="radio" name="q1" value="a"><span class="opt">1-WayReceived</span></label>
+            <label><input type="radio" name="q1" value="b"><span class="opt">AdjOK?</span></label>
+            <label><input type="radio" name="q1" value="c"><span class="opt">2-WayReceived</span></label>
+            <label><input type="radio" name="q1" value="d"><span class="opt">NegotiationDone</span></label>
+          </div>
+          <button type="button" class="btn"><span data-l="fr">Vérifier</span><span data-l="en">Check</span><span data-l="nl">Controleren</span><span data-l="de">Prüfen</span></button>
+          <p class="fb" aria-live="polite"></p>
+          <div class="expl" hidden>
+            <p><span data-l="fr">R1 trouve son propre Router ID dans la liste Neighbor : la communication est bidirectionnelle, d'où 2-WayReceived. Sans lui, ce serait 1-WayReceived.</span><span data-l="en">R1 finds its own Router ID in the Neighbor list: communication is bidirectional, hence 2-WayReceived. Without it, the event would be 1-WayReceived.</span><span data-l="nl">R1 vindt zijn eigen Router ID in de Neighbor-lijst: de communicatie is bidirectioneel, dus 2-WayReceived. Zonder die ID zou het 1-WayReceived zijn.</span><span data-l="de">R1 findet seine eigene Router ID in der Neighbor-Liste: Die Kommunikation ist bidirektional, daher 2-WayReceived. Ohne sie wäre es 1-WayReceived.</span></p>
+            <p class="ref">RFC 2328 §10.5 <a class="ref-link" href="#src-1">[1]</a></p>
+          </div>
+        </fieldset>
+        <p class="quiz-score" aria-live="polite"></p>
+      </form>
+      <script>NPE.quiz("quiz-form");</script>
+    </details>
+  </section>
+
+  <!-- ===== 9. Sources ===== -->
+  <section class="sec" id="sources" aria-labelledby="h-sources">
+    <h2 id="h-sources"><span class="num">8</span><span data-l="fr">Sources</span><span data-l="en">Sources</span><span data-l="nl">Bronnen</span><span data-l="de">Quellen</span></h2>
+    <ol class="sources">
+      <li id="src-1"><cite>RFC 2328 — OSPF Version 2</cite>, J. Moy, IETF, April 1998 — §A.2, §A.3.1, §A.3.2, §10.1–§10.5, §C.3, §D.4. <a href="https://www.rfc-editor.org/rfc/rfc2328">https://www.rfc-editor.org/rfc/rfc2328</a></li>
+      <li id="src-2"><cite>IANA — Open Shortest Path First v2 (OSPFv2) Parameters</cite>, registry "OSPFv2 Options". <a href="https://www.iana.org/assignments/ospfv2-parameters/ospfv2-parameters.xhtml">https://www.iana.org/assignments/ospfv2-parameters/ospfv2-parameters.xhtml</a></li>
+      <li id="src-3"><cite>Wireshark — Display Filter Reference: Open Shortest Path First</cite>. <a href="https://www.wireshark.org/docs/dfref/o/ospf.html">https://www.wireshark.org/docs/dfref/o/ospf.html</a></li>
+    </ol>
+  </section>
+</main>
+
+<nav class="toc" aria-labelledby="toc-h">
+  <details id="toc">
+    <summary id="toc-h"><span data-l="fr">Sur cette page</span><span data-l="en">On this page</span><span data-l="nl">Op deze pagina</span><span data-l="de">Auf dieser Seite</span></summary>
+    <ol>
+      <li><a href="#concepts"><span class="n">1</span><span data-l="fr">Concepts</span><span data-l="en">Concepts</span><span data-l="nl">Concepten</span><span data-l="de">Konzepte</span></a></li>
+      <li><a href="#packets"><span class="n">2</span><span data-l="fr">Formats de paquets</span><span data-l="en">Packet formats</span><span data-l="nl">Pakketformaten</span><span data-l="de">Paketformate</span></a></li>
+      <li><a href="#operation"><span class="n">3</span><span data-l="fr">Fonctionnement</span><span data-l="en">Operation</span><span data-l="nl">Werking</span><span data-l="de">Funktionsweise</span></a></li>
+      <li><a href="#advanced"><span class="n">4</span><span data-l="fr">Comportement avancé</span><span data-l="en">Advanced behaviour</span><span data-l="nl">Geavanceerd gedrag</span><span data-l="de">Fortgeschrittenes Verhalten</span></a></li>
+      <li><a href="#vendors"><span class="n">5</span><span data-l="fr">Configuration multi-vendeurs</span><span data-l="en">Multi-vendor configuration</span><span data-l="nl">Configuratie per vendor</span><span data-l="de">Herstellerkonfiguration</span></a></li>
+      <li><a href="#troubleshooting"><span class="n">6</span><span data-l="fr">Dépannage</span><span data-l="en">Troubleshooting</span><span data-l="nl">Probleemoplossing</span><span data-l="de">Fehlersuche</span></a></li>
+      <li><a href="#quiz"><span class="n">7</span>Quiz</a></li>
+      <li><a href="#sources"><span class="n">8</span><span data-l="fr">Sources</span><span data-l="en">Sources</span><span data-l="nl">Bronnen</span><span data-l="de">Quellen</span></a></li>
+    </ol>
+  </details>
+  <script>if (matchMedia("(min-width: 64rem)").matches) document.getElementById("toc").open = true;</script>
+</nav>
+</div>
+
+<footer class="site-footer">
+  <div class="bar">
+    <span>Network Protocols Expert</span>
+    <span><span data-l="fr">Fondé sur les RFC et la documentation officielle des vendeurs.</span><span data-l="en">Based on the RFCs and official vendor documentation.</span><span data-l="nl">Gebaseerd op de RFC's en officiële documentatie van de vendors.</span><span data-l="de">Basierend auf den RFCs und der offiziellen Herstellerdokumentation.</span></span>
+  </div>
+</footer>
+<script>NPE.chrome();</script>
+</body>
+</html>

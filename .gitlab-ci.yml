@@ -142,16 +142,16 @@ security:secrets:
     paths: [gitleaks.sarif]
 
 # ---------------------------------------------------------------- build
+# One URL per language (/fr/, /en/, /nl/, /de/) with hreflang, canonical, Open Graph,
+# JSON-LD, sitemap.xml, robots.txt, 404 and a root language chooser (scripts/build_site.py).
 build:site:
   stage: build
-  image: alpine:3.22@sha256:2e0b81d60597f449baa56dc25d355367869d2dca4cd57e866f1e2b52af3eb55f
+  extends: .python
   needs: [test:pages-static, test:packet-builder]
+  variables:
+    SITE_URL: https://learning.cuvelier.tech
   script:
-    - mkdir -p public
-    - cp index.html public/
-    - for d in protocols/*/; do [ -f "$d/index.html" ] && mkdir -p "public/$d" && cp "$d/index.html" "public/$d"; done || true
-    - echo "$CI_COMMIT_SHA" > public/version.txt
-    - find public -type f | sort
+    - python3 scripts/build_site.py public
   artifacts:
     paths: [public]
     expire_in: 1 week
@@ -163,6 +163,12 @@ verify:browser:
   needs: [build:site]
   # The image ships the browsers only, not the Python package: install it pinned
   # with hashes, at the same version as the image tag.
+  # smoke_test.py: axe-core WCAG 2.2 AA (light + dark theme), CLS < 0.1, reduced motion,
+  # hreflang/canonical, in-place language switch, 360 px, no external request.
+  # axe-core is pinned (version + sha512 integrity) in the script and cached here.
+  cache:
+    key: axe-core-4.14.0
+    paths: [.cache/]
   before_script:
     - pip install --require-hashes -r requirements/browser.txt
   script:

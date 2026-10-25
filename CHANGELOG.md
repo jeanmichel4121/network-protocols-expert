@@ -17,6 +17,19 @@ Versioning rules for this library:
 - Repository governance: MR and issue templates, CODEOWNERS, contributing guide,
   pre-commit hooks, editor and lint configuration.
 
+- Page template `templates/protocol-template.html`: the nine sections, synchronised RFC bit
+  diagram + Wireshark tree + hex dump rendered from the packet builder's field map,
+  step-by-step animation with prediction prompts, vendor tabs, decision tree, accessible
+  quiz with explained answers, light/dark themes, print stylesheet (demo: OSPFv2 Hello).
+- Redesigned home page sharing the template's design system.
+- One URL per language (`/fr/`, `/en/`, `/nl/`, `/de/`) with hreflang, canonical, Open Graph,
+  JSON-LD, sitemap, robots.txt, 404 and a root language chooser (`scripts/build_site.py`).
+- `docs/web-standards.md`: sourced web, accessibility (WCAG 2.2 AA) and learning-design standards.
+- CI: axe-core WCAG 2.2 AA in light and dark themes, CLS budget, reduced-motion,
+  hreflang and language-URL checks; static checks for balanced translations, shared
+  template blocks, diagram legends and builder-generated packets.
+- `tools/packet-builder.py`: field map output and `--update` to embed samples in a page.
+
 ### Changed
 - Deploy publishes the site publicly on https://learning.cuvelier.tech (NAS, atomic
   releases, smoke test) instead of GitLab Pages; the runners now live in the homelab

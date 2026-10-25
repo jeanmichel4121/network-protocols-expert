@@ -9,3 +9,4 @@ gitleaks.sarif
 # Claude Code personal / machine-specific files
 CLAUDE.local.md
 .claude/settings.local.json
+.playwright-mcp/
