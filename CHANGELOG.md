@@ -12,6 +12,8 @@ Versioning rules for this library:
 ## [Unreleased]
 
 ### Added
+- Public read-only GitHub mirror (GitLab push mirror of protected branches), documented in
+  README and CLAUDE.md.
 - Site footer in columns (library links, method, project, version, documentation
   addresses) shared by every page; centred closing band on the home page.
 - CI/CD pipeline: lint (YAML, Python, Conventional Commits), tests, secret scanning,

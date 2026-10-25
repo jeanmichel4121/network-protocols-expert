@@ -3,6 +3,10 @@
 [![pipeline](https://gitlab.com/jeanmichel4121/network-protocols-expert/badges/main/pipeline.svg)](https://gitlab.com/jeanmichel4121/network-protocols-expert/-/pipelines?ref=main)
 [![release](https://gitlab.com/jeanmichel4121/network-protocols-expert/-/badges/release.svg)](https://gitlab.com/jeanmichel4121/network-protocols-expert/-/releases)
 
+> **Source of truth: GitLab.com.** [github.com/jeanmichel4121/network-protocols-expert](https://github.com/jeanmichel4121/network-protocols-expert)
+> is a read-only push mirror of the protected branches; changes pushed there are overwritten.
+> The site is published at <https://learning.cuvelier.tech>.
+
 Learning library for network protocols at expert level, aimed at CCIE and the equivalent
 expert certifications of other vendors. One self-contained HTML page per protocol, available
 in French, English, Dutch and German. Each page contains:

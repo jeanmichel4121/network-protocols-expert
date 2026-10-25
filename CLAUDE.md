@@ -44,6 +44,11 @@ each page available in **French, English, Dutch and German**.
 
 ## Git hosting, CI/CD and publication
 - GitLab.com, **private** project "Network Protocols Expert" (`jeanmichel4121/network-protocols-expert`), default branch `main`.
+  GitLab is the only place to push. A **public read-only mirror** on GitHub
+  (`github.com/jeanmichel4121/network-protocols-expert`) receives protected branches and tags
+  through a GitLab push mirror (SSH deploy key, write access to that repo only). Never push,
+  open PRs or commit on GitHub: the mirror overwrites diverging refs. Everything committed is
+  therefore public: the "no secrets, no real IPs/hostnames" rule below applies to history too.
 - All CI jobs run on my **self-hosted runners on my home NAS** (ARM64, Docker executor):
   tag `nas` for every job, tag `nas-deploy` for the deploy only (protected branches only,
   official `alpine` images only). Shared GitLab runners are disabled. Every CI image must exist for
