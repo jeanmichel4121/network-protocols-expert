@@ -1,4 +1,4 @@
-# network-protocols-expert — CI/CD pipeline
+# network-protocols-expert: CI/CD pipeline
 #
 # Runs only on the self-hosted runners on the home NAS (ARM64, Docker executor):
 # tag `nas` for every job, tag `nas-deploy` for the deploy (protected refs only).
@@ -101,8 +101,20 @@ lint:commits:
   script:
     - apt-get -qq update >/dev/null && apt-get -qq install -y --no-install-recommends git >/dev/null
     - python3 scripts/check_commits.py "$CI_MERGE_REQUEST_DIFF_BASE_SHA" HEAD
+    # Trunk-based: short-lived typed branches; the MR title becomes the squash commit on main.
+    - python3 scripts/check_commits.py --branch "$CI_MERGE_REQUEST_SOURCE_BRANCH_NAME"
+    - python3 scripts/check_commits.py --title "$CI_MERGE_REQUEST_TITLE"
   rules:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+
+# Every file has a licence and a copyright notice (REUSE.toml, LICENSES/).
+lint:reuse:
+  stage: lint
+  extends: .python-tools
+  needs: []
+  script:
+    - apt-get -qq update >/dev/null && apt-get -qq install -y --no-install-recommends git >/dev/null
+    - reuse lint
 
 # ---------------------------------------------------------------- test
 test:packet-builder:
@@ -141,6 +153,21 @@ security:secrets:
     expire_in: 1 week
     paths: [gitleaks.sarif]
 
+# Weekly (pipeline schedule) and on any change to a pin: report outdated Python tools,
+# rebuilt images (new digest for the same tag), pre-commit hooks and axe-core.
+# Replaces Dependabot/Renovate, which cannot open pull requests here. Orange = act.
+security:dependencies:
+  stage: security
+  extends: .python
+  needs: []
+  allow_failure: true
+  script:
+    - python3 scripts/check_updates.py
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "schedule"
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+      changes: [requirements/*, .gitlab-ci.yml, .pre-commit-config.yaml, scripts/smoke_test.py]
+
 # ---------------------------------------------------------------- build
 # One URL per language (/fr/, /en/, /nl/, /de/) with hreflang, canonical, Open Graph,
 # JSON-LD, sitemap.xml, robots.txt, 404 and a root language chooser (scripts/build_site.py).
@@ -155,6 +182,23 @@ build:site:
   artifacts:
     paths: [public]
     expire_in: 1 week
+
+# CycloneDX SBOM of the build tooling (the pages themselves have no dependency),
+# linked from each GitLab release (scripts/create_release.py).
+build:sbom:
+  stage: build
+  extends: .python
+  needs: []
+  script:
+    - pip install --require-hashes -r requirements/sbom.txt
+    - cat requirements/ci.txt requirements/browser.txt > /tmp/requirements-all.txt
+    - cyclonedx-py requirements /tmp/requirements-all.txt --of JSON -o sbom.cdx.json
+  artifacts:
+    paths: [sbom.cdx.json]
+    expire_in: 1 year
+  rules:
+    - if: $CI_COMMIT_TAG =~ /^v\d+\.\d+\.\d+$/
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
 
 # ---------------------------------------------------------------- verify
 verify:browser:
@@ -174,8 +218,17 @@ verify:browser:
   script:
     - python3 scripts/smoke_test.py public
 
+# HTML validation (HTML5 parser, strict), links and anchors between pages, every
+# protocol page listed on the home page of its language, security.txt present.
+verify:site:
+  stage: verify
+  extends: .python-tools
+  needs: [build:site]
+  script:
+    - python3 scripts/check_site.py public
+
 # ---------------------------------------------------------------- deploy
-# Publishes public/ (from build:site) to https://learning.cuvelier.tech — PUBLIC, no auth.
+# Publishes public/ (from build:site) to https://learning.cuvelier.tech (PUBLIC, no auth).
 # Runs on the dedicated `nas-deploy` runner: gitlab.com only hands it jobs from
 # protected refs, it accepts only official alpine images, and it is the only
 # runner that mounts the site volume (/site) served by the NAS nginx.
@@ -227,7 +280,7 @@ deploy:learning:
 release:
   stage: release
   extends: .python
-  needs: [build:site, verify:browser, security:secrets]
+  needs: [build:site, build:sbom, verify:browser, verify:site, security:secrets]
   interruptible: false
   script:
     - python3 scripts/create_release.py

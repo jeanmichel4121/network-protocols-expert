@@ -1,0 +1,35 @@
+name: Site problem
+description: Layout, accessibility, language switch, animation or print problem.
+title: "fix(site): "
+labels: ["type::bug", "status::needs-triage"]
+body:
+  - type: input
+    id: url
+    attributes:
+      label: Page URL
+    validations:
+      required: true
+  - type: textarea
+    id: what
+    attributes:
+      label: What happens, and what you expected
+    validations:
+      required: true
+  - type: dropdown
+    id: kind
+    attributes:
+      label: Kind of problem
+      options: [Layout, Accessibility (keyboard, screen reader, contrast), Language switch, Animation, Print, Other]
+    validations:
+      required: true
+  - type: input
+    id: env
+    attributes:
+      label: Browser, device and theme
+      placeholder: Firefox 133 on Windows 11, dark theme, 1920 px wide
+    validations:
+      required: true
+  - type: textarea
+    id: extra
+    attributes:
+      label: Screenshot or extra details

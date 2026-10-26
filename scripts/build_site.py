@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Assemble the published site in public/ — one URL per language.
+"""Assemble the published site in public/, one URL per language.
 
 Each source page holds the four languages and switches in place (CLAUDE.md). Search
 engines index one language per URL (Google: "use different URLs for each language
@@ -11,12 +11,13 @@ version"), so every page is written four times:
 Each copy gets <html lang>, <title>, description, canonical, hreflang alternates
 (+ x-default), Open Graph and JSON-LD for its language, taken from the page's
 <script type="application/json" id="page-meta">. Also written: a root language
-chooser (/), 404.html, sitemap.xml, robots.txt and version.txt.
+chooser (/), 404.html, sitemap.xml, robots.txt, version.txt and security.txt (RFC 9116).
 
 Usage: build_site.py [OUT_DIR]   (env SITE_URL, default https://learning.cuvelier.tech)
 Standard library only.
 """
 
+import datetime
 import html
 import json
 import os
@@ -100,6 +101,20 @@ def head_tags(meta: dict, lang: str, path: str) -> str:
 def full_title(meta: dict, lang: str) -> str:
     t = meta["title"][lang]
     return t if meta.get("kind") == "home" else f"{t} | {BRAND}"
+
+
+def security_txt() -> str:
+    """RFC 9116 file; Expires is renewed by every deploy (180 days, under the 1-year limit)."""
+    now = datetime.datetime.now(datetime.UTC).replace(microsecond=0)
+    expires = now + datetime.timedelta(days=180)
+    repo = "https://github.com/jeanmichel4121/network-protocols-expert"
+    return (
+        f"Contact: {repo}/security/advisories/new\n"
+        f"Expires: {expires.isoformat().replace('+00:00', 'Z')}\n"
+        "Preferred-Languages: fr, en, nl, de\n"
+        f"Canonical: {SITE}/.well-known/security.txt\n"
+        f"Policy: {repo}/blob/main/SECURITY.md\n"
+    )
 
 
 def localise(text: str, meta: dict, lang: str, path: str, home_href: str) -> str:
@@ -313,6 +328,11 @@ def main() -> int:
         f"User-agent: *\nAllow: /\n\nSitemap: {SITE}/sitemap.xml\n", encoding="utf-8"
     )
     (out / "version.txt").write_text(os.environ.get("CI_COMMIT_SHA", "local") + "\n", encoding="utf-8")
+    # RFC 9116, also at the top level for clients that do not look in /.well-known/.
+    sec = security_txt()
+    (out / ".well-known").mkdir()
+    (out / ".well-known" / "security.txt").write_text(sec, encoding="utf-8")
+    (out / "security.txt").write_text(sec, encoding="utf-8")
 
     for f in sorted(out.rglob("*")):
         if f.is_file():

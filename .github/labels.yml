@@ -1,0 +1,45 @@
+# Label taxonomy, the single source for GitLab (source of truth) and the GitHub mirror.
+# Apply with: python3 scripts/sync_labels.py (needs GITLAB_TOKEN / GITHUB_TOKEN, see the script).
+# Scopes use the GitLab "key::value" form; pick one value per scope on an issue or MR.
+# Colours: one family per scope, so a board reads at a glance.
+- {name: "type::page", color: "#1f75cb", description: "New protocol page"}
+- {name: "type::correction", color: "#c0392b", description: "Factual error in a page (RFC, vendor command, value)"}
+- {name: "type::bug", color: "#e74c3c", description: "Site or tooling defect (layout, script, accessibility)"}
+- {name: "type::feature", color: "#2e86de", description: "Improvement to the site, template or tooling"}
+- {name: "type::template", color: "#6699cc", description: "Shared template change, propagated to every page"}
+- {name: "type::docs", color: "#8e44ad", description: "Repository documentation"}
+- {name: "type::ci", color: "#16a085", description: "Pipeline, runners, deploy"}
+- {name: "type::security", color: "#b03a2e", description: "Security issue or hardening"}
+- {name: "type::chore", color: "#7f8c8d", description: "Maintenance, dependency updates"}
+- {name: "priority::high", color: "#d35400", description: "Wrong or broken content that misleads readers: fix first"}
+- {name: "priority::medium", color: "#e67e22", description: "Should be done in the current milestone"}
+- {name: "priority::low", color: "#f0b27a", description: "Nice to have"}
+- {name: "status::needs-triage", color: "#f1c40f", description: "New report, not reviewed yet"}
+- {name: "status::confirmed", color: "#27ae60", description: "Reviewed and accepted"}
+- {name: "status::in-progress", color: "#2ecc71", description: "Someone is working on it"}
+- {name: "status::needs-source", color: "#e9be74", description: "Waiting for an authoritative source (RFC, vendor doc)"}
+- {name: "status::blocked", color: "#a04000", description: "Blocked by another issue or an external dependency"}
+- {name: "status::wont-fix", color: "#95a5a6", description: "Will not be done, with the reason in a comment"}
+- {name: "status::duplicate", color: "#bdc3c7", description: "Already reported, linked in a comment"}
+- {name: "area::concepts", color: "#5dade2", description: "Section 2: concepts"}
+- {name: "area::packets", color: "#5dade2", description: "Section 3: packet formats, bit diagrams, Wireshark trees"}
+- {name: "area::operation", color: "#5dade2", description: "Section 4: state machines and animations"}
+- {name: "area::advanced", color: "#5dade2", description: "Section 5: advanced behaviour"}
+- {name: "area::vendors", color: "#5dade2", description: "Section 6: multi-vendor configuration and verification"}
+- {name: "area::troubleshooting", color: "#5dade2", description: "Section 7: decision tree and fault table"}
+- {name: "area::quiz", color: "#5dade2", description: "Section 8: quiz"}
+- {name: "area::sources", color: "#5dade2", description: "Section 9: sources and citations"}
+- {name: "area::landing", color: "#85c1e9", description: "Home page"}
+- {name: "area::accessibility", color: "#85c1e9", description: "WCAG 2.2 AA, keyboard, screen readers"}
+- {name: "area::i18n", color: "#85c1e9", description: "Translations and language switch"}
+- {name: "lang::fr", color: "#a9cce3", description: "French version only"}
+- {name: "lang::en", color: "#a9cce3", description: "English version only"}
+- {name: "lang::nl", color: "#a9cce3", description: "Dutch version only"}
+- {name: "lang::de", color: "#a9cce3", description: "German version only"}
+- {name: "vendor::cisco", color: "#117a65", description: "Cisco IOS XE, NX-OS, IOS XR"}
+- {name: "vendor::checkpoint", color: "#117a65", description: "Check Point Gaia"}
+- {name: "vendor::f5", color: "#117a65", description: "F5 BIG-IP TMOS"}
+- {name: "vendor::paloalto", color: "#117a65", description: "Palo Alto Networks PAN-OS"}
+- {name: "vendor::netscaler", color: "#117a65", description: "NetScaler"}
+- {name: "vendor::fortinet", color: "#117a65", description: "Fortinet FortiGate FortiOS"}
+- {name: "protocol::ethernet", color: "#34495e", description: "Ethernet II, IEEE 802.3, 802.1Q"}

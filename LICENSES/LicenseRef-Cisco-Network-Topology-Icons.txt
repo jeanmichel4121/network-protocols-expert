@@ -1,0 +1,15 @@
+Cisco Network Topology Icons
+
+Copyright Cisco Systems, Inc.
+
+Source: Cisco Brand Center, Network Topology Icons
+https://www.cisco.com/c/en/us/about/brand-center/network-topology-icons.html
+
+Terms stated by Cisco on that page (retrieved 2026-10-25):
+
+    "You may use them freely, but you may not alter them."
+
+These icons are NOT covered by the MIT licence or by CC BY-SA 4.0 of this repository.
+They are redistributed unaltered (format conversion EPS to SVG only, see
+tools/icons/cisco/README.md) and may only be scaled uniformly. Cisco and the Cisco
+logo are trademarks of Cisco Systems, Inc.

@@ -60,7 +60,7 @@ def ospf_hello(
     header = header[:12] + struct.pack("!H", csum) + header[14:]
     pkt = header + body
     opt_bits = [
-        # (mask, Wireshark label, Wireshark filter, reference) — IANA "OSPFv2 Options"
+        # (mask, Wireshark label, Wireshark filter, reference), from IANA "OSPFv2 Options"
         # registry; labels and filters from the Wireshark display filter reference (ospf).
         (0x80, "DN", "ospf.v2.options.dn", "RFC 4576"),
         (0x40, "(O) Opaque", "ospf.v2.options.o", "RFC 5250"),

@@ -28,7 +28,7 @@ Last reviewed: 2026-10-25.
   `description` (≤ 200 characters) in the four languages, `name`, `tags`, `standards`,
   `updated`. **[CI]**
 
-## 2. Accessibility — WCAG 2.2 level AA
+## 2. Accessibility: WCAG 2.2 level AA
 
 Target: WCAG 2.2 AA [W1]. axe-core checks every built page in the light and the dark
 theme and at 360 px (tags `wcag2a`, `wcag2aa`, `wcag21a`, `wcag21aa`, `wcag22aa`). **[CI]**
@@ -36,7 +36,7 @@ theme and at 360 px (tags `wcag2a`, `wcag2aa`, `wcag21a`, `wcag21aa`, `wcag22aa`
 | Criterion | What it means here |
 |---|---|
 | 2.4.11 Focus Not Obscured (AA, new in 2.2) | The header is sticky: `scroll-padding-top` keeps the focused element below it. |
-| 2.5.8 Target Size (AA, new in 2.2) | Every control ≥ 24 × 24 CSS px; buttons are 36–44 px high. Reference links `[n]` are 24 px boxes. **[CI]** |
+| 2.5.8 Target Size (AA, new in 2.2) | Every control ≥ 24 × 24 CSS px; buttons are 36 to 44 px high. Reference links `[n]` are 24 px boxes. **[CI]** |
 | 2.5.7 Dragging Movements (AA, new in 2.2) | No drag interaction without a single-click alternative. |
 | 2.5.3 Label in Name | A control's accessible name contains its visible text (no `aria-label` that rewords it). **[CI]** |
 | 1.4.3 Contrast | Text ≥ 4.5:1 in both themes (palette tokens are checked by axe in light and dark). **[CI]** |
@@ -62,7 +62,7 @@ Component patterns:
 ## 3. Motion
 
 - Auto-advancing content (the animation's Play) has a visible Pause and stops at the
-  end — WCAG 2.2.2 Pause, Stop, Hide (A) [W2].
+  end: WCAG 2.2.2 Pause, Stop, Hide (A) [W2].
 - `prefers-reduced-motion: reduce` turns transitions and animations off (W3C technique
   C39); content never depends on motion [W2]. **[CI]** (no animation runs at load).
 - Smooth scrolling only under `prefers-reduced-motion: no-preference`.
@@ -92,14 +92,14 @@ Component patterns:
 
 ## 6. Typography and layout
 
-- Body text 16–17 px (`clamp`), line height 1.6, prose limited to ~70 characters per line
-  (`max-width: 72ch`); 45–75 characters is the readable range [T1][T2].
+- Body text 16 to 17 px (`clamp`), line height 1.6, prose limited to ~70 characters per line
+  (`max-width: 72ch`); 45 to 75 characters is the readable range [T1][T2].
 - System font stack and a system monospace stack: no web font, nothing to download.
 - Documentation layout: sticky header, content column, table of contents on the right
   from 64 rem (collapsible block above the content on smaller screens). The TOC
   highlights the section in view with `IntersectionObserver` (not a scroll handler) and
   its entries are real links that work without JavaScript [D1].
-- Sections 4–7 are `<details open>`: collapsible, open by default.
+- Sections 4 to 7 are `<details open>`: collapsible, open by default.
 
 ## 7. Colour and theming
 
@@ -117,7 +117,7 @@ Component patterns:
 | Explanatory feedback beats "correct/incorrect" | Elaborated feedback helps higher-order learning and transfer more than knowledge of the correct response [L1][L2] | Every quiz answer reveals an explanation and its RFC/vendor reference, whichever option was chosen. |
 | Predict, then observe | Explorable explanations work because the reader commits to a prediction and checks it against the model [L3] | Animation steps carry "Predict: …" prompts revealed on demand. |
 | Worked examples first, retrieval after | Worked examples help early skill acquisition; retrieval practice consolidates [L4][L5] | Packet sections are decoded examples; the quiz forces recall and packet reading. |
-| Cut extraneous load | Multimedia/cognitive-load principles: remove what does not serve the goal, put words next to the graphic they describe [L4] | One precise sentence beside each diagram, ≤ 5–7 elements per diagram, details on demand (field panel). |
+| Cut extraneous load | Multimedia/cognitive-load principles: remove what does not serve the goal, put words next to the graphic they describe [L4] | One precise sentence beside each diagram, ≤ 5 to 7 elements per diagram, details on demand (field panel). |
 | Pages that stand alone | Readers arrive anywhere and leave anytime [L6] | Each section is self-contained; the TOC and stable anchors (`#packets`, `#quiz`…) support deep links. |
 
 ## 8b. Writing style
@@ -147,22 +147,22 @@ explanations shown, source URLs printed after each source.
 
 ## Sources
 
-- [G1] Google Search Central — Managing multi-regional and multilingual sites. https://developers.google.com/search/docs/specialty/international/managing-multi-regional-sites
-- [S1] Google Search Central — Education Q&A (Quiz) structured data. https://developers.google.com/search/docs/appearance/structured-data/education-qa
-- [W1] W3C — What's New in WCAG 2.2. https://www.w3.org/WAI/standards-guidelines/wcag/new-in-22/
-- [W2] W3C — Understanding SC 2.3.3 Animation from Interactions. https://w3c.github.io/wcag/understanding/animation-from-interactions.html
-- [H1] Harvard Digital Accessibility — Form feedback with live regions. https://accessibility.huit.harvard.edu/technique-form-feedback-live-regions
-- [A1] Smashing Magazine — Accessible SVGs: perfect patterns for screen reader users (2021). https://smashingmagazine.com/2021/05/accessible-svg-patterns-comparison/
-- [A2] data.europa.eu — Accessible SVG and ARIA. https://data.europa.eu/apps/data-visualisation-guide/accessible-svg-and-aria
+- [G1] Google Search Central: Managing multi-regional and multilingual sites. https://developers.google.com/search/docs/specialty/international/managing-multi-regional-sites
+- [S1] Google Search Central: Education Q&A (Quiz) structured data. https://developers.google.com/search/docs/appearance/structured-data/education-qa
+- [W1] W3C: What's New in WCAG 2.2. https://www.w3.org/WAI/standards-guidelines/wcag/new-in-22/
+- [W2] W3C: Understanding SC 2.3.3 Animation from Interactions. https://w3c.github.io/wcag/understanding/animation-from-interactions.html
+- [H1] Harvard Digital Accessibility: Form feedback with live regions. https://accessibility.huit.harvard.edu/technique-form-feedback-live-regions
+- [A1] Smashing Magazine: Accessible SVGs: perfect patterns for screen reader users (2021). https://smashingmagazine.com/2021/05/accessible-svg-patterns-comparison/
+- [A2] data.europa.eu: Accessible SVG and ARIA. https://data.europa.eu/apps/data-visualisation-guide/accessible-svg-and-aria
 - [P1] Core Web Vitals thresholds (LCP, INP, CLS). https://corewebvitals.io/core-web-vitals
-- [B1] web.dev — Baseline 2026. https://web.dev/baseline/2026
-- [B2] MDN — `light-dark()`. https://developer.mozilla.org/docs/Web/CSS/color_value/light-dark
-- [T1] UXPin — Optimal line length for readability. https://www.uxpin.com/studio/blog/optimal-line-length-for-readability/
-- [T2] Canada GCWeb design system — Typography. https://design.cra-arc.alpha.canada.ca/en/design-systems/gcweb/typography/index.html
-- [D1] 21st.dev — Docs site components (TOC scroll-spy with IntersectionObserver). https://21st.dev/blog/docs-site-components
-- [L1] Butler, Godbole & Marsh (2013) — Explanation feedback is better than correct answer feedback for promoting transfer of learning. Journal of Educational Psychology 105(2).
-- [L2] Van der Kleij, Feskens & Eggen (2015) — Effects of feedback in a computer-based learning environment on students' learning outcomes: a meta-analysis. Review of Educational Research 85(4).
+- [B1] web.dev: Baseline 2026. https://web.dev/baseline/2026
+- [B2] MDN: `light-dark()`. https://developer.mozilla.org/docs/Web/CSS/color_value/light-dark
+- [T1] UXPin: Optimal line length for readability. https://www.uxpin.com/studio/blog/optimal-line-length-for-readability/
+- [T2] Canada GCWeb design system: Typography. https://design.cra-arc.alpha.canada.ca/en/design-systems/gcweb/typography/index.html
+- [D1] 21st.dev: Docs site components (TOC scroll-spy with IntersectionObserver). https://21st.dev/blog/docs-site-components
+- [L1] Butler, Godbole & Marsh (2013): Explanation feedback is better than correct answer feedback for promoting transfer of learning. Journal of Educational Psychology 105(2).
+- [L2] Van der Kleij, Feskens & Eggen (2015): Effects of feedback in a computer-based learning environment on students' learning outcomes: a meta-analysis. Review of Educational Research 85(4).
 - [L3] Explorable explanation (Bret Victor, 2011). https://en.wikipedia.org/wiki/Explorable_explanation
-- [L4] Mayer — Applying the science of learning: evidence-based principles for the design of multimedia instruction (2008). https://pressbooks.pub/learningenvironmentsdesign/chapter/mayer-applying-the-science-of-learning-evidence-based-principles-for-the-design-of-multimedia-instruction/
-- [L5] UBC — Design principles for multimedia. https://wiki.ubc.ca/Documentation:Design_Principles_for_Multimedia
-- [L6] Red Blob Games — notes on interactive explanations. https://redblobgames.com/x/2306-educ432
+- [L4] Mayer: Applying the science of learning: evidence-based principles for the design of multimedia instruction (2008). https://pressbooks.pub/learningenvironmentsdesign/chapter/mayer-applying-the-science-of-learning-evidence-based-principles-for-the-design-of-multimedia-instruction/
+- [L5] UBC: Design principles for multimedia. https://wiki.ubc.ca/Documentation:Design_Principles_for_Multimedia
+- [L6] Red Blob Games: notes on interactive explanations. https://redblobgames.com/x/2306-educ432

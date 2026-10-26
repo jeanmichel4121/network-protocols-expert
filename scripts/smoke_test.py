@@ -102,7 +102,7 @@ def run_axe(page, axe: str, label: str) -> list:
     out = []
     for v in res["violations"]:
         targets = ", ".join(" ".join(n["target"]) for n in v["nodes"][:3])
-        out.append(f"axe [{label}] {v['id']} ({v['impact']}): {v['help']} — {targets}")
+        out.append(f"axe [{label}] {v['id']} ({v['impact']}): {v['help']}: {targets}")
     return out
 
 

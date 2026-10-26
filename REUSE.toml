@@ -1,0 +1,40 @@
+# Licensing of every file, in the REUSE 3.3 format (https://reuse.software/spec-3.3/).
+# Checked by `reuse lint` in pre-commit and in CI. When several annotations match a
+# file, the last one wins.
+version = 1
+SPDX-PackageName = "network-protocols-expert"
+SPDX-PackageSupplier = "Jean-Michel Cuvelier"
+SPDX-PackageDownloadLocation = "https://github.com/jeanmichel4121/network-protocols-expert"
+
+# Default: code, tooling, configuration and the page template.
+[[annotations]]
+path = "**"
+precedence = "override"
+SPDX-FileCopyrightText = "2026 Jean-Michel Cuvelier"
+SPDX-License-Identifier = "MIT"
+
+# Learning content: protocol pages, their sources, the home page and the documentation.
+[[annotations]]
+path = ["protocols/**", "docs/**"]
+precedence = "override"
+SPDX-FileCopyrightText = "2026 Jean-Michel Cuvelier"
+SPDX-License-Identifier = "CC-BY-SA-4.0"
+
+# The home page and its screenshots embed the unaltered Cisco icons.
+[[annotations]]
+path = ["index.html", "docs/assets/**"]
+precedence = "override"
+SPDX-FileCopyrightText = ["2026 Jean-Michel Cuvelier", "Cisco Systems, Inc."]
+SPDX-License-Identifier = "CC-BY-SA-4.0 AND LicenseRef-Cisco-Network-Topology-Icons"
+
+[[annotations]]
+path = "tools/icons/cisco/*.svg"
+precedence = "override"
+SPDX-FileCopyrightText = "Cisco Systems, Inc."
+SPDX-License-Identifier = "LicenseRef-Cisco-Network-Topology-Icons"
+
+[[annotations]]
+path = "CODE_OF_CONDUCT.md"
+precedence = "override"
+SPDX-FileCopyrightText = "Organization for Ethical Source"
+SPDX-License-Identifier = "CC-BY-SA-4.0"

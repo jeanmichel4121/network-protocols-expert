@@ -14,6 +14,7 @@ import urllib.request
 
 def main() -> int:
     tag = os.environ["CI_COMMIT_TAG"]
+    project = os.environ["CI_PROJECT_URL"]
     notes = subprocess.run(
         [sys.executable, "scripts/release_notes.py", tag], check=True, capture_output=True, text=True
     ).stdout
@@ -23,11 +24,17 @@ def main() -> int:
         "description": notes,
         "assets": {
             "links": [
+                {"name": "Website", "url": "https://learning.cuvelier.tech", "link_type": "other"},
                 {
-                    "name": "Website (GitLab Pages)",
-                    "url": os.environ.get("CI_PAGES_URL", ""),
+                    "name": "SBOM of the build tooling (CycloneDX JSON)",
+                    "url": f"{project}/-/jobs/artifacts/{tag}/raw/sbom.cdx.json?job=build:sbom",
                     "link_type": "other",
-                }
+                },
+                {
+                    "name": "Source on GitHub (read-only mirror)",
+                    "url": f"https://github.com/jeanmichel4121/network-protocols-expert/tree/{tag}",
+                    "link_type": "other",
+                },
             ]
         },
     }

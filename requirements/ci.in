@@ -1,2 +1,4 @@
 ruff==0.17.2
 yamllint==1.38.0
+html5lib==1.1
+reuse[charset-normalizer]==6.2.0

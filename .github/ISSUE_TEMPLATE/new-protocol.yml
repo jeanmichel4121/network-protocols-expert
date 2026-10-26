@@ -1,0 +1,29 @@
+name: New protocol
+description: Suggest a protocol (or a part of one) for a new page.
+title: "feat(<protocol>): "
+labels: ["type::page", "status::needs-triage"]
+body:
+  - type: input
+    id: protocol
+    attributes:
+      label: Protocol and version
+      placeholder: BGP-4 with EVPN, or OSPFv3
+    validations:
+      required: true
+  - type: textarea
+    id: scope
+    attributes:
+      label: Scope
+      description: What the page should cover, and what it should leave out.
+    validations:
+      required: true
+  - type: input
+    id: standards
+    attributes:
+      label: Governing standards
+      placeholder: RFC 4271, RFC 7432
+  - type: textarea
+    id: why
+    attributes:
+      label: Why it matters
+      description: For example the certification blueprint or the operational problem it helps with.

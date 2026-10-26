@@ -1,0 +1,20 @@
+cff-version: 1.2.0
+message: "If you use or reference this library, please cite it as below."
+type: dataset
+title: "Network Protocols Expert: an expert-level network protocol learning library"
+abstract: >-
+  One self-contained HTML page per network protocol, in French, English, Dutch and German:
+  RFC-style bit diagrams and Wireshark-style trees for every message type, animated
+  exchanges, multi-vendor configuration with sourced commands, troubleshooting and quizzes.
+authors:
+  - family-names: Cuvelier
+    given-names: Jean-Michel
+url: "https://learning.cuvelier.tech"
+repository-code: "https://github.com/jeanmichel4121/network-protocols-expert"
+license: CC-BY-SA-4.0
+keywords:
+  - networking
+  - network protocols
+  - RFC
+  - CCIE
+  - Wireshark

@@ -1,0 +1,72 @@
+name: Correction
+description: A page states something wrong (field, value, timer, command, output, translation).
+title: "fix(<protocol>): "
+labels: ["type::correction", "status::needs-triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you. Every fact in the library must come from an authoritative source, so please
+        give one. You may write in French, English, Dutch or German.
+  - type: input
+    id: url
+    attributes:
+      label: Page URL
+      description: Copy the address, including the section anchor if possible.
+      placeholder: https://learning.cuvelier.tech/en/ethernet/#packets
+    validations:
+      required: true
+  - type: dropdown
+    id: section
+    attributes:
+      label: Section
+      options:
+        - 1. Header
+        - 2. Concepts
+        - 3. Packet formats
+        - 4. Operation (animation)
+        - 5. Advanced behaviour
+        - 6. Multi-vendor configuration
+        - 7. Troubleshooting
+        - 8. Quiz
+        - 9. Sources
+    validations:
+      required: true
+  - type: dropdown
+    id: languages
+    attributes:
+      label: Language versions affected
+      multiple: true
+      options: [All, French, English, Dutch, German]
+    validations:
+      required: true
+  - type: textarea
+    id: wrong
+    attributes:
+      label: What the page says
+      description: Quote the sentence, value or command.
+    validations:
+      required: true
+  - type: textarea
+    id: right
+    attributes:
+      label: What is correct
+    validations:
+      required: true
+  - type: textarea
+    id: source
+    attributes:
+      label: Source
+      description: RFC number and section, IEEE clause, or vendor document title, software version and URL.
+      placeholder: RFC 2328 section A.3.2, or "PAN-OS 11.1 CLI Reference, show interface"
+    validations:
+      required: true
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Checks
+      options:
+        - label: The source is a standard (RFC, IEEE, IANA) or official vendor documentation.
+          required: true
+        - label: I did not paste real IP addresses, hostnames, configurations or captures from a production network.
+          required: true

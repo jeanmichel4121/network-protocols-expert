@@ -6,3 +6,18 @@
 /.gitlab-ci.yml @jeanmichel4121
 /infra/ @jeanmichel4121
 /requirements/ @jeanmichel4121
+/.pre-commit-config.yaml @jeanmichel4121
+
+[Template and shared layout]
+/templates/ @jeanmichel4121
+/tools/sync-shared.py @jeanmichel4121
+
+[Governance, licensing and security]
+/LICENSE @jeanmichel4121
+/LICENSES/ @jeanmichel4121
+/REUSE.toml @jeanmichel4121
+/SECURITY.md @jeanmichel4121
+/CODE_OF_CONDUCT.md @jeanmichel4121
+/CLAUDE.md @jeanmichel4121
+/.github/ @jeanmichel4121
+/.gitlab/ @jeanmichel4121

@@ -1,0 +1,2 @@
+# SBOM generator for the release job (scripts/create_release.py links its output).
+cyclonedx-bom==7.5.0

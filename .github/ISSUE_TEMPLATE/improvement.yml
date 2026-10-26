@@ -1,0 +1,22 @@
+name: Improvement
+description: Suggest an improvement to the pages, the home page or the reading experience.
+title: "feat(site): "
+labels: ["type::feature", "status::needs-triage"]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: What is missing or hard today
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposal
+    validations:
+      required: true
+  - type: textarea
+    id: example
+    attributes:
+      label: Example or reference
+      description: A page, a standard (WCAG, MDN) or a site that does it well.

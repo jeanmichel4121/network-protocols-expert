@@ -2,6 +2,7 @@
 
 - Name / version(s):
 - Scope (e.g. OSPFv2 only, BGP + EVPN):
+- Out of scope:
 - Governing standards (RFC / IEEE):
 
 ## Message types to document
@@ -21,4 +22,4 @@
 
 -
 
-/label ~"type::page"
+/label ~"type::page" ~"status::needs-triage"

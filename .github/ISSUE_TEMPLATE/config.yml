@@ -1,0 +1,11 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Report a security vulnerability
+    url: https://github.com/jeanmichel4121/network-protocols-expert/security/advisories/new
+    about: Report privately. Never describe a vulnerability in a public issue.
+  - name: Read the library
+    url: https://learning.cuvelier.tech
+    about: The published pages, in French, English, Dutch and German.
+  - name: About the author
+    url: https://about.cuvelier.tech
+    about: Who maintains this library.

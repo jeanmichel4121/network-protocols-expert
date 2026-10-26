@@ -1,10 +1,28 @@
+# Build output and caches
 public/
 __pycache__/
 *.pyc
-.DS_Store
 .cache/
+.venv/
 gl-code-quality-report.json
 gitleaks.sarif
+sbom.cdx.json
+
+# Never commit captures or environment files (CLAUDE.md, Confidentiality)
+*.pcap
+*.pcapng
+*.cap
+.env
+.env.*
+
+# Editors and operating systems
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
 
 # Claude Code personal / machine-specific files
 CLAUDE.local.md
