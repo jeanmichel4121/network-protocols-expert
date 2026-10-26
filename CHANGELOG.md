@@ -12,6 +12,8 @@ Versioning rules for this library:
 ## [Unreleased]
 
 ### Added
+- Footer: source code, report an error and content licence (CC BY-SA 4.0) links;
+  licence and author in the JSON-LD of every page.
 - Public repository setup: MIT (code) and CC BY-SA 4.0 (content) licences with REUSE
   per-file licensing, code of conduct, security policy with private reporting,
   citation file, GitHub issue forms and support page, shared label taxonomy
@@ -26,6 +28,9 @@ Versioning rules for this library:
   Security, Release), GitHub improvement form and PR notice.
 
 ### Fixed
+- Template: example router IDs moved to the RFC 5737 range (198.51.100.1/2 instead of
+  the public 1.1.1.1/2.2.2.2); straight quotes instead of curly ones and numbered steps
+  (1, 2, 3) as required by the writing style rules.
 - Release assets linked to a disabled GitLab Pages site; `.gitignore` now excludes
   captures, `.env` files and editor files as documented.
 - Public read-only GitHub mirror (GitLab push mirror of protected branches), documented in

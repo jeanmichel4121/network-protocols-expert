@@ -34,7 +34,7 @@ def ip4(addr: str) -> bytes:
 
 def ospf_hello(
     *,
-    router_id="1.1.1.1",
+    router_id="198.51.100.1",
     area="0.0.0.0",
     mask="255.255.255.0",
     hello=10,
@@ -43,7 +43,7 @@ def ospf_hello(
     dead=40,
     dr="192.0.2.2",
     bdr="192.0.2.1",
-    neighbors=("2.2.2.2",),
+    neighbors=("198.51.100.2",),
 ) -> dict:
     """OSPFv2 Hello, RFC 2328 §A.3.1 (header) and §A.3.2 (Hello), AuType 0."""
     body = (

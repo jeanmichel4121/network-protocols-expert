@@ -94,6 +94,8 @@ def head_tags(meta: dict, lang: str, path: str) -> str:
         }
         if meta.get("updated"):
             ld["dateModified"] = meta["updated"]
+    ld["license"] = "https://creativecommons.org/licenses/by-sa/4.0/"
+    ld["author"] = {"@type": "Person", "name": "Jean-Michel Cuvelier", "url": "https://about.cuvelier.tech"}
     tags.append('<script type="application/ld+json">' + json.dumps(ld, ensure_ascii=False) + "</script>")
     return "\n".join(tags)
 
