@@ -83,7 +83,7 @@ links; the switch in the header changes language without reloading the page.
 
 | Protocol | Scope | Status |
 |---|---|---|
-| Ethernet | Ethernet II, IEEE 802.3 LLC/SNAP, IEEE 802.1Q | In progress |
+| [Ethernet](https://learning.cuvelier.tech/en/ethernet/) | Ethernet II, IEEE 802.3 LLC/SNAP, IEEE 802.1Q and Q-in-Q, MAC Control (PAUSE, PFC) | Published |
 
 The list on the [home page](https://learning.cuvelier.tech) is always current.
 

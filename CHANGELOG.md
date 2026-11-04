@@ -12,6 +12,11 @@ Versioning rules for this library:
 ## [Unreleased]
 
 ### Added
+- Ethernet page (`protocols/ethernet/`): Ethernet II, IEEE 802.3 LLC and SNAP, IEEE 802.1Q
+  C-TAG and Q-in-Q, MAC Control PAUSE and PFC; eight sample frames from
+  `tools/packet-builder.py` (FCS and CRC residue checked), three step-by-step animations,
+  MTU accounting per vendor, six platforms with sourced commands, decision tree, 17 quiz
+  questions, sources in `sources.md`. Listed on the home page.
 - Footer: source code, report an error and content licence (CC BY-SA 4.0) links;
   licence and author in the JSON-LD of every page.
 - Public repository setup: MIT (code) and CC BY-SA 4.0 (content) licences with REUSE
