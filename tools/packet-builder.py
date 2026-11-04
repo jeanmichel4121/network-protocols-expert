@@ -187,13 +187,14 @@ def self_test() -> int:
     if inet_checksum(pkt[:16] + pkt[24:]) != 0:
         print("FAIL ospf-hello checksum does not verify")
         errors += 1
-    # The field map must tile the packet exactly: contiguous, byte-aligned, no gap.
+    # The field map must tile the packet exactly: contiguous, no gap, no overlap. A field
+    # narrower than a byte (802.1Q PCP, DEI, VID) carries the hex of the bytes it sits in.
     for name, build in SAMPLES.items():
         s = build()
         raw = bytes.fromhex(s["hex"].replace(" ", ""))
         pos = 0
         for f in s["fields"]:
-            if f["offset"] != pos or f["hex"] != raw[pos // 8 : (pos + f["bits"]) // 8].hex(" "):
+            if f["offset"] != pos or f["hex"] != raw[pos // 8 : -(-(pos + f["bits"]) // 8)].hex(" "):
                 print(f"FAIL {name} field map at {f['id']}")
                 errors += 1
             pos += f["bits"]

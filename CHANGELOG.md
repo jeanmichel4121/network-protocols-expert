@@ -27,7 +27,19 @@ Versioning rules for this library:
   MR templates (Correction, Template-change, Release) and issue templates (Feature,
   Security, Release), GitHub improvement form and PR notice.
 
+### Changed
+- Template packet view: fields narrower than a byte (802.1Q PCP, DEI, VID), one Wireshark
+  tree entry per protocol (`tree` key, optional `ws_root`), bit-mask prefix in tree lines,
+  flag texts and widths, and an "Allowed values" row in the field details.
+- Template diagrams: schematic SVG vocabulary (`svg.sch`, shapes `sh-*` and lines `ln-*` in
+  the library colour code) and animation elements that appear at a step (`data-s`) and
+  disappear after another (`data-until`).
+- Template: inline markers `.tag.vend` (vendor deviation) and `.tag.err` (not supported or
+  not documented), muted comments in command blocks.
+
 ### Fixed
+- Template: animation control icons were drawn at the width of the diagram (480 px)
+  instead of 18 px; packet comment without `--`, which is invalid inside an HTML comment.
 - Template: example router IDs moved to the RFC 5737 range (198.51.100.1/2 instead of
   the public 1.1.1.1/2.2.2.2); straight quotes instead of curly ones and numbered steps
   (1, 2, 3) as required by the writing style rules.
