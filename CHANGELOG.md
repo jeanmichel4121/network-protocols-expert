@@ -77,6 +77,9 @@ Versioning rules for this library:
 
 
 ### Fixed
+- Ethernet page: the vendor callouts use the template's `callout vendor` class (they were
+  unstyled); spaced hyphens used as separators replaced in `sources.md`, the source list, the
+  command comments and three diagram labels.
 - Headings break a word that is longer than the line (German compounds in a chapter title
   overflowed by 8 px at 360 px).
 - Template: animation control icons were drawn at the width of the diagram (480 px)
