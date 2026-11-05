@@ -9,6 +9,8 @@ abstract: >-
 authors:
   - family-names: Cuvelier
     given-names: Jean-Michel
+version: 0.1.0
+date-released: "2026-11-05"
 url: "https://learning.cuvelier.tech"
 repository-code: "https://github.com/jeanmichel4121/network-protocols-expert"
 license: CC-BY-SA-4.0

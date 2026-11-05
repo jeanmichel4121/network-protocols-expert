@@ -11,6 +11,11 @@ Versioning rules for this library:
 
 ## [Unreleased]
 
+## [0.1.0] - 2026-11-05
+
+First release: the Ethernet and IPv4 pages, published as chapters, the page template and its
+tooling, the CI pipeline and the public site.
+
 ### Added
 - Chapter list: a button folds it away on wide screens, so the chapter gets the full width; the
   choice is kept per reader, and pointing at the left edge of the window shows the list again.
@@ -65,6 +70,9 @@ Versioning rules for this library:
   dependency report (`scripts/check_updates.py`), CycloneDX SBOM linked from releases,
   MR templates (Correction, Template-change, Release) and issue templates (Feature,
   Security, Release), GitHub improvement form and PR notice.
+- Project scaffold, `CLAUDE.md` authoring rules, home page in French, English, Dutch and German.
+- `tools/packet-builder.py` with OSPFv2 Hello sample and RFC 1071 checksum self-test.
+- Self-hosted GitLab Runner setup for the NAS (`infra/nas-runner`).
 
 ### Changed
 - Ethernet page, clarity pass: the Concepts chapter opens in plain language with a new diagram of
@@ -114,7 +122,11 @@ Versioning rules for this library:
   per worker thread; the CI job uses 2, as the NAS runner gives a job 1 GB of memory (4
   browsers crash there).
 - Table of contents: a wrapped entry keeps its indent after the chapter number.
-
+- Page text no longer uses em dashes, middle-dot separators or decorative arrows
+  (writing-style rule added to CLAUDE.md); page titles use "Page | Network Protocols Expert".
+- Deploy publishes the site publicly on https://learning.cuvelier.tech (NAS, atomic
+  releases, smoke test) instead of GitLab Pages; the runners now live in the homelab
+  stack `learning` (`infra/nas-runner` is a pointer).
 
 ### Fixed
 - Ethernet page: the vendor callouts use the template's `callout vendor` class (they were
@@ -165,18 +177,5 @@ Versioning rules for this library:
   as Cisco's terms require), laid out left to right under the headline; CI checks the embedded
   scene matches the generator.
 
-### Changed
-- Page text no longer uses em dashes, middle-dot separators or decorative arrows
-  (writing-style rule added to CLAUDE.md); page titles use "Page | Network Protocols Expert".
-
-### Changed
-- Deploy publishes the site publicly on https://learning.cuvelier.tech (NAS, atomic
-  releases, smoke test) instead of GitLab Pages; the runners now live in the homelab
-  stack `learning` (`infra/nas-runner` is a pointer).
-
-## [0.1.0] - 2026-10-25
-
-### Added
-- Project scaffold, `CLAUDE.md` authoring rules, home page in French, English, Dutch and German.
-- `tools/packet-builder.py` with OSPFv2 Hello sample and RFC 1071 checksum self-test.
-- Self-hosted GitLab Runner setup for the NAS (`infra/nas-runner`).
+[Unreleased]: https://github.com/jeanmichel4121/network-protocols-expert/compare/v0.1.0...main
+[0.1.0]: https://github.com/jeanmichel4121/network-protocols-expert/tree/v0.1.0
