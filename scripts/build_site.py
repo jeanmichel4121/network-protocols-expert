@@ -204,9 +204,41 @@ WORDS = {
     },
     "resume": {"fr": "Reprendre :", "en": "Resume:", "nl": "Verdergaan:", "de": "Fortsetzen:"},
     "score": {"fr": "Quiz :", "en": "Quiz:", "nl": "Quiz:", "de": "Quiz:"},
+    "menu": {
+        "fr": "Liste des chapitres",
+        "en": "Chapter list",
+        "nl": "Lijst met hoofdstukken",
+        "de": "Kapitelliste",
+    },
     "prev": {"fr": "Précédent", "en": "Previous", "nl": "Vorige", "de": "Zurück"},
     "next": {"fr": "Suivant", "en": "Next", "nl": "Volgende", "de": "Weiter"},
 }
+PIN_ICON = (
+    '<svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" '
+    'stroke-width="2" stroke-linecap="round" stroke-linejoin="round">'
+    '<rect x="3" y="4" width="18" height="16" rx="2"/><path d="M9 4v16"/></svg>'
+)
+# Wide screens: the chapter list is open, and its button folds it away (choice kept in localStorage,
+# applied here, before the chapter is painted). Folded, pointing at the left edge shows the list;
+# right after the click it stays away until the pointer has left.
+PIN_SCRIPT = """(function () {
+  var root = document.documentElement, nav = document.currentScript.parentNode;
+  var pin = document.getElementById("toc-pin"), off = false;
+  if (matchMedia("(min-width: 64rem)").matches) document.getElementById("toc").open = true;
+  try { off = localStorage.getItem("npe-nav") === "off"; } catch (e) {}
+  function set() {
+    root.classList.toggle("nav-off", off);
+    pin.setAttribute("aria-expanded", String(!off));
+  }
+  set();
+  pin.addEventListener("click", function () {
+    off = !off;
+    root.classList.toggle("nav-quiet", off);
+    set();
+    try { localStorage.setItem("npe-nav", off ? "off" : "on"); } catch (e) {}
+  });
+  nav.addEventListener("mouseleave", function () { root.classList.remove("nav-quiet"); });
+})();"""
 SEP = {"fr": " : ", "en": ": ", "nl": ": ", "de": ": "}
 # What each chapter holds: the card text on the overview and the description of the chapter URL.
 CHAPTER_DESC = {
@@ -411,12 +443,14 @@ def chapter_nav(parts: dict, name: str, here: str) -> str:
         items.append(item + "</li>")
     of = {lang: f"{WORDS['chapters'][lang]} ({name})" for lang in LANGS}
     return (
-        '<nav class="toc" aria-labelledby="toc-h">\n  <details id="toc">\n'
+        '<nav class="toc" aria-labelledby="toc-h">\n'
+        '  <button type="button" class="toc-pin icon-btn" id="toc-pin" aria-expanded="true" '
+        f'aria-controls="toc">{PIN_ICON}<span class="sr-only">{spans(WORDS["menu"])}</span></button>\n'
+        '  <details id="toc">\n'
         f'    <summary id="toc-h">{spans(of)}</summary>\n'
         f"    <ol>{''.join(items)}</ol>\n"
         "  </details>\n"
-        '  <script>if (matchMedia("(min-width: 64rem)").matches) '
-        'document.getElementById("toc").open = true;</script>\n'
+        f"  <script>{PIN_SCRIPT}</script>\n"
         "</nav>\n"
     )
 

@@ -12,6 +12,8 @@ Versioning rules for this library:
 ## [Unreleased]
 
 ### Added
+- Chapter list: a button folds it away on wide screens, so the chapter gets the full width; the
+  choice is kept per reader, and pointing at the left edge of the window shows the list again.
 - Links to an anchor of a former full page (`/fr/ethernet/#h-pkt-eth-ii`) are sent on to the
   chapter that now holds it (map written by `build_site.py` in each overview).
 - IPv4 page (`protocols/ipv4/`): full header, DS field (DSCP, ECN), fragmentation and PMTUD,

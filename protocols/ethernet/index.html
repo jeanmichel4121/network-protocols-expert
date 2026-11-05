@@ -150,6 +150,27 @@ button { font: inherit; color: inherit; }
   .layout.chap > .toc { grid-column: 1; }
   .layout.chap > main { grid-column: 2; grid-row: 1; }
 }
+/* The chapter list can be folded away (button written by build_site.py, choice kept per reader):
+   the text gets the width, and pointing at the left edge shows the list again over the page. */
+.toc-pin { display: none; }
+@media screen and (min-width: 64rem) {
+  .layout.chap > .toc > .toc-pin { display: grid; min-width: 2.25rem; margin-bottom: 0.35rem; }
+  .nav-off .layout.chap { grid-template-columns: 2.25rem minmax(0, 1fr); gap: 2rem; }
+  .nav-off .layout.chap > .toc { overflow: visible; max-height: none; min-height: calc(100dvh - var(--header-h) - 4rem); }
+  .nav-off .layout.chap > .toc > details {
+    position: absolute; left: 0; top: 2.75rem; z-index: 40; width: 16rem; padding: 0 0.9rem 0.4rem;
+    max-height: calc(100dvh - var(--header-h) - 7rem); overflow-y: auto;
+    background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); box-shadow: var(--shadow-2);
+    visibility: hidden; opacity: 0;
+  }
+  /* The pointer zone reaches the edge of the window, left of the centred layout. */
+  .nav-off .layout.chap > .toc::before { content: ""; position: absolute; top: 0; bottom: 0; right: 100%; width: 50vw; }
+  .nav-off:not(.nav-quiet) .layout.chap > .toc:hover > details { visibility: visible; opacity: 1; }
+}
+@media screen and (min-width: 64rem) and (prefers-reduced-motion: no-preference) {
+  .nav-off .layout.chap > .toc > details { transition: opacity 0.15s 0.2s, visibility 0s 0.35s; }
+  .nav-off:not(.nav-quiet) .layout.chap > .toc:hover > details { transition: opacity 0.15s 0.1s, visibility 0s 0.1s; }
+}
 .toc .sub { border-left: 0; padding: 0 0 0.35rem 1.4em; }
 .toc .sub a { font-size: 0.8125rem; padding-block: 0.2rem; }
 .chap-cards { list-style: none; margin: 1rem 0 1.5rem; padding: 0; display: grid; gap: 0.75rem; grid-template-columns: repeat(auto-fill, minmax(min(100%, 17rem), 1fr)); }
