@@ -37,6 +37,9 @@ one chapter at a time by script (still one heavy URL, a single indexed page).
 - The site has about ten times more HTML files. The browser smoke test checks pages in
   parallel (`SMOKE_WORKERS`, one browser per worker thread).
 - Printing a chapter prints that chapter (current language, sections expanded).
+- The overview keeps the URL of the former full page. A link to one of its anchors
+  (`/fr/ethernet/#h-pkt-eth-ii`) is sent on to the chapter that holds that id, by a small
+  script and an id-to-chapter map written by `build_site.py`.
 - A chapter starts with its own content, so what a script fills in after the first paint
   now moves the first screen (on the long page it was far below the fold). The packet chips
   line and the packet tab list are written in the markup by `tools/packet-builder.py

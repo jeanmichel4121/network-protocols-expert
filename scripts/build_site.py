@@ -196,6 +196,14 @@ def card(meta: dict, slug: str) -> str:
 WORDS = {
     "overview": {"fr": "Vue d'ensemble", "en": "Overview", "nl": "Overzicht", "de": "Überblick"},
     "chapters": {"fr": "Chapitres", "en": "Chapters", "nl": "Hoofdstukken", "de": "Kapitel"},
+    "seen": {
+        "fr": "(déjà ouvert)",
+        "en": "(already opened)",
+        "nl": "(al geopend)",
+        "de": "(bereits geöffnet)",
+    },
+    "resume": {"fr": "Reprendre :", "en": "Resume:", "nl": "Verdergaan:", "de": "Fortsetzen:"},
+    "score": {"fr": "Quiz :", "en": "Quiz:", "nl": "Quiz:", "de": "Quiz:"},
     "prev": {"fr": "Précédent", "en": "Previous", "nl": "Vorige", "de": "Zurück"},
     "next": {"fr": "Suivant", "en": "Next", "nl": "Volgende", "de": "Weiter"},
 }
@@ -390,7 +398,8 @@ def chapter_nav(parts: dict, name: str, here: str) -> str:
     ]
     for sid, sec in parts["sections"]:
         num, label = parts["labels"][sid]
-        item = f'<li><a href="{up}{sid}/"{cur if sid == here else ""}><span class="n">{num}</span>{label}</a>'
+        item = f'<li><a href="{up}{sid}/" data-ch="{sid}"{cur if sid == here else ""}>'
+        item += f'<span class="n">{num}</span>{label}</a>'
         if sid == here:
             subs = [
                 f'<li><a href="#{hid}">{link_free(body)}</a></li>'
@@ -478,7 +487,8 @@ def overview_cards(parts: dict) -> str:
         cd = spans({lang: desc[lang][0].upper() + desc[lang][1:] for lang in LANGS}) if desc else ""
         cc = count_label(sid, sec)
         cards.append(
-            f'<li><a href="{sid}/"><span class="ct"><span class="n">{num}</span><span>{label}</span></span>'
+            f'<li><a href="{sid}/" data-ch="{sid}"><span class="ct"><span class="n">{num}</span>'
+            f"<span>{label}</span></span>"
             + (f'<span class="cd">{cd}</span>' if cd else "")
             + (f'<span class="cc">{cc}</span>' if cc else "")
             + "</a></li>"
@@ -491,6 +501,73 @@ def overview_cards(parts: dict) -> str:
     )
 
 
+def seen_marks(slug: str, here: str, name: str, labels: dict) -> str:
+    """Per-reader conveniences of a protocol's pages, kept in localStorage (the pages work without):
+    marks the chapters already opened (chapter list and overview cards), remembers the chapter
+    being read (the home page offers to resume it) and the last quiz score (shown on the quiz card)."""
+    word = json.dumps(f'<span class="sr-only"> {spans(WORDS["seen"])}</span>')
+    last = json.dumps({"slug": slug, "ch": here, "name": name, "labels": labels}, ensure_ascii=False)
+    score = json.dumps(f'<span class="cc score">{spans(WORDS["score"])} </span>')
+    return (
+        "<script>(function () {\n"
+        "  try {\n"
+        f'    var key = "npe-seen:{slug}", here = "{here}", store = localStorage;\n'
+        '    var seen = JSON.parse(store.getItem(key) || "[]");\n'
+        "    if (here) {\n"
+        "      if (seen.indexOf(here) < 0) { seen.push(here); store.setItem(key, JSON.stringify(seen)); }\n"
+        f'      store.setItem("npe-last", JSON.stringify({last}));\n'
+        "    }\n"
+        '    document.querySelectorAll("a[data-ch]").forEach(function (a) {\n'
+        "      if (a.dataset.ch === here || seen.indexOf(a.dataset.ch) < 0) return;\n"
+        f'      a.classList.add("seen"); a.insertAdjacentHTML("beforeend", {word});\n'
+        "    });\n"
+        f'    var quiz = store.getItem("npe-quiz:{slug}");\n'
+        "    var card = document.querySelector('.chap-cards a[data-ch=\"quiz\"]');\n"
+        "    if (quiz && /^\\d+ \\/ \\d+$/.test(quiz) && card) {\n"
+        f'      card.insertAdjacentHTML("beforeend", {score});\n'
+        "      card.lastElementChild.appendChild(document.createTextNode(quiz));\n"
+        "    }\n"
+        '    document.addEventListener("npe:quiz", function (e) {\n'
+        f'      store.setItem("npe-quiz:{slug}", e.detail.ok + " / " + e.detail.total);\n'
+        "    });\n"
+        "  } catch (e) { /* storage unavailable: no marks */ }\n"
+        "})();</script>"
+    )
+
+
+def resume_link() -> str:
+    """Home page: a link back to the chapter this reader had open last (set by seen_marks)."""
+    return (
+        f'<p class="resume" id="resume" hidden>{spans(WORDS["resume"])} <a></a></p>\n'
+        "<script>(function () {\n"
+        "  try {\n"
+        '    var last = JSON.parse(localStorage.getItem("npe-last") || "null");\n'
+        '    var box = document.getElementById("resume");\n'
+        "    if (!last || !/^[a-z0-9-]+$/.test(last.slug) || !/^[a-z0-9-]+$/.test(last.ch)) return;\n"
+        '    var a = box.querySelector("a");\n'
+        '    a.href = last.slug + "/" + last.ch + "/";\n'
+        '    ["fr", "en", "nl", "de"].forEach(function (l) {\n'
+        '      var s = document.createElement("span"); s.dataset.l = l;\n'
+        '      s.textContent = last.name + ", " + ((last.labels || {})[l] || last.ch); a.appendChild(s);\n'
+        "    });\n"
+        "    box.hidden = false;\n"
+        "  } catch (e) { /* storage unavailable: no link */ }\n"
+        "})();</script>\n"
+    )
+
+
+TEXT_SKIP = re.compile(r"(<(script|style|pre|code|textarea)\b.*?</\2>|<[^>]+>)", re.S)
+
+
+def french_spaces(page: str) -> str:
+    """French puts a space before : ; ? ! and inside « »: make it a no-break space, so the mark
+    never starts a line on its own. Text only; scripts, styles and code are left as they are."""
+    parts = TEXT_SKIP.split(page)
+    for k in range(0, len(parts), 3):
+        parts[k] = re.sub(r" ([:;?!»])", "\u00a0\\1", parts[k]).replace("« ", "«\u00a0")
+    return "".join(parts[k] for k in range(len(parts)) if k % 3 != 2)
+
+
 PACKET_DATA = re.compile(r'<script type="application/json" data-packet="([a-z0-9-]+)">.*?</script>', re.S)
 
 
@@ -501,6 +578,22 @@ def with_packet_data(sec: str, data: dict) -> str:
     tags = re.findall(r"<(?!script)[a-z][^>]*>", sec)
     needed = {k for tag in tags for k in re.findall(r'\sdata-(?:packet|after)="([a-z0-9-]+)"', tag)} - present
     return "".join(data[k] for k in sorted(needed) if k in data) + sec
+
+
+def old_anchors(owner: dict) -> str:
+    """The overview URL was the whole page before ADR 0009: a link to one of its anchors
+    (/fr/ethernet/#h-pkt-eth-ii) is sent on to the chapter that now holds that id."""
+    moved = {i: sid for i, sid in owner.items() if sid}
+    return (
+        '<script type="application/json" id="anchor-map">'
+        + json.dumps(moved, separators=(",", ":"), sort_keys=True)
+        + "</script>\n<script>(function () {\n"
+        + "  var id = decodeURIComponent(location.hash.slice(1));\n"
+        + "  if (!id || document.getElementById(id)) return;\n"
+        + '  var to = JSON.parse(document.getElementById("anchor-map").textContent)[id];\n'
+        + '  if (to) location.replace(to + "/#" + encodeURIComponent(id));\n'
+        + "})();</script>"
+    )
 
 
 def protocol_pages(slug: str, text: str, meta: dict, src: str) -> list:
@@ -543,7 +636,15 @@ def protocol_pages(slug: str, text: str, meta: dict, src: str) -> list:
             overview_meta,
             page(
                 chapter_nav(parts, name, ""),
-                parts["crumbs"] + "\n" + relink(parts["hero"], "", owner) + "\n" + overview_cards(parts),
+                old_anchors(owner)
+                + "\n"
+                + parts["crumbs"]
+                + "\n"
+                + relink(parts["hero"], "", owner)
+                + "\n"
+                + overview_cards(parts)
+                + "\n"
+                + seen_marks(slug, "", name, {}),
             ),
         )
     ]
@@ -566,7 +667,15 @@ def protocol_pages(slug: str, text: str, meta: dict, src: str) -> list:
         body = as_chapter(relink(with_packet_data(sec, packet_data), sid, owner)).replace(
             "<h1", f'<p class="eyebrow">{html.escape(name)}</p>\n<h1', 1
         )
-        content = crumbs_to(parts["crumbs"], label) + "\n" + body + "\n" + pager(parts, sid)
+        content = (
+            crumbs_to(parts["crumbs"], label)
+            + "\n"
+            + body
+            + "\n"
+            + pager(parts, sid)
+            + "\n"
+            + seen_marks(slug, sid, name, label_text[sid])
+        )
         out.append((f"{slug}/{sid}/", cmeta, page(chapter_nav(parts, name, sid), content)))
     return out
 
@@ -717,11 +826,15 @@ def main() -> int:
     if cards:
         home = re.sub(r"<!--PROTOCOLS-->.*?<!--/PROTOCOLS-->", lambda _: cards, home, flags=re.S)
 
+    if home.count('    <ul class="pcards">\n') != 1:
+        sys.exit("index.html: expected one <ul class=pcards>")
+    home = home.replace('    <ul class="pcards">\n', resume_link() + '    <ul class="pcards">\n', 1)
+
     pages = [("", home_meta)]
     for lang in LANGS:
         target = out / lang / "index.html"
         target.parent.mkdir(parents=True, exist_ok=True)
-        target.write_text(localise(home, home_meta, lang, "", "./"), encoding="utf-8")
+        target.write_text(french_spaces(localise(home, home_meta, lang, "", "./")), encoding="utf-8")
     for slug, text, meta in protocols:
         for path, pmeta, page in protocol_pages(slug, text, meta, f"protocols/{slug}/index.html"):
             if not pmeta.get("noindex"):
@@ -730,7 +843,8 @@ def main() -> int:
                 target = out / lang / path / "index.html"
                 target.parent.mkdir(parents=True, exist_ok=True)
                 target.write_text(
-                    localise(page, pmeta, lang, path, "../" * path.count("/")), encoding="utf-8"
+                    french_spaces(localise(page, pmeta, lang, path, "../" * path.count("/"))),
+                    encoding="utf-8",
                 )
 
     blocks = shared_blocks(home)

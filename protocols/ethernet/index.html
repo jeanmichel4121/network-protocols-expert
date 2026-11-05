@@ -143,6 +143,11 @@ button { font: inherit; color: inherit; }
 .chap-cards .n { color: var(--accent); font-variant-numeric: tabular-nums; }
 .chap-cards .cd { color: var(--muted); font-size: 0.9rem; }
 .chap-cards .cc { font: 600 0.75rem var(--mono); color: var(--muted); }
+/* Chapters this reader has already opened (set by the published site, kept in localStorage). */
+.chap-cards .score { color: var(--accent); }
+.resume { margin: 0 0 1rem; padding: 0.6rem 0.9rem; border: 1px solid var(--line); border-left: 3px solid var(--accent); border-radius: var(--radius); background: var(--surface); max-width: none; }
+.resume a { font-weight: 650; }
+.toc a.seen::after, .chap-cards a.seen .ct::after { content: "\2713"; color: var(--green); font-weight: 700; margin-left: auto; padding-left: 0.5rem; }
 .pager { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 0.75rem; margin: 3rem 0 0; padding-top: 1.5rem; border-top: 1px solid var(--line); }
 .pager a { flex: 1 1 14rem; max-width: 26rem; display: grid; gap: 0.15rem; padding: 0.8rem 1rem; border: 1px solid var(--line); border-radius: 10px; background: var(--surface); color: var(--fg); text-decoration: none; }
 .pager a:hover { border-color: var(--accent); }
@@ -159,7 +164,7 @@ button { font: inherit; color: inherit; }
 .facts { display: grid; grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr)); gap: 0.75rem; margin: 0; }
 .facts div { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 0.75rem 1rem; }
 .facts dt { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); font-weight: 650; }
-.facts dd { margin: 0.2rem 0 0; font-weight: 550; }
+.facts dd { margin: 0.25rem 0 0; font-weight: 500; font-size: 0.9375rem; line-height: 1.5; }
 
 /* ===== Sections ======================================================= */
 .sec { margin-bottom: 3.5rem; }
@@ -288,6 +293,7 @@ th { background: var(--surface-2); font-weight: 650; white-space: nowrap; }
 /* ===== Animation ====================================================== */
 .anim .body { overflow-x: auto; }
 .anim .body svg { width: 100%; min-width: 30rem; height: auto; display: block; max-width: 44rem; margin-inline: auto; }
+.anim .body svg.sch { max-width: 60rem; }
 .anim svg text { fill: var(--fg); font: 600 16px var(--font); }
 .anim svg .lbl { font: 500 15px var(--mono); fill: var(--fg); }
 .anim .node rect { fill: var(--surface-2); stroke: var(--line); stroke-width: 1.5; }
@@ -332,7 +338,11 @@ svg.sch .ln-ok { stroke: var(--green); stroke-width: 2.5; fill: none; }
 svg.sch .ln-span { stroke: var(--muted); stroke-width: 1.5; fill: none; stroke-dasharray: 4 3; }
 svg.sch .mk-ok { fill: var(--green); }
 svg.sch .halo { paint-order: stroke; stroke: var(--surface); stroke-width: 4px; stroke-linejoin: round; }
-.anim [data-s].future, .anim [data-s].gone { visibility: hidden; }
+/* A step not reached yet is drawn faint, so the whole diagram is there from the initial state;
+   an element that another one replaces later (data-until) stays hidden until its turn. */
+.anim [data-s] { transition: opacity 0.3s ease; }
+.anim [data-s].future { opacity: 0.22; }
+.anim [data-s][data-until].future, .anim [data-s].gone { visibility: hidden; }
 .anim [data-s].current [class^="sh-"], .anim [data-s].current[class^="sh-"] { stroke: var(--accent); stroke-width: 3; }
 .anim-controls { display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem; padding: 0.8rem 1.1rem; border-top: 1px solid var(--line); }
 .anim-controls button {
@@ -367,6 +377,11 @@ svg.sch .halo { paint-order: stroke; stroke: var(--surface); stroke-width: 4px; 
 .pkt-set [role="tablist"] { flex-wrap: wrap; overflow: visible; gap: 0.4rem; border-bottom: 0; }
 .pkt-set [role="tab"] { margin: 0; padding: 0.35rem 0.9rem; min-height: 2.25rem; border: 1px solid var(--line); border-radius: 999px; background: var(--surface); font: 600 0.8125rem var(--mono); }
 .pkt-set [role="tab"][aria-selected="true"] { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+@media (max-width: 40rem) {
+  .pkt-set [role="tablist"] { flex-wrap: nowrap; overflow-x: auto; padding: 0.25rem 2.5rem 0.5rem 0.25rem; margin-inline: -0.25rem; scrollbar-width: thin;
+    -webkit-mask-image: linear-gradient(to right, #000 calc(100% - 2.5rem), transparent); mask-image: linear-gradient(to right, #000 calc(100% - 2.5rem), transparent); }
+  .pkt-set [role="tab"] { flex: none; }
+}
 .cmd { border: 1px solid var(--line); border-radius: 10px; overflow: hidden; margin: 1rem 0; background: var(--surface); }
 .cmd-head { display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem; padding: 0.5rem 0.6rem 0.5rem 1rem; border-bottom: 1px solid var(--line); background: var(--surface-2); font-size: 0.875rem; font-weight: 650; }
 .ver { font: 600 0.75rem var(--mono); padding: 0.1rem 0.55rem; border-radius: 999px; border: 1px solid var(--line); background: var(--surface); color: var(--muted); }
@@ -395,7 +410,8 @@ svg.sch .halo { paint-order: stroke; stroke: var(--surface); stroke-width: 4px; 
 
 /* ===== Quiz =========================================================== */
 .quiz-q { border: 1px solid var(--line); border-radius: var(--radius); padding: 1rem 1.25rem 1.25rem; margin: 0 0 1rem; background: var(--surface); }
-.quiz-q legend { font-weight: 650; padding: 0 0.4rem; margin-left: -0.4rem; max-width: 70ch; }
+.quiz-q legend { float: left; width: 100%; font-weight: 650; padding: 0; margin: 0 0 0.25rem; max-width: 70ch; }
+.quiz-q legend + * { clear: both; }
 .quiz-q .opts { display: grid; gap: 0.4rem; margin: 0.75rem 0; }
 .quiz-q label { display: flex; gap: 0.6rem; align-items: flex-start; padding: 0.55rem 0.75rem; border: 1px solid var(--line); border-radius: 8px; cursor: pointer; min-height: 2.75rem; }
 .quiz-q label:has(input:checked) { border-color: var(--accent); background: color-mix(in srgb, var(--accent) 8%, transparent); }
@@ -453,7 +469,7 @@ svg.sch .halo { paint-order: stroke; stroke: var(--surface); stroke-width: 4px; 
   .tabs [role="tablist"] { display: none; }
   .diagram, .cmd, .quiz-q, .packet, .dtree > li, table { break-inside: avoid; }
   .sources a[href^="http"]::after { content: " <" attr(href) ">"; font-size: 0.85em; word-break: break-all; }
-  .anim .msg.future { opacity: 1; }
+  .anim .msg.future, .anim [data-s].future { opacity: 1; }
   .scroll-x, .table-wrap, .wstree, .hexdump, .cmd pre { overflow: visible; }
   .site-footer { background: none; color: inherit; margin-top: 2rem; border-top: 1px solid #999; }
   .site-footer .cols nav { display: none; }
@@ -815,6 +831,8 @@ window.NPE = (function () {
         document.getElementById(x.getAttribute("aria-controls")).hidden = !on;
       });
       if (focus) t.focus();
+      /* A tab list that scrolls sideways (narrow screens) keeps the selected tab in view. */
+      if (list.scrollWidth > list.clientWidth) list.scrollLeft = Math.max(0, t.offsetLeft - list.offsetLeft - 16);
     }
     list.addEventListener("click", function (e) { var t = e.target.closest('[role="tab"]'); if (t) select(t); });
     list.addEventListener("keydown", function (e) {
@@ -900,6 +918,9 @@ window.NPE = (function () {
         q.classList.toggle("ok", ok); q.classList.toggle("ko", !ok);
         q.querySelector(".expl").hidden = false;
         feedback(q); total();
+        /* The published site remembers the score per reader (scripts/build_site.py). */
+        document.dispatchEvent(new CustomEvent("npe:quiz", { detail: {
+          ok: form.querySelectorAll('.quiz-q[data-done="ok"]').length, total: qs.length } }));
       });
     });
     onLang(function () { qs.forEach(feedback); total(); });

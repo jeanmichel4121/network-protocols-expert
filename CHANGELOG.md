@@ -12,6 +12,8 @@ Versioning rules for this library:
 ## [Unreleased]
 
 ### Added
+- Links to an anchor of a former full page (`/fr/ethernet/#h-pkt-eth-ii`) are sent on to the
+  chapter that now holds it (map written by `build_site.py` in each overview).
 - IPv4 page (`protocols/ipv4/`): full header, DS field (DSCP, ECN), fragmentation and PMTUD,
   every IP option (registry with the RFC 7126 advice and the layout of each option); ten sample
   packets from `tools/packet-builder.py` (checksums, fragments and the RFC 1624 update checked by the
@@ -63,6 +65,18 @@ Versioning rules for this library:
   Security, Release), GitHub improvement form and PR notice.
 
 ### Changed
+- UX review of the published site:
+  - step-by-step diagrams show every step faintly from the initial state (the IPv4 flowchart
+    started as an empty frame) and use the full width;
+  - on a narrow screen the packet tabs are one row that scrolls sideways (10 tabs took four
+    rows) and the selected tab stays in view;
+  - a quiz question sits inside its card instead of across the border; lighter header facts;
+  - the chapter list and the overview cards mark the chapters already opened (kept in
+    `localStorage`, per reader);
+  - the home page offers to resume the chapter read last, and the quiz card shows the last
+    score (both per reader, in `localStorage`);
+  - French text gets a no-break space before `: ; ? !` and inside guillemets, so a mark never
+    starts a line (`build_site.py`).
 - Template packet view: fields narrower than a byte (802.1Q PCP, DEI, VID), one Wireshark
   tree entry per protocol (`tree` key, optional `ws_root`), bit-mask prefix in tree lines,
   flag texts and widths, and an "Allowed values" row in the field details.
@@ -81,6 +95,7 @@ Versioning rules for this library:
 - Ethernet page: the vendor callouts use the template's `callout vendor` class (they were
   unstyled); spaced hyphens used as separators replaced in `sources.md`, the source list, the
   command comments and three diagram labels.
+- IPv4 diagrams: two legend entries had lost their arrow symbol.
 - Headings break a word that is longer than the line (German compounds in a chapter title
   overflowed by 8 px at 360 px).
 - Template: animation control icons were drawn at the width of the diagram (480 px)

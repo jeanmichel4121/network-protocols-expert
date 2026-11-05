@@ -29,6 +29,10 @@ Last reviewed: 2026-10-25.
   Links to an anchor that moved to another chapter are rewritten to that chapter. A
   learner-paced segment at a time follows Mayer's segmenting principle [L4]. **[CI]**
   (`check_site.py`: links, anchors, every chapter linked from its overview)
+- The chapter list and the overview cards mark the chapters a reader has already opened
+  (`localStorage`, a per-viewer convenience: the page works without it).
+- A step-by-step diagram shows the steps not reached yet faintly, so the reader sees where
+  the exchange goes before pressing Play.
 - The sample packets of a section are tabs (`NPE.pktset`): one packet shown at a time,
   a link to a field or heading inside a packet opens its tab; every packet is shown
   without JavaScript and in print.
