@@ -9,7 +9,6 @@ chapters, one URL each (ADR 0009), so a reader gets one chapter at a time:
     public/<lang>/index.html                  home, <html lang> = <lang>
     public/<lang>/<slug>/index.html           overview: header, chapter cards
     public/<lang>/<slug>/<chapter>/index.html one section (concepts, packets, ...)
-    public/<lang>/<slug>/all/index.html       the whole page, for print (noindex)
 
 Chapter pages keep the page's shared CSS/JS (they stay self-contained), get the chapter
 list and previous/next links, and every #anchor that moved to another chapter is
@@ -157,7 +156,7 @@ def localise(text: str, meta: dict, lang: str, path: str, home_href: str) -> str
         head,
         count=1,
     )
-    if meta.get("kind") in ("chapter", "all"):
+    if meta.get("kind") == "chapter":
         # The in-page language switch retitles the page from #page-meta: give it this page's titles.
         js_meta = {k: meta[k] for k in ("slug", "name", "kind", "title", "description") if k in meta}
         head = META_RE.sub(
@@ -197,24 +196,6 @@ def card(meta: dict, slug: str) -> str:
 WORDS = {
     "overview": {"fr": "Vue d'ensemble", "en": "Overview", "nl": "Overzicht", "de": "Überblick"},
     "chapters": {"fr": "Chapitres", "en": "Chapters", "nl": "Hoofdstukken", "de": "Kapitel"},
-    "all": {
-        "fr": "Version complète (une page)",
-        "en": "Full version (one page)",
-        "nl": "Volledige versie (één pagina)",
-        "de": "Vollständige Fassung (eine Seite)",
-    },
-    "all_note": {
-        "fr": "pour l'impression ou une lecture d'une traite",
-        "en": "to print or to read in one go",
-        "nl": "om af te drukken of in één keer te lezen",
-        "de": "zum Drucken oder zum Lesen am Stück",
-    },
-    "all_short": {
-        "fr": "version complète",
-        "en": "full version",
-        "nl": "volledige versie",
-        "de": "vollständige Fassung",
-    },
     "prev": {"fr": "Précédent", "en": "Previous", "nl": "Vorige", "de": "Zurück"},
     "next": {"fr": "Suivant", "en": "Next", "nl": "Volgende", "de": "Weiter"},
 }
@@ -424,7 +405,6 @@ def chapter_nav(parts: dict, name: str, here: str) -> str:
         '<nav class="toc" aria-labelledby="toc-h">\n  <details id="toc">\n'
         f'    <summary id="toc-h">{spans(of)}</summary>\n'
         f"    <ol>{''.join(items)}</ol>\n"
-        f'    <p class="all"><a href="{up}all/">{spans(WORDS["all"])}</a></p>\n'
         "  </details>\n"
         '  <script>if (matchMedia("(min-width: 64rem)").matches) '
         'document.getElementById("toc").open = true;</script>\n'
@@ -507,8 +487,6 @@ def overview_cards(parts: dict) -> str:
         '<section class="sec" id="chapters" aria-labelledby="h-chapters">\n'
         f'<h2 id="h-chapters">{spans(WORDS["chapters"])}</h2>\n'
         f'<ol class="chap-cards">{"".join(cards)}</ol>\n'
-        f'<p><a href="all/">{spans(WORDS["all"])}</a>, '
-        f"{spans(WORDS['all_note'])}.</p>\n"
         "</section>"
     )
 
@@ -526,7 +504,7 @@ def with_packet_data(sec: str, data: dict) -> str:
 
 
 def protocol_pages(slug: str, text: str, meta: dict, src: str) -> list:
-    """[(path, meta, html)] for the overview, every chapter and the full version of one page."""
+    """[(path, meta, html)] for the overview and every chapter of one page."""
     parts = split_page(text, src)
     parts["sections"] = [(sid, heading_ids(sid, sec)) for sid, sec in parts["sections"]]
     owner = {i: "" for i in ID_RE.findall(parts["hero"])}
@@ -590,21 +568,6 @@ def protocol_pages(slug: str, text: str, meta: dict, src: str) -> list:
         )
         content = crumbs_to(parts["crumbs"], label) + "\n" + body + "\n" + pager(parts, sid)
         out.append((f"{slug}/{sid}/", cmeta, page(chapter_nav(parts, name, sid), content)))
-    full = dict(
-        meta,
-        kind="all",
-        noindex=True,
-        title={lang: f"{meta['title'][lang]} ({WORDS['all_short'][lang]})" for lang in LANGS},
-        part_of=meta["title"],
-        part_of_path=f"{slug}/",
-    )
-    out.append(
-        (
-            f"{slug}/all/",
-            full,
-            text.replace(parts["crumbs"], crumbs_to(parts["crumbs"], spans(WORDS["all"])), 1),
-        )
-    )
     return out
 
 

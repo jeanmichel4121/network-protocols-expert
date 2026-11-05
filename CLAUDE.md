@@ -101,8 +101,8 @@ Fortinet NSE 8, F5 Certified Solution Expert, NetScaler Expert; see README.md).
   built by `scripts/build_site.py`). The CSP allows inline JS/CSS and forbids network
   calls (`connect-src 'none'`).
 - Chapters (ADR 0009): the build also publishes each page as an overview
-  (`/<lang>/<slug>/`), one URL per section (`/<lang>/<slug>/<section id>/`) and the full
-  page (`/<lang>/<slug>/all/`, for print). The source stays one file; every section must
+  (`/<lang>/<slug>/`) and one URL per section (`/<lang>/<slug>/<section id>/`); there is
+  no full-page version. The source stays one file; every section must
   be listed in its table of contents.
 
 ## HTML technical rules (mandatory)

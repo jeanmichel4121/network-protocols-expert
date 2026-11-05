@@ -98,7 +98,7 @@ runners, with images pinned by digest and Python tools pinned by hash.
 | lint | YAML, Python (ruff), Conventional Commits, branch name and merge request title, licensing (REUSE) |
 | test | packet-builder self-test, static page checks (self-contained, 4 languages complete, packets equal to the builder output, shared template blocks unchanged) |
 | security | secret scanning (gitleaks); weekly report of outdated pins (Python tools, image digests, hooks, axe-core) |
-| build | one URL per language and per chapter (overview, one page per section, full version for print), `hreflang`, canonical, Open Graph, JSON-LD, sitemap, `security.txt`; CycloneDX SBOM of the build tooling |
+| build | one URL per language and per chapter (overview, one page per section), `hreflang`, canonical, Open Graph, JSON-LD, sitemap, `security.txt`; CycloneDX SBOM of the build tooling |
 | verify | HTML validation, links between pages, every protocol and chapter listed; headless browser: axe WCAG 2.2 AA in light, dark and mobile, layout shift, reduced motion, no external request |
 | deploy | atomic release to <https://learning.cuvelier.tech>, smoke-tested, from `main` only |
 | release | release notes from [`CHANGELOG.md`](CHANGELOG.md) on `vX.Y.Z` tags, with website, SBOM and source links |

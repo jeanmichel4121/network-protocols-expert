@@ -21,7 +21,8 @@ Versioning rules for this library:
   label `protocol::ipv4`.
 - Published chapters (ADR 0009): every protocol page is also published as an overview
   (header and one card per chapter), one URL per section with the chapter list,
-  breadcrumb and previous/next links, and a full version for print (`noindex`). The source
+  breadcrumb and previous/next links (no full-page version: it was dropped before the
+  first release, the chapters are the way to read a protocol). The source
   stays one self-contained file; links to anchors in another chapter are rewritten, the
   sitemap lists every chapter and `check_site.py` checks that each one is linked.
 - Template packet set (`NPE.pktset`): the sample packets of a section are tabs, one packet

@@ -22,9 +22,8 @@ Last reviewed: 2026-10-25.
 - The language switch stays instant: it changes the language in place and rewrites the
   URL to the matching `/xx/` path (`history.replaceState`), without a reload. **[CI]**
 - Each protocol page is also published as chapters (ADR 0009): the overview
-  `/<lang>/<slug>/` (header and one card per chapter), one URL per section
-  `/<lang>/<slug>/<section id>/` and the full page `/<lang>/<slug>/all/` for print
-  (`noindex`). A chapter page keeps the shared CSS and JS, so it stays self-contained; it
+  `/<lang>/<slug>/` (header and one card per chapter), and one URL per section
+  `/<lang>/<slug>/<section id>/`. A chapter page keeps the shared CSS and JS, so it stays self-contained; it
   gets the chapter list, a breadcrumb, previous/next links (`rel="prev"`/`"next"`), its
   own title and description, and JSON-LD `isPartOf` the overview, which lists `hasPart`.
   Links to an anchor that moved to another chapter are rewritten to that chapter. A
@@ -35,7 +34,7 @@ Last reviewed: 2026-10-25.
   without JavaScript and in print.
 - `/` is a language chooser (`x-default`) that sends a returning visitor to their saved
   language, else their browser language. `sitemap.xml` lists every URL with its
-  alternates (chapters included, not the full version); `robots.txt` points to it;
+  alternates (chapters included); `robots.txt` points to it;
   `404.html` is served for unknown paths.
 - Page metadata lives in `<script type="application/json" id="page-meta">`: `title` and
   `description` (≤ 200 characters) in the four languages, `name`, `tags`, `standards`,

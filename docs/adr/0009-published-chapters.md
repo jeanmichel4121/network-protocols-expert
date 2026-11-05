@@ -16,8 +16,9 @@ CI checks as they are (language completeness, packets equal to the builder outpu
 
 - The source stays one self-contained file per protocol: `protocols/<slug>/index.html`.
 - `scripts/build_site.py` publishes it as an overview (`/<lang>/<slug>/`: header and one card
-  per chapter), one URL per `<section class="sec">` (`/<lang>/<slug>/<section id>/`), and the
-  whole page at `/<lang>/<slug>/all/` for print (`noindex`).
+  per chapter) and one URL per `<section class="sec">` (`/<lang>/<slug>/<section id>/`).
+  No full-page version is published (it was at first, as `/<lang>/<slug>/all/`, and was
+  removed on 2026-11-05: the chapters are the way to read a protocol).
 - A chapter page keeps the shared CSS and JavaScript inline, gets the chapter list (left
   column on wide screens), a breadcrumb, previous/next links, its own title, description,
   canonical, hreflang and JSON-LD (`isPartOf` the overview, which lists `hasPart`). Anchors
@@ -35,7 +36,7 @@ one chapter at a time by script (still one heavy URL, a single indexed page).
   otherwise, and `check_site.py` checks that every chapter is linked from its overview.
 - The site has about ten times more HTML files. The browser smoke test checks pages in
   parallel (`SMOKE_WORKERS`, one browser per worker thread).
-- Printing a chapter prints that chapter; the full version prints the whole protocol.
+- Printing a chapter prints that chapter (current language, sections expanded).
 - A chapter starts with its own content, so what a script fills in after the first paint
   now moves the first screen (on the long page it was far below the fold). The packet chips
   line and the packet tab list are written in the markup by `tools/packet-builder.py
