@@ -11,6 +11,8 @@ Versioning rules for this library:
 
 ## [Unreleased]
 
+## [0.2.0] - 2026-11-05
+
 ### Changed
 - Packet views: the whole 32-bit rows of a long field are folded into one row (a 64-byte
   field is no longer drawn as 16 identical rows), with its legend entry; the bit diagram
@@ -186,5 +188,6 @@ tooling, the CI pipeline and the public site.
   as Cisco's terms require), laid out left to right under the headline; CI checks the embedded
   scene matches the generator.
 
-[Unreleased]: https://github.com/jeanmichel4121/network-protocols-expert/compare/v0.1.0...main
+[Unreleased]: https://github.com/jeanmichel4121/network-protocols-expert/compare/v0.2.0...main
+[0.2.0]: https://github.com/jeanmichel4121/network-protocols-expert/compare/v0.1.0...v0.2.0
 [0.1.0]: https://github.com/jeanmichel4121/network-protocols-expert/tree/v0.1.0
