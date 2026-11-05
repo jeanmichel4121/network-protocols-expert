@@ -265,6 +265,7 @@ th { background: var(--surface-2); font-weight: 650; white-space: nowrap; }
 .sw.l-body { background: var(--teal-bg); border-color: var(--teal); border-style: dashed; }
 .sw.l-tlv { background: var(--purple-bg); border-color: var(--purple); border-style: dotted; }
 .sw.l-encap { background: var(--grey-bg); border-color: var(--grey); }
+.sw.fold { background: var(--surface); border-color: var(--muted); border-style: dashed none; border-radius: 0; }
 .sw.rep { background: var(--surface); border-color: var(--muted); border-style: dashed; }
 .sw.hl { background: var(--surface); border-color: var(--accent); outline: 2px solid var(--accent); }
 
@@ -272,9 +273,19 @@ th { background: var(--surface-2); font-weight: 650; white-space: nowrap; }
 .packet { margin: 1.5rem 0 3rem; }
 .packet-meta { display: flex; flex-wrap: wrap; gap: 0.5rem; margin: 0 0 1rem; padding: 0; list-style: none; }
 .packet-meta li { font-size: 0.8125rem; background: var(--surface-2); border: 1px solid var(--line); border-radius: 999px; padding: 0.15rem 0.7rem; }
-.views { display: grid; gap: 1rem; }
+/* Packet views. Stacked by default, in the order bit diagram, field detail, tree, so the whole
+   32-bit grid (37rem) fits and the detail stays next to the diagram. Side by side on very wide screens. */
+.views { display: contents; }
 .views > * { min-width: 0; }
-@media (min-width: 90rem) { .views { grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr); } }
+.body:has(> .views) { display: flex; flex-direction: column; gap: 1rem; }
+.body:has(> .views) > * { order: 4; margin-top: 0; }
+.body:has(> .views) > .fpanel { order: 2; }
+.views > :first-child { order: 1; }
+.views > :last-child { order: 3; }
+@media (min-width: 110rem) {
+  .views { display: grid; gap: 1rem; grid-template-columns: minmax(37rem, 1.35fr) minmax(0, 1fr); }
+  .body:has(> .views) > .views { order: 1; }
+}
 .view-title { font-size: 0.8125rem; font-weight: 650; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); margin: 0 0 0.5rem; }
 .scroll-x { overflow-x: auto; padding-bottom: 0.25rem; }
 .ruler, .bitgrid { display: grid; grid-template-columns: repeat(32, minmax(1.15rem, 1fr)); min-width: 37rem; }
@@ -301,6 +312,10 @@ th { background: var(--surface-2); font-weight: 650; white-space: nowrap; }
 .bf.cont .bn { font-weight: 400; font-style: italic; }
 .bf.cut { border-bottom: 2px dashed var(--muted); }
 .bf.cut .bn::after { content: " …"; }
+/* Folded row: the whole 32-bit rows of a long field after its first row, drawn once. */
+.bf.fold { min-height: 1.9rem; border-top: 2px dashed var(--muted); border-bottom: 2px dashed var(--muted); color: var(--muted); }
+.bf.fold .bn { font-style: normal; }
+.bf.fold .bn::before { content: "\22EE"; margin-right: 0.5rem; }
 
 .wstree { font: 0.8125rem/1.55 var(--mono); background: var(--code-bg); border: 1px solid var(--line); border-radius: 10px; padding: 0.6rem 0.4rem; overflow-x: auto; }
 .wstree details { padding-left: 1rem; }
@@ -320,8 +335,13 @@ th { background: var(--surface-2); font-weight: 650; white-space: nowrap; }
 /* Field reference: one collapsible card per field (role, size, every value). */
 .fref { border: 1px solid var(--line); border-radius: 10px; background: var(--surface); margin: 0 0 0.5rem; }
 .fref > summary { cursor: pointer; padding: 0.55rem 1rem; font-weight: 600; min-height: 2.75rem; display: flex; flex-wrap: wrap; align-items: center; gap: 0.25rem 0.75rem; }
+.fref > summary::before { content: "\25B8"; color: var(--muted); width: 0.9rem; }
+.fref[open] > summary::before { content: "\25BE"; }
+.fref > summary::-webkit-details-marker { display: none; }
 .fref > summary .meta { font: 500 0.75rem var(--mono); color: var(--muted); }
 .fref > div { padding: 0 1rem 0.75rem; }
+.fref .table-wrap { margin: 0 0 0.5rem; box-shadow: none; }
+.fref > div > p:last-child { margin-bottom: 0; }
 .fpanel { margin-top: 1rem; border: 1px solid var(--line); border-radius: 10px; background: var(--surface-2); padding: 0.9rem 1rem; min-height: 9.5rem; }
 .fpanel .hint { color: var(--muted); margin: 0; }
 .fpanel h4 { margin: 0 0 0.5rem; font-size: 1rem; }
@@ -665,10 +685,10 @@ window.NPE = (function () {
   "use strict";
   var LANGS = ["fr", "en", "nl", "de"];
   var UI = {
-    fr: { values: "Valeurs possibles", name: "Nom", offset: "Offset", size: "Taille", value: "Valeur", filter: "Filtre Wireshark", ref: "Référence", role: "Rôle", bits: "bits", bytes: "octets", hint: "Survolez ou sélectionnez un champ (diagramme ou arbre) pour afficher son détail.", cont: "suite", repeat: "répété", step: "Étape", start: "État initial : aucun paquet échangé.", play: "Lecture", pause: "Pause", prev: "Étape précédente", next: "Étape suivante", reset: "Recommencer", copy: "Copier", copied: "Copié ✓", correct: "✓ Correct.", wrong: "✗ Incorrect. La bonne réponse est :", choose: "Choisissez d'abord une réponse.", score: "Score :", crumbs: "Fil d'Ariane", langs: "Langue", vendors: "Vendeurs", bitdiag: "Diagramme de bits RFC", wstree: "Arbre Wireshark", theme: "Thème sombre", toc: "Sur cette page", var: "variable", cs_sum: "Somme des {n} mots (champ Checksum compté 0)", cs_fold: "Report des retenues", cs_cpl: "Complément à un", cs_hdr: "valeur dans l'en-tête :", cs_inc: "Mise à jour incrémentale (RFC 1624, équation 3)", cs_word: "Mot", cs_fields: "Champs", cs_after: "Après modification", cs_chg: "(modifié)", packets: "Paquets d'exemple", chapters: "Chapitres", pager: "Chapitre précédent et suivant", footnav: "Navigation du pied de page", set: "Activé", notset: "Non activé" },
-    en: { values: "Allowed values", name: "Name", offset: "Offset", size: "Size", value: "Value", filter: "Wireshark filter", ref: "Reference", role: "Role", bits: "bits", bytes: "bytes", hint: "Hover or select a field (diagram or tree) to see its details.", cont: "cont.", repeat: "repeated", step: "Step", start: "Initial state: no packet exchanged yet.", play: "Play", pause: "Pause", prev: "Previous step", next: "Next step", reset: "Restart", copy: "Copy", copied: "Copied ✓", correct: "✓ Correct.", wrong: "✗ Incorrect. The correct answer is:", choose: "Choose an answer first.", score: "Score:", crumbs: "Breadcrumb", langs: "Language", vendors: "Vendors", bitdiag: "RFC bit diagram", wstree: "Wireshark tree", theme: "Dark theme", toc: "On this page", var: "variable", cs_sum: "Sum of the {n} words (Checksum field counted as 0)", cs_fold: "Carries folded back", cs_cpl: "One's complement", cs_hdr: "value in the header:", cs_inc: "Incremental update (RFC 1624, eqn. 3)", cs_word: "Word", cs_fields: "Fields", cs_after: "After the change", cs_chg: "(changed)", packets: "Sample packets", chapters: "Chapters", pager: "Previous and next chapter", footnav: "Footer navigation", set: "Set", notset: "Not set" },
-    nl: { values: "Toegestane waarden", name: "Naam", offset: "Offset", size: "Grootte", value: "Waarde", filter: "Wireshark-filter", ref: "Referentie", role: "Rol", bits: "bits", bytes: "bytes", hint: "Beweeg over een veld of selecteer het (diagram of boom) om de details te zien.", cont: "vervolg", repeat: "herhaald", step: "Stap", start: "Beginsituatie: nog geen pakket uitgewisseld.", play: "Afspelen", pause: "Pauzeren", prev: "Vorige stap", next: "Volgende stap", reset: "Opnieuw beginnen", copy: "Kopiëren", copied: "Gekopieerd ✓", correct: "✓ Juist.", wrong: "✗ Onjuist. Het juiste antwoord is:", choose: "Kies eerst een antwoord.", score: "Score:", crumbs: "Kruimelpad", langs: "Taal", vendors: "Vendors", bitdiag: "RFC-bitdiagram", wstree: "Wireshark-boom", theme: "Donker thema", toc: "Op deze pagina", var: "variabel", cs_sum: "Som van de {n} woorden (Checksum-veld telt als 0)", cs_fold: "Overdrachten opgeteld", cs_cpl: "One's complement", cs_hdr: "waarde in de header:", cs_inc: "Incrementele update (RFC 1624, vergelijking 3)", cs_word: "Woord", cs_fields: "Velden", cs_after: "Na de wijziging", cs_chg: "(gewijzigd)", packets: "Voorbeeldpakketten", chapters: "Hoofdstukken", pager: "Vorig en volgend hoofdstuk", footnav: "Voettekstnavigatie", set: "Ingesteld", notset: "Niet ingesteld" },
-    de: { values: "Zulässige Werte", name: "Name", offset: "Offset", size: "Größe", value: "Wert", filter: "Wireshark-Filter", ref: "Referenz", role: "Funktion", bits: "Bit", bytes: "Byte", hint: "Bewegen Sie den Zeiger über ein Feld oder wählen Sie es aus (Diagramm oder Baum), um Details zu sehen.", cont: "Forts.", repeat: "wiederholt", step: "Schritt", start: "Ausgangszustand: noch kein Paket ausgetauscht.", play: "Abspielen", pause: "Pause", prev: "Vorheriger Schritt", next: "Nächster Schritt", reset: "Neu starten", copy: "Kopieren", copied: "Kopiert ✓", correct: "✓ Richtig.", wrong: "✗ Falsch. Richtig ist:", choose: "Wählen Sie zuerst eine Antwort.", score: "Punkte:", crumbs: "Brotkrumennavigation", langs: "Sprache", vendors: "Hersteller", bitdiag: "RFC-Bitdiagramm", wstree: "Wireshark-Baum", theme: "Dunkles Design", toc: "Auf dieser Seite", var: "variabel", cs_sum: "Summe der {n} Wörter (Feld Checksum als 0 gezählt)", cs_fold: "Überträge addiert", cs_cpl: "Einerkomplement", cs_hdr: "Wert im Header:", cs_inc: "Inkrementelle Aktualisierung (RFC 1624, Gleichung 3)", cs_word: "Wort", cs_fields: "Felder", cs_after: "Nach der Änderung", cs_chg: "(geändert)", packets: "Beispielpakete", chapters: "Kapitel", pager: "Vorheriges und nächstes Kapitel", footnav: "Fußzeilennavigation", set: "Gesetzt", notset: "Nicht gesetzt" }
+    fr: { values: "Valeurs possibles", name: "Nom", offset: "Offset", size: "Taille", value: "Valeur", filter: "Filtre Wireshark", ref: "Référence", role: "Rôle", bits: "bits", bytes: "octets", hint: "Survolez ou sélectionnez un champ (diagramme ou arbre) pour afficher son détail.", cont: "suite", repeat: "répété", step: "Étape", start: "État initial : aucun paquet échangé.", play: "Lecture", pause: "Pause", prev: "Étape précédente", next: "Étape suivante", reset: "Recommencer", copy: "Copier", copied: "Copié ✓", correct: "✓ Correct.", wrong: "✗ Incorrect. La bonne réponse est :", choose: "Choisissez d'abord une réponse.", score: "Score :", crumbs: "Fil d'Ariane", langs: "Langue", vendors: "Vendeurs", bitdiag: "Diagramme de bits RFC", wstree: "Arbre Wireshark", theme: "Thème sombre", toc: "Sur cette page", var: "variable", cs_sum: "Somme des {n} mots (champ Checksum compté 0)", cs_fold: "Report des retenues", cs_cpl: "Complément à un", cs_hdr: "valeur dans l'en-tête :", cs_inc: "Mise à jour incrémentale (RFC 1624, équation 3)", cs_word: "Mot", cs_fields: "Champs", cs_after: "Après modification", cs_chg: "(modifié)", packets: "Paquets d'exemple", chapters: "Chapitres", pager: "Chapitre précédent et suivant", footnav: "Navigation du pied de page", set: "Activé", notset: "Non activé", fold: "{n} lignes de plus, même champ ({b} octets)", foldleg: "Ligne repliée : suite d'un champ long, non dessinée ligne par ligne" },
+    en: { values: "Allowed values", name: "Name", offset: "Offset", size: "Size", value: "Value", filter: "Wireshark filter", ref: "Reference", role: "Role", bits: "bits", bytes: "bytes", hint: "Hover or select a field (diagram or tree) to see its details.", cont: "cont.", repeat: "repeated", step: "Step", start: "Initial state: no packet exchanged yet.", play: "Play", pause: "Pause", prev: "Previous step", next: "Next step", reset: "Restart", copy: "Copy", copied: "Copied ✓", correct: "✓ Correct.", wrong: "✗ Incorrect. The correct answer is:", choose: "Choose an answer first.", score: "Score:", crumbs: "Breadcrumb", langs: "Language", vendors: "Vendors", bitdiag: "RFC bit diagram", wstree: "Wireshark tree", theme: "Dark theme", toc: "On this page", var: "variable", cs_sum: "Sum of the {n} words (Checksum field counted as 0)", cs_fold: "Carries folded back", cs_cpl: "One's complement", cs_hdr: "value in the header:", cs_inc: "Incremental update (RFC 1624, eqn. 3)", cs_word: "Word", cs_fields: "Fields", cs_after: "After the change", cs_chg: "(changed)", packets: "Sample packets", chapters: "Chapters", pager: "Previous and next chapter", footnav: "Footer navigation", set: "Set", notset: "Not set", fold: "{n} more rows, same field ({b} bytes)", foldleg: "Folded row: rest of a long field, not drawn row by row" },
+    nl: { values: "Toegestane waarden", name: "Naam", offset: "Offset", size: "Grootte", value: "Waarde", filter: "Wireshark-filter", ref: "Referentie", role: "Rol", bits: "bits", bytes: "bytes", hint: "Beweeg over een veld of selecteer het (diagram of boom) om de details te zien.", cont: "vervolg", repeat: "herhaald", step: "Stap", start: "Beginsituatie: nog geen pakket uitgewisseld.", play: "Afspelen", pause: "Pauzeren", prev: "Vorige stap", next: "Volgende stap", reset: "Opnieuw beginnen", copy: "Kopiëren", copied: "Gekopieerd ✓", correct: "✓ Juist.", wrong: "✗ Onjuist. Het juiste antwoord is:", choose: "Kies eerst een antwoord.", score: "Score:", crumbs: "Kruimelpad", langs: "Taal", vendors: "Vendors", bitdiag: "RFC-bitdiagram", wstree: "Wireshark-boom", theme: "Donker thema", toc: "Op deze pagina", var: "variabel", cs_sum: "Som van de {n} woorden (Checksum-veld telt als 0)", cs_fold: "Overdrachten opgeteld", cs_cpl: "One's complement", cs_hdr: "waarde in de header:", cs_inc: "Incrementele update (RFC 1624, vergelijking 3)", cs_word: "Woord", cs_fields: "Velden", cs_after: "Na de wijziging", cs_chg: "(gewijzigd)", packets: "Voorbeeldpakketten", chapters: "Hoofdstukken", pager: "Vorig en volgend hoofdstuk", footnav: "Voettekstnavigatie", set: "Ingesteld", notset: "Niet ingesteld", fold: "nog {n} rijen, hetzelfde veld ({b} bytes)", foldleg: "Ingeklapte rij: vervolg van een lang veld, niet rij per rij getekend" },
+    de: { values: "Zulässige Werte", name: "Name", offset: "Offset", size: "Größe", value: "Wert", filter: "Wireshark-Filter", ref: "Referenz", role: "Funktion", bits: "Bit", bytes: "Byte", hint: "Bewegen Sie den Zeiger über ein Feld oder wählen Sie es aus (Diagramm oder Baum), um Details zu sehen.", cont: "Forts.", repeat: "wiederholt", step: "Schritt", start: "Ausgangszustand: noch kein Paket ausgetauscht.", play: "Abspielen", pause: "Pause", prev: "Vorheriger Schritt", next: "Nächster Schritt", reset: "Neu starten", copy: "Kopieren", copied: "Kopiert ✓", correct: "✓ Richtig.", wrong: "✗ Falsch. Richtig ist:", choose: "Wählen Sie zuerst eine Antwort.", score: "Punkte:", crumbs: "Brotkrumennavigation", langs: "Sprache", vendors: "Hersteller", bitdiag: "RFC-Bitdiagramm", wstree: "Wireshark-Baum", theme: "Dunkles Design", toc: "Auf dieser Seite", var: "variabel", cs_sum: "Summe der {n} Wörter (Feld Checksum als 0 gezählt)", cs_fold: "Überträge addiert", cs_cpl: "Einerkomplement", cs_hdr: "Wert im Header:", cs_inc: "Inkrementelle Aktualisierung (RFC 1624, Gleichung 3)", cs_word: "Wort", cs_fields: "Felder", cs_after: "Nach der Änderung", cs_chg: "(geändert)", packets: "Beispielpakete", chapters: "Kapitel", pager: "Vorheriges und nächstes Kapitel", footnav: "Fußzeilennavigation", set: "Gesetzt", notset: "Nicht gesetzt", fold: "{n} weitere Zeilen, dasselbe Feld ({b} Byte)", foldleg: "Eingeklappte Zeile: Fortsetzung eines langen Feldes, nicht zeilenweise gezeichnet" }
   };
   var root = document.documentElement;
   function lang() { return LANGS.indexOf(root.lang) < 0 ? "en" : root.lang; }
@@ -723,13 +743,28 @@ window.NPE = (function () {
 
     /* data.grid_from: the bit diagram starts at that bit (e.g. 112 to draw an IPv4 header on its own
        32-bit rows, as in RFC 791, while the tree and the hex dump keep the Ethernet header). */
-    var g = "", origin = data.grid_from || 0;
+    var g = "", origin = data.grid_from || 0, folded = false;
+    /* One span per language (the grid is drawn once, the language switch is CSS). */
+    function each(key, n, b) {
+      return Object.keys(UI).map(function (l) {
+        return '<span data-l="' + l + '">' + esc(UI[l][key].replace("{n}", n).replace("{b}", b)) + "</span>";
+      }).join("");
+    }
     data.fields.forEach(function (f) {
       if (f.offset < origin) return;
-      /* f.rows: a long field (Data) is drawn on that many rows only, the last one cut ("…"). */
+      /* f.rows: a long field (Data) is drawn on that many rows only, the last one cut ("…").
+         Otherwise the whole 32-bit rows that follow the first row of a field are folded into one
+         row when there are two or more, so a 64-byte field is not drawn as 16 identical rows. */
       var start = f.offset - origin, left = f.bits, first = true, row = 1;
       while (left > 0) {
         var col = start % 32, take = Math.min(left, 32 - col), cut = f.rows && row === f.rows && left > take;
+        var more = !first && !f.rows && col === 0 ? Math.floor(left / 32) : 0;
+        if (more > 1) {
+          g += '<div class="bf l-' + f.layer + ' cont fold" data-f="' + f.id + '" style="grid-column:1 / span 32;grid-row:' +
+            (Math.floor(start / 32) + 1) + '" aria-hidden="true"><span class="bn">' + each("fold", more, more * 4) + "</span></div>";
+          start += more * 32; left -= more * 32; folded = true;
+          continue;
+        }
         var cls = "bf l-" + f.layer + (f.repeat ? " rep" : "") + (first ? "" : " cont") + (cut ? " cut" : "");
         var pos = ' style="grid-column:' + (col + 1) + " / span " + take + ";grid-row:" + (Math.floor(start / 32) + 1) + '"';
         if (first) {
@@ -744,6 +779,8 @@ window.NPE = (function () {
       }
     });
     grid.innerHTML = g;
+    var legend = folded && el.querySelector(".legend");
+    if (legend) legend.insertAdjacentHTML("beforeend", '<div><dt><span class="sw fold"></span></dt><dd>' + each("foldleg") + "</dd></div>");
 
     function mask(m, set, width) {
       var s = "";

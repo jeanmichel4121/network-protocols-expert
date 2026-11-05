@@ -11,6 +11,13 @@ Versioning rules for this library:
 
 ## [Unreleased]
 
+### Changed
+- Packet views: the whole 32-bit rows of a long field are folded into one row (a 64-byte
+  field is no longer drawn as 16 identical rows), with its legend entry; the bit diagram
+  always shows its 32 columns, with the field detail under it and the Wireshark tree below
+  (side by side on very wide screens only).
+- Ethernet: the seven value tables are collapsible cards, closed by default.
+
 ## [0.1.0] - 2026-11-05
 
 First release: the Ethernet and IPv4 pages, published as chapters, the page template and its
