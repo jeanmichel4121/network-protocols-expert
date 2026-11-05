@@ -97,8 +97,8 @@ runners, with images pinned by digest and Python tools pinned by hash.
 | lint | YAML, Python (ruff), Conventional Commits, branch name and merge request title, licensing (REUSE) |
 | test | packet-builder self-test, static page checks (self-contained, 4 languages complete, packets equal to the builder output, shared template blocks unchanged) |
 | security | secret scanning (gitleaks); weekly report of outdated pins (Python tools, image digests, hooks, axe-core) |
-| build | one URL per language, `hreflang`, canonical, Open Graph, JSON-LD, sitemap, `security.txt`; CycloneDX SBOM of the build tooling |
-| verify | HTML validation, links between pages, every protocol listed; headless browser: axe WCAG 2.2 AA in light, dark and mobile, layout shift, reduced motion, no external request |
+| build | one URL per language and per chapter (overview, one page per section, full version for print), `hreflang`, canonical, Open Graph, JSON-LD, sitemap, `security.txt`; CycloneDX SBOM of the build tooling |
+| verify | HTML validation, links between pages, every protocol and chapter listed; headless browser: axe WCAG 2.2 AA in light, dark and mobile, layout shift, reduced motion, no external request |
 | deploy | atomic release to <https://learning.cuvelier.tech>, smoke-tested, from `main` only |
 | release | release notes from [`CHANGELOG.md`](CHANGELOG.md) on `vX.Y.Z` tags, with website, SBOM and source links |
 
@@ -128,7 +128,7 @@ security features) is documented with its reason in
 Requirements: Python 3.12 or later.
 
 ```sh
-python3 scripts/build_site.py public      # build the site with one URL per language
+python3 scripts/build_site.py public      # build the site: one URL per language and per chapter
 python3 -m http.server -d public 8000      # then open http://127.0.0.1:8000/
 ```
 

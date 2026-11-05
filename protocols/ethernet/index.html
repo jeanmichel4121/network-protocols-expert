@@ -16,6 +16,7 @@
    so neither causes a flash nor a layout shift. */
 (function () {
   var r = document.documentElement;
+  r.classList.add("js");
   function get(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
   var t = get("theme");
   if (t === "light" || t === "dark") r.dataset.theme = t;
@@ -69,7 +70,7 @@ body {
   font: clamp(1rem, 0.96rem + 0.2vw, 1.0625rem)/1.6 var(--font);
   text-rendering: optimizeLegibility;
 }
-h1, h2, h3, h4 { line-height: 1.2; text-wrap: balance; margin: 0 0 0.6em; }
+h1, h2, h3, h4 { line-height: 1.2; text-wrap: balance; margin: 0 0 0.6em; overflow-wrap: break-word; hyphens: auto; }
 h1 { font-size: clamp(2rem, 1.5rem + 2.2vw, 3rem); letter-spacing: -0.02em; }
 h2 { font-size: clamp(1.5rem, 1.3rem + 0.9vw, 2rem); letter-spacing: -0.01em; }
 h3 { font-size: 1.25rem; }
@@ -117,15 +118,37 @@ button { font: inherit; color: inherit; }
 .toc { font-size: 0.9rem; }
 .toc summary { cursor: pointer; font-weight: 650; padding: 0.6rem 0; list-style-position: inside; }
 .toc ol { list-style: none; margin: 0; padding: 0 0 0.5rem; border-left: 2px solid var(--line); }
-.toc a { display: block; padding: 0.3rem 0.8rem; margin-left: -2px; border-left: 2px solid transparent; color: var(--muted); text-decoration: none; min-height: 1.5rem; }
+.toc a { display: flex; padding: 0.3rem 0.8rem; margin-left: -2px; border-left: 2px solid transparent; color: var(--muted); text-decoration: none; min-height: 1.5rem; }
 .toc a:hover { color: var(--fg); }
 .toc a[aria-current] { color: var(--accent); border-left-color: var(--accent); font-weight: 600; }
-.toc .n { display: inline-block; min-width: 1.4em; font-variant-numeric: tabular-nums; }
+.toc .n { flex: none; min-width: 1.4em; font-variant-numeric: tabular-nums; }
 @media (max-width: 63.99rem) { .toc { border: 1px solid var(--line); border-radius: var(--radius); padding: 0 1rem; background: var(--surface); margin-top: 1rem; } }
 @media (min-width: 64rem) {
   .layout { grid-template-columns: minmax(0, 1fr) 15rem; gap: 3.5rem; }
   .toc { grid-column: 2; grid-row: 1; position: sticky; top: calc(var(--header-h) + 1.5rem); align-self: start; max-height: calc(100dvh - var(--header-h) - 3rem); overflow-y: auto; margin-top: 2.5rem; }
 }
+/* Published site: scripts/build_site.py splits each page into chapters, one URL each, with the
+   chapter list first (left column on wide screens, a collapsed box above the chapter on small ones). */
+@media (min-width: 64rem) {
+  .layout.chap { grid-template-columns: 15rem minmax(0, 1fr); }
+  .layout.chap > .toc { grid-column: 1; }
+  .layout.chap > main { grid-column: 2; grid-row: 1; }
+}
+.toc .sub { border-left: 0; padding: 0 0 0.35rem 1.4em; }
+.toc .sub a { font-size: 0.8125rem; padding-block: 0.2rem; }
+.toc .all { margin: 0.25rem 0 0.75rem; font-size: 0.8125rem; }
+.chap-cards { list-style: none; margin: 1rem 0 1.5rem; padding: 0; display: grid; gap: 0.75rem; grid-template-columns: repeat(auto-fill, minmax(min(100%, 17rem), 1fr)); }
+.chap-cards a { display: grid; align-content: start; gap: 0.35rem; height: 100%; padding: 1rem 1.1rem; border: 1px solid var(--line); border-radius: var(--radius); background: var(--surface); color: var(--fg); text-decoration: none; }
+.chap-cards a:hover { border-color: var(--accent); }
+.chap-cards .ct { display: flex; gap: 0.5rem; align-items: baseline; font-weight: 650; }
+.chap-cards .n { color: var(--accent); font-variant-numeric: tabular-nums; }
+.chap-cards .cd { color: var(--muted); font-size: 0.9rem; }
+.chap-cards .cc { font: 600 0.75rem var(--mono); color: var(--muted); }
+.pager { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 0.75rem; margin: 3rem 0 0; padding-top: 1.5rem; border-top: 1px solid var(--line); }
+.pager a { flex: 1 1 14rem; max-width: 26rem; display: grid; gap: 0.15rem; padding: 0.8rem 1rem; border: 1px solid var(--line); border-radius: 10px; background: var(--surface); color: var(--fg); text-decoration: none; }
+.pager a:hover { border-color: var(--accent); }
+.pager .pl { font-size: 0.8125rem; color: var(--muted); }
+.pager .next { margin-left: auto; text-align: right; }
 
 /* ===== Hero =========================================================== */
 .crumbs ol { list-style: none; display: flex; flex-wrap: wrap; gap: 0.4rem; padding: 0; margin: 1.75rem 0 1.25rem; font-size: 0.875rem; color: var(--muted); }
@@ -141,7 +164,10 @@ button { font: inherit; color: inherit; }
 
 /* ===== Sections ======================================================= */
 .sec { margin-bottom: 3.5rem; }
-.sec > h2, .sec > details > summary h2 { display: flex; align-items: baseline; gap: 0.6rem; }
+.sec > h1, .sec > h2, .sec > details > summary h2 { display: flex; align-items: baseline; gap: 0.6rem; }
+/* Flex items keep their longest word by default: let the title shrink so long words break. */
+.sec > h1 > [data-l], .sec > h2 > [data-l], .sec > details > summary h2 > [data-l] { min-width: 0; }
+.sec .num { flex: none; }
 .sec .num { font-size: 0.65em; font-weight: 700; color: var(--accent); font-variant-numeric: tabular-nums; border: 1.5px solid currentColor; border-radius: 8px; padding: 0.05em 0.4em; }
 .sec > details > summary { cursor: pointer; list-style: none; }
 .sec > details > summary::-webkit-details-marker { display: none; }
@@ -315,6 +341,14 @@ svg.sch .mk-err { fill: var(--red); }
 }
 .tabs [role="tab"][aria-selected="true"] { color: var(--accent); border-bottom-color: var(--accent); }
 .tabs [role="tabpanel"] { padding-top: 1.25rem; }
+/* Packet set (NPE.pktset): one tab per sample packet; without JS and in print every packet is shown.
+   Until the tabs are built, only the first packet is drawn, so the page does not shift (CLS). */
+.js .pkt-set:not(.tabs) > article.packet ~ article.packet { display: none; }
+.pkt-set > [role="tablist"] { display: none; }
+.js .pkt-set > [role="tablist"] { display: flex; }
+.pkt-set [role="tablist"] { flex-wrap: wrap; overflow: visible; gap: 0.4rem; border-bottom: 0; }
+.pkt-set [role="tab"] { margin: 0; padding: 0.35rem 0.9rem; min-height: 2.25rem; border: 1px solid var(--line); border-radius: 999px; background: var(--surface); font: 600 0.8125rem var(--mono); }
+.pkt-set [role="tab"][aria-selected="true"] { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
 .cmd { border: 1px solid var(--line); border-radius: 10px; overflow: hidden; margin: 1rem 0; background: var(--surface); }
 .cmd-head { display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem; padding: 0.5rem 0.6rem 0.5rem 1rem; border-bottom: 1px solid var(--line); background: var(--surface-2); font-size: 0.875rem; font-weight: 650; }
 .ver { font: 600 0.75rem var(--mono); padding: 0.1rem 0.55rem; border-radius: 999px; border: 1px solid var(--line); background: var(--surface); color: var(--muted); }
@@ -394,7 +428,7 @@ svg.sch .mk-err { fill: var(--red); }
 @media print {
   :root { color-scheme: light; }
   body { background: #fff; font-size: 10.5pt; }
-  .site-header, .toc, .skip, .anim-controls, .copy, .quiz-q .btn, .lang, .icon-btn, .tpl { display: none !important; }
+  .site-header, .toc, .pager, .skip, .anim-controls, .copy, .quiz-q .btn, .lang, .icon-btn, .tpl, .pkt-set > [role="tablist"] { display: none !important; }
   .layout { display: block; padding: 0; }
   [role="tabpanel"][hidden], .expl[hidden] { display: block !important; }
   .tabs [role="tablist"] { display: none; }
@@ -413,10 +447,10 @@ window.NPE = (function () {
   "use strict";
   var LANGS = ["fr", "en", "nl", "de"];
   var UI = {
-    fr: { values: "Valeurs possibles", name: "Nom", offset: "Offset", size: "Taille", value: "Valeur", filter: "Filtre Wireshark", ref: "Référence", role: "Rôle", bits: "bits", bytes: "octets", hint: "Survolez ou sélectionnez un champ (diagramme ou arbre) pour afficher son détail.", cont: "suite", repeat: "répété", step: "Étape", start: "État initial : aucun paquet échangé.", play: "Lecture", pause: "Pause", prev: "Étape précédente", next: "Étape suivante", reset: "Recommencer", copy: "Copier", copied: "Copié ✓", correct: "✓ Correct.", wrong: "✗ Incorrect. La bonne réponse est :", choose: "Choisissez d'abord une réponse.", score: "Score :", crumbs: "Fil d'Ariane", langs: "Langue", vendors: "Vendeurs", bitdiag: "Diagramme de bits RFC", wstree: "Arbre Wireshark", theme: "Thème sombre", toc: "Sur cette page", footnav: "Navigation du pied de page", set: "Activé", notset: "Non activé" },
-    en: { values: "Allowed values", name: "Name", offset: "Offset", size: "Size", value: "Value", filter: "Wireshark filter", ref: "Reference", role: "Role", bits: "bits", bytes: "bytes", hint: "Hover or select a field (diagram or tree) to see its details.", cont: "cont.", repeat: "repeated", step: "Step", start: "Initial state: no packet exchanged yet.", play: "Play", pause: "Pause", prev: "Previous step", next: "Next step", reset: "Restart", copy: "Copy", copied: "Copied ✓", correct: "✓ Correct.", wrong: "✗ Incorrect. The correct answer is:", choose: "Choose an answer first.", score: "Score:", crumbs: "Breadcrumb", langs: "Language", vendors: "Vendors", bitdiag: "RFC bit diagram", wstree: "Wireshark tree", theme: "Dark theme", toc: "On this page", footnav: "Footer navigation", set: "Set", notset: "Not set" },
-    nl: { values: "Toegestane waarden", name: "Naam", offset: "Offset", size: "Grootte", value: "Waarde", filter: "Wireshark-filter", ref: "Referentie", role: "Rol", bits: "bits", bytes: "bytes", hint: "Beweeg over een veld of selecteer het (diagram of boom) om de details te zien.", cont: "vervolg", repeat: "herhaald", step: "Stap", start: "Beginsituatie: nog geen pakket uitgewisseld.", play: "Afspelen", pause: "Pauzeren", prev: "Vorige stap", next: "Volgende stap", reset: "Opnieuw beginnen", copy: "Kopiëren", copied: "Gekopieerd ✓", correct: "✓ Juist.", wrong: "✗ Onjuist. Het juiste antwoord is:", choose: "Kies eerst een antwoord.", score: "Score:", crumbs: "Kruimelpad", langs: "Taal", vendors: "Vendors", bitdiag: "RFC-bitdiagram", wstree: "Wireshark-boom", theme: "Donker thema", toc: "Op deze pagina", footnav: "Voettekstnavigatie", set: "Ingesteld", notset: "Niet ingesteld" },
-    de: { values: "Zulässige Werte", name: "Name", offset: "Offset", size: "Größe", value: "Wert", filter: "Wireshark-Filter", ref: "Referenz", role: "Funktion", bits: "Bit", bytes: "Byte", hint: "Bewegen Sie den Zeiger über ein Feld oder wählen Sie es aus (Diagramm oder Baum), um Details zu sehen.", cont: "Forts.", repeat: "wiederholt", step: "Schritt", start: "Ausgangszustand: noch kein Paket ausgetauscht.", play: "Abspielen", pause: "Pause", prev: "Vorheriger Schritt", next: "Nächster Schritt", reset: "Neu starten", copy: "Kopieren", copied: "Kopiert ✓", correct: "✓ Richtig.", wrong: "✗ Falsch. Richtig ist:", choose: "Wählen Sie zuerst eine Antwort.", score: "Punkte:", crumbs: "Brotkrumennavigation", langs: "Sprache", vendors: "Hersteller", bitdiag: "RFC-Bitdiagramm", wstree: "Wireshark-Baum", theme: "Dunkles Design", toc: "Auf dieser Seite", footnav: "Fußzeilennavigation", set: "Gesetzt", notset: "Nicht gesetzt" }
+    fr: { values: "Valeurs possibles", name: "Nom", offset: "Offset", size: "Taille", value: "Valeur", filter: "Filtre Wireshark", ref: "Référence", role: "Rôle", bits: "bits", bytes: "octets", hint: "Survolez ou sélectionnez un champ (diagramme ou arbre) pour afficher son détail.", cont: "suite", repeat: "répété", step: "Étape", start: "État initial : aucun paquet échangé.", play: "Lecture", pause: "Pause", prev: "Étape précédente", next: "Étape suivante", reset: "Recommencer", copy: "Copier", copied: "Copié ✓", correct: "✓ Correct.", wrong: "✗ Incorrect. La bonne réponse est :", choose: "Choisissez d'abord une réponse.", score: "Score :", crumbs: "Fil d'Ariane", langs: "Langue", vendors: "Vendeurs", bitdiag: "Diagramme de bits RFC", wstree: "Arbre Wireshark", theme: "Thème sombre", toc: "Sur cette page", packets: "Paquets d'exemple", chapters: "Chapitres", pager: "Chapitre précédent et suivant", footnav: "Navigation du pied de page", set: "Activé", notset: "Non activé" },
+    en: { values: "Allowed values", name: "Name", offset: "Offset", size: "Size", value: "Value", filter: "Wireshark filter", ref: "Reference", role: "Role", bits: "bits", bytes: "bytes", hint: "Hover or select a field (diagram or tree) to see its details.", cont: "cont.", repeat: "repeated", step: "Step", start: "Initial state: no packet exchanged yet.", play: "Play", pause: "Pause", prev: "Previous step", next: "Next step", reset: "Restart", copy: "Copy", copied: "Copied ✓", correct: "✓ Correct.", wrong: "✗ Incorrect. The correct answer is:", choose: "Choose an answer first.", score: "Score:", crumbs: "Breadcrumb", langs: "Language", vendors: "Vendors", bitdiag: "RFC bit diagram", wstree: "Wireshark tree", theme: "Dark theme", toc: "On this page", packets: "Sample packets", chapters: "Chapters", pager: "Previous and next chapter", footnav: "Footer navigation", set: "Set", notset: "Not set" },
+    nl: { values: "Toegestane waarden", name: "Naam", offset: "Offset", size: "Grootte", value: "Waarde", filter: "Wireshark-filter", ref: "Referentie", role: "Rol", bits: "bits", bytes: "bytes", hint: "Beweeg over een veld of selecteer het (diagram of boom) om de details te zien.", cont: "vervolg", repeat: "herhaald", step: "Stap", start: "Beginsituatie: nog geen pakket uitgewisseld.", play: "Afspelen", pause: "Pauzeren", prev: "Vorige stap", next: "Volgende stap", reset: "Opnieuw beginnen", copy: "Kopiëren", copied: "Gekopieerd ✓", correct: "✓ Juist.", wrong: "✗ Onjuist. Het juiste antwoord is:", choose: "Kies eerst een antwoord.", score: "Score:", crumbs: "Kruimelpad", langs: "Taal", vendors: "Vendors", bitdiag: "RFC-bitdiagram", wstree: "Wireshark-boom", theme: "Donker thema", toc: "Op deze pagina", packets: "Voorbeeldpakketten", chapters: "Hoofdstukken", pager: "Vorig en volgend hoofdstuk", footnav: "Voettekstnavigatie", set: "Ingesteld", notset: "Niet ingesteld" },
+    de: { values: "Zulässige Werte", name: "Name", offset: "Offset", size: "Größe", value: "Wert", filter: "Wireshark-Filter", ref: "Referenz", role: "Funktion", bits: "Bit", bytes: "Byte", hint: "Bewegen Sie den Zeiger über ein Feld oder wählen Sie es aus (Diagramm oder Baum), um Details zu sehen.", cont: "Forts.", repeat: "wiederholt", step: "Schritt", start: "Ausgangszustand: noch kein Paket ausgetauscht.", play: "Abspielen", pause: "Pause", prev: "Vorheriger Schritt", next: "Nächster Schritt", reset: "Neu starten", copy: "Kopieren", copied: "Kopiert ✓", correct: "✓ Richtig.", wrong: "✗ Falsch. Richtig ist:", choose: "Wählen Sie zuerst eine Antwort.", score: "Punkte:", crumbs: "Brotkrumennavigation", langs: "Sprache", vendors: "Hersteller", bitdiag: "RFC-Bitdiagramm", wstree: "Wireshark-Baum", theme: "Dunkles Design", toc: "Auf dieser Seite", packets: "Beispielpakete", chapters: "Kapitel", pager: "Vorheriges und nächstes Kapitel", footnav: "Fußzeilennavigation", set: "Gesetzt", notset: "Nicht gesetzt" }
   };
   var root = document.documentElement;
   function lang() { return LANGS.indexOf(root.lang) < 0 ? "en" : root.lang; }
@@ -457,11 +491,8 @@ window.NPE = (function () {
     if (!el || !data) return;
     var byId = {};
     data.fields.forEach(function (f) { byId[f.id] = f; });
-    var chips = el.querySelector(".packet-meta");
-    function paintChips() {
-      if (chips) chips.innerHTML = "<li>" + data.length + " " + ui("bytes") + "</li><li>" + esc(data.encapsulation) + "</li>" +
-        (chips.dataset.ref ? "<li>" + esc(chips.dataset.ref) + "</li>" : "");
-    }
+    /* The chips line (ul.packet-meta: length, encapsulation, reference) is written in the page by
+       tools/packet-builder.py --update, so it is there from the first paint. */
     var grid = el.querySelector(".bitgrid"), ruler = el.querySelector(".ruler"),
         tree = el.querySelector(".wstree"), hex = el.querySelector(".hexdump"), panel = el.querySelector(".fpanel");
 
@@ -568,8 +599,8 @@ window.NPE = (function () {
     el.addEventListener("click", pick);
     roving(grid, "button.bf");
     roving(tree, "summary, .tl");
-    show(null); paintFlags(); paintChips();
-    onLang(function () { show(active); paintFlags(); paintChips(); });
+    show(null); paintFlags();
+    onLang(function () { show(active); paintFlags(); });
   }
 
   /* ---------- Step-by-step exchange: play / pause / previous / next ---------- */
@@ -660,6 +691,52 @@ window.NPE = (function () {
       if (j < 0) return;
       e.preventDefault(); select(all[j], true);
     });
+  }
+
+  /* ---------- Packet set: the sample packets of a section as tabs, one packet at a time ----------
+     The tab list (a div role=tablist, one button data-pkt per packet, shown only with JS) is
+     written in the page by tools/packet-builder.py --update: label = data-tab on the article,
+     else the builder's "message". It is drawn from the first paint, so the page does not shift
+     when the tabs start; without it the script makes one. Without JS (and in print) every packet
+     stays listed; a link to an id inside a packet opens its tab. */
+  function pktset(id) {
+    var box = document.getElementById(id);
+    if (!box) return;
+    var arts = Array.prototype.filter.call(box.children, function (n) { return n.matches("article.packet"); });
+    if (arts.length < 2) return;
+    var list = box.querySelector(':scope > [role="tablist"]'), made = !list;
+    if (made) {
+      list = document.createElement("div");
+      list.setAttribute("role", "tablist");
+      list.dataset.aria = "packets";
+      list.setAttribute("aria-label", ui("packets"));
+    }
+    arts.forEach(function (a, k) {
+      var pid = a.dataset.packet, data = json('script[data-packet="' + pid + '"]') || {};
+      var b = list.querySelector('[data-pkt="' + pid + '"]') || list.appendChild(document.createElement("button"));
+      b.type = "button"; b.id = "tab-" + pid;
+      b.setAttribute("role", "tab");
+      b.setAttribute("aria-controls", a.id || (a.id = "pkt-" + pid));
+      b.setAttribute("aria-selected", k ? "false" : "true");
+      b.tabIndex = k ? -1 : 0;
+      b.textContent = a.dataset.tab || data.message || pid;
+      a.setAttribute("role", "tabpanel");
+      a.setAttribute("aria-labelledby", b.id);
+      a.tabIndex = 0;
+      a.hidden = k > 0;
+    });
+    box.classList.add("tabs");
+    if (made) box.insertBefore(list, arts[0]);
+    tabs(id);
+    function fromHash() {
+      var t = location.hash && document.getElementById(decodeURIComponent(location.hash.slice(1)));
+      var a = t && t.closest("article.packet");
+      if (!a || a.parentNode !== box || !a.hidden) return;
+      list.querySelector('[aria-controls="' + a.id + '"]').click();
+      t.scrollIntoView();
+    }
+    addEventListener("hashchange", fromHash);
+    fromHash();
   }
 
   /* ---------- Quiz: fieldset/legend, live feedback, explanation + reference ---------- */
@@ -858,7 +935,7 @@ window.NPE = (function () {
     setLang(lang(), false);
   }
 
-  return { packet: packet, animation: animation, tabs: tabs, quiz: quiz, network: network, chrome: chrome, onLang: onLang };
+  return { packet: packet, pktset: pktset, animation: animation, tabs: tabs, quiz: quiz, network: network, chrome: chrome, onLang: onLang };
 })();
 </script>
 </head>
@@ -1027,9 +1104,10 @@ window.NPE = (function () {
 
 
 
-    <article class="packet" data-packet="eth-phy" aria-labelledby="h-pkt-eth-phy">
+    <div class="pkt-set" id="eth-frames"><div role="tablist" data-aria="packets" aria-label="Sample packets"><button type="button" role="tab" id="tab-eth-phy" data-pkt="eth-phy" aria-controls="pkt-eth-phy" aria-selected="true">Preamble + SFD</button><button type="button" role="tab" id="tab-eth-ii" data-pkt="eth-ii" aria-controls="pkt-eth-ii" aria-selected="false" tabindex="-1">Ethernet II</button><button type="button" role="tab" id="tab-eth-llc" data-pkt="eth-llc" aria-controls="pkt-eth-llc" aria-selected="false" tabindex="-1">802.3 + LLC</button><button type="button" role="tab" id="tab-eth-snap" data-pkt="eth-snap" aria-controls="pkt-eth-snap" aria-selected="false" tabindex="-1">802.3 + LLC + SNAP</button><button type="button" role="tab" id="tab-eth-dot1q" data-pkt="eth-dot1q" aria-controls="pkt-eth-dot1q" aria-selected="false" tabindex="-1">802.1Q</button><button type="button" role="tab" id="tab-eth-qinq" data-pkt="eth-qinq" aria-controls="pkt-eth-qinq" aria-selected="false" tabindex="-1">Q-in-Q</button><button type="button" role="tab" id="tab-eth-pause" data-pkt="eth-pause" aria-controls="pkt-eth-pause" aria-selected="false" tabindex="-1">PAUSE</button><button type="button" role="tab" id="tab-eth-pfc" data-pkt="eth-pfc" aria-controls="pkt-eth-pfc" aria-selected="false" tabindex="-1">PFC</button></div>
+    <article class="packet" id="pkt-eth-phy" data-packet="eth-phy" aria-labelledby="h-pkt-eth-phy">
       <h3 id="h-pkt-eth-phy"><span data-l="fr">Paquet 802.3 au niveau physique (préambule + SFD + trame)</span><span data-l="en">802.3 packet at the physical layer (preamble + SFD + frame)</span><span data-l="nl">802.3-packet op de fysieke laag (preamble + SFD + frame)</span><span data-l="de">802.3-Paket auf der physischen Schicht (Präambel + SFD + Rahmen)</span></h3>
-      <ul class="packet-meta" data-ref="IEEE 802.3 §3.1.1"></ul>
+      <ul class="packet-meta" data-ref="IEEE 802.3 §3.1.1"><li>72 <span data-l="fr">octets</span><span data-l="en">bytes</span><span data-l="nl">bytes</span><span data-l="de">Byte</span></li><li>Physical layer (Reconciliation Sublayer and PHY)</li><li>IEEE 802.3 §3.1.1</li></ul>
       <p><span data-l="fr">Le préambule (7 x 0x55) permet la synchronisation d'horloge sur les PHY historiques ; le SFD 0xD5 marque le début de la trame. Ils ne sont jamais remis au logiciel : Wireshark ne les voit pas. Aux débits ≥ 10 Gb/s, le premier octet du préambule est remplacé par un caractère de contrôle /S/ (XGMII), sans changer le format logique. L'IFG de 12 octets suit chaque paquet. Total sur le fil : 8 + 64 + 12 = 84 octets.</span><span data-l="en">The preamble (7 x 0x55) provides clock synchronisation on legacy PHYs; the SFD 0xD5 marks the start of the frame. Neither is ever handed to software: Wireshark does not see them. At ≥ 10 Gb/s, the first preamble octet is replaced by a /S/ control character (XGMII), without changing the logical format. A 12-octet IFG follows every packet. Total on the wire: 8 + 64 + 12 = 84 octets.</span><span data-l="nl">De preamble (7 x 0x55) zorgt voor kloksynchronisatie bij oudere PHY's; de SFD 0xD5 markeert het begin van het frame. Geen van beide wordt ooit aan software doorgegeven: Wireshark ziet ze niet. Bij ≥ 10 Gb/s wordt het eerste preamble-octet vervangen door een controlesymbool /S/ (XGMII), zonder het logische formaat te wijzigen. Na elk pakket volgt een IFG van 12 octetten. Totaal op de lijn: 8 + 64 + 12 = 84 octetten.</span><span data-l="de">Die Präambel (7 x 0x55) dient bei älteren PHYs der Taktsynchronisation; der SFD 0xD5 markiert den Rahmenbeginn. Beide werden nie an Software übergeben: Wireshark sieht sie nicht. Ab 10 Gb/s wird das erste Präambel-Oktett durch ein Steuerzeichen /S/ (XGMII) ersetzt, ohne das logische Format zu ändern. Nach jedem Paket folgt ein IFG von 12 Oktetten. Insgesamt auf der Leitung: 8 + 64 + 12 = 84 Oktette.</span></p>
       <figure class="diagram">
         <figcaption><span class="t"><span data-l="fr">Paquet 802.3 au niveau physique : préambule, SFD et trame</span><span data-l="en">802.3 packet at the physical layer: preamble, SFD and frame</span><span data-l="nl">802.3-pakket op de fysieke laag: preamble, SFD en frame</span><span data-l="de">802.3-Paket auf der physischen Schicht: Präambel, SFD und Rahmen</span></span><span class="s"><span data-l="fr">Exemple généré par tools/packet-builder.py (72 octets, FCS calculé), adresses MAC de documentation.</span><span data-l="en">Sample generated by tools/packet-builder.py (72 bytes, computed FCS), documentation MAC addresses.</span><span data-l="nl">Voorbeeld gegenereerd door tools/packet-builder.py (72 bytes, berekende FCS), documentatie-MAC-adressen.</span><span data-l="de">Beispiel erzeugt mit tools/packet-builder.py (72 Byte, berechnete FCS), Dokumentations-MAC-Adressen.</span></span></figcaption>
@@ -1063,9 +1141,9 @@ window.NPE = (function () {
       <script>NPE.packet("eth-phy");</script>
     </article>
 
-    <article class="packet" data-packet="eth-ii" aria-labelledby="h-pkt-eth-ii">
+    <article class="packet" id="pkt-eth-ii" data-packet="eth-ii" aria-labelledby="h-pkt-eth-ii">
       <h3 id="h-pkt-eth-ii">Ethernet II (DIX): IPv4 / ICMP Echo request</h3>
-      <ul class="packet-meta" data-ref="IEEE 802.3 §3.2.3, RFC 9542 §2.1"></ul>
+      <ul class="packet-meta" data-ref="IEEE 802.3 §3.2.3, RFC 9542 §2.1"><li>64 <span data-l="fr">octets</span><span data-l="en">bytes</span><span data-l="nl">bytes</span><span data-l="de">Byte</span></li><li>Physical medium (IEEE 802.3 PHY), EtherType 0x0800</li><li>IEEE 802.3 §3.2.3, RFC 9542 §2.1</li></ul>
       <p><span data-l="fr">Le format dominant. Ici, le paquet IPv4 ne fait que 28 octets (20 d'en-tête + 8 d'ICMP) : l'émetteur ajoute 18 octets de padding pour atteindre 60 octets avant le FCS. Le récepteur IP retire le padding grâce au champ Total Length de l'en-tête IPv4, car Ethernet II ne transporte aucune longueur.</span><span data-l="en">The dominant format. Here the IPv4 packet is only 28 octets (20 header + 8 ICMP): the sender adds 18 octets of padding to reach 60 octets before the FCS. The IP receiver strips the padding using the IPv4 Total Length field, because Ethernet II carries no length.</span><span data-l="nl">Het dominante formaat. Hier is het IPv4-pakket slechts 28 octetten (20 header + 8 ICMP): de zender voegt 18 octetten padding toe om 60 octetten vóór de FCS te bereiken. De IP-ontvanger verwijdert de padding aan de hand van het IPv4-veld Total Length, want Ethernet II draagt geen lengte.</span><span data-l="de">Das vorherrschende Format. Hier ist das IPv4-Paket nur 28 Oktette lang (20 Header + 8 ICMP): Der Sender fügt 18 Oktette Padding hinzu, um 60 Oktette vor der FCS zu erreichen. Der IP-Empfänger entfernt das Padding anhand des IPv4-Felds Total Length, da Ethernet II keine Länge transportiert.</span></p>
       <figure class="diagram">
         <figcaption><span class="t"><span data-l="fr">Trame Ethernet II : diagramme de bits et arbre Wireshark synchronisés</span><span data-l="en">Ethernet II frame: synchronised bit diagram and Wireshark tree</span><span data-l="nl">Ethernet II-frame: gesynchroniseerd bitdiagram en Wireshark-boom</span><span data-l="de">Ethernet II-Rahmen: synchronisiertes Bitdiagramm und Wireshark-Baum</span></span><span class="s"><span data-l="fr">Exemple généré par tools/packet-builder.py (64 octets, FCS calculé), adresses MAC de documentation.</span><span data-l="en">Sample generated by tools/packet-builder.py (64 bytes, computed FCS), documentation MAC addresses.</span><span data-l="nl">Voorbeeld gegenereerd door tools/packet-builder.py (64 bytes, berekende FCS), documentatie-MAC-adressen.</span><span data-l="de">Beispiel erzeugt mit tools/packet-builder.py (64 Byte, berechnete FCS), Dokumentations-MAC-Adressen.</span></span></figcaption>
@@ -1099,9 +1177,9 @@ window.NPE = (function () {
       <script>NPE.packet("eth-ii");</script>
     </article>
 
-    <article class="packet" data-packet="eth-llc" aria-labelledby="h-pkt-eth-llc">
+    <article class="packet" id="pkt-eth-llc" data-packet="eth-llc" aria-labelledby="h-pkt-eth-llc">
       <h3 id="h-pkt-eth-llc">IEEE 802.3 + LLC: STP Configuration BPDU</h3>
-      <ul class="packet-meta" data-ref="IEEE 802.3 §3.2.3, RFC 9542 §2.1"></ul>
+      <ul class="packet-meta" data-ref="IEEE 802.3 §3.2.3, RFC 9542 §2.1"><li>64 <span data-l="fr">octets</span><span data-l="en">bytes</span><span data-l="nl">bytes</span><span data-l="de">Byte</span></li><li>Physical medium, Length field (no EtherType), DSAP/SSAP 0x42</li><li>IEEE 802.3 §3.2.3, RFC 9542 §2.1</li></ul>
       <p><span data-l="fr">Le champ Length/Type vaut 38 (≤ 1500) : c'est une longueur, qui compte LLC + BPDU mais pas le padding. Le protocole est identifié par DSAP/SSAP 0x42 (Spanning Tree). La destination 01-80-C2-00-00-00 est l'adresse de groupe des ponts, qu'un pont 802.1Q ne relaie jamais.</span><span data-l="en">Length/Type is 38 (≤ 1500): it is a length, counting LLC + BPDU but not the padding. The protocol is identified by DSAP/SSAP 0x42 (Spanning Tree). Destination 01-80-C2-00-00-00 is the Bridge Group Address, which an 802.1Q bridge never relays.</span><span data-l="nl">Length/Type is 38 (≤ 1500): het is een lengte die LLC + BPDU telt, maar niet de padding. Het protocol wordt geïdentificeerd door DSAP/SSAP 0x42 (Spanning Tree). Bestemming 01-80-C2-00-00-00 is het Bridge Group Address, dat een 802.1Q-bridge nooit doorstuurt.</span><span data-l="de">Length/Type ist 38 (≤ 1500): Es ist eine Länge, die LLC + BPDU zählt, nicht aber das Padding. Das Protokoll wird über DSAP/SSAP 0x42 (Spanning Tree) gekennzeichnet. Das Ziel 01-80-C2-00-00-00 ist die Bridge Group Address, die eine 802.1Q-Bridge nie weiterleitet.</span></p>
       <figure class="diagram">
         <figcaption><span class="t"><span data-l="fr">Trame 802.3 + LLC : diagramme de bits et arbre Wireshark synchronisés</span><span data-l="en">802.3 + LLC frame: synchronised bit diagram and Wireshark tree</span><span data-l="nl">802.3 + LLC-frame: gesynchroniseerd bitdiagram en Wireshark-boom</span><span data-l="de">802.3 + LLC-Rahmen: synchronisiertes Bitdiagramm und Wireshark-Baum</span></span><span class="s"><span data-l="fr">Exemple généré par tools/packet-builder.py (64 octets, FCS calculé), adresses MAC de documentation.</span><span data-l="en">Sample generated by tools/packet-builder.py (64 bytes, computed FCS), documentation MAC addresses.</span><span data-l="nl">Voorbeeld gegenereerd door tools/packet-builder.py (64 bytes, berekende FCS), documentatie-MAC-adressen.</span><span data-l="de">Beispiel erzeugt mit tools/packet-builder.py (64 Byte, berechnete FCS), Dokumentations-MAC-Adressen.</span></span></figcaption>
@@ -1135,9 +1213,9 @@ window.NPE = (function () {
       <script>NPE.packet("eth-llc");</script>
     </article>
 
-    <article class="packet" data-packet="eth-snap" aria-labelledby="h-pkt-eth-snap">
+    <article class="packet" id="pkt-eth-snap" data-packet="eth-snap" aria-labelledby="h-pkt-eth-snap">
       <h3 id="h-pkt-eth-snap">IEEE 802.3 + LLC + SNAP: IPv4 (RFC 1042)</h3>
-      <ul class="packet-meta" data-ref="IEEE 802.3 §3.2.3, RFC 9542 §2.1"></ul>
+      <ul class="packet-meta" data-ref="IEEE 802.3 §3.2.3, RFC 9542 §2.1"><li>64 <span data-l="fr">octets</span><span data-l="en">bytes</span><span data-l="nl">bytes</span><span data-l="de">Byte</span></li><li>Physical medium, Length field, DSAP/SSAP 0xAA, OUI 00-00-00</li><li>IEEE 802.3 §3.2.3, RFC 9542 §2.1</li></ul>
       <p><span data-l="fr">SNAP (DSAP/SSAP 0xAA, contrôle 0x03) ajoute 5 octets : un OUI et un Protocol ID. Avec l'OUI 00-00-00, le PID est un EtherType : c'est ainsi que RFC 1042 transporte IPv4 sur des réseaux 802 sans EtherType natif (FDDI, Token Ring, 802.11 en interne). L'en-tête coûte 8 octets de plus qu'Ethernet II.</span><span data-l="en">SNAP (DSAP/SSAP 0xAA, control 0x03) adds 5 octets: an OUI and a Protocol ID. With OUI 00-00-00, the PID is an EtherType: this is how RFC 1042 carries IPv4 over 802 networks with no native EtherType (FDDI, Token Ring, 802.11 internally). The header costs 8 octets more than Ethernet II.</span><span data-l="nl">SNAP (DSAP/SSAP 0xAA, control 0x03) voegt 5 octetten toe: een OUI en een Protocol ID. Met OUI 00-00-00 is de PID een EtherType: zo transporteert RFC 1042 IPv4 over 802-netwerken zonder eigen EtherType (FDDI, Token Ring, intern bij 802.11). De header kost 8 octetten meer dan Ethernet II.</span><span data-l="de">SNAP (DSAP/SSAP 0xAA, Control 0x03) fügt 5 Oktette hinzu: einen OUI und eine Protocol ID. Mit OUI 00-00-00 ist die PID ein EtherType: So transportiert RFC 1042 IPv4 über 802-Netze ohne eigenen EtherType (FDDI, Token Ring, intern bei 802.11). Der Header kostet 8 Oktette mehr als Ethernet II.</span></p>
       <figure class="diagram">
         <figcaption><span class="t"><span data-l="fr">Trame 802.3 + LLC + SNAP : diagramme de bits et arbre Wireshark synchronisés</span><span data-l="en">802.3 + LLC + SNAP frame: synchronised bit diagram and Wireshark tree</span><span data-l="nl">802.3 + LLC + SNAP-frame: gesynchroniseerd bitdiagram en Wireshark-boom</span><span data-l="de">802.3 + LLC + SNAP-Rahmen: synchronisiertes Bitdiagramm und Wireshark-Baum</span></span><span class="s"><span data-l="fr">Exemple généré par tools/packet-builder.py (64 octets, FCS calculé), adresses MAC de documentation.</span><span data-l="en">Sample generated by tools/packet-builder.py (64 bytes, computed FCS), documentation MAC addresses.</span><span data-l="nl">Voorbeeld gegenereerd door tools/packet-builder.py (64 bytes, berekende FCS), documentatie-MAC-adressen.</span><span data-l="de">Beispiel erzeugt mit tools/packet-builder.py (64 Byte, berechnete FCS), Dokumentations-MAC-Adressen.</span></span></figcaption>
@@ -1171,9 +1249,9 @@ window.NPE = (function () {
       <script>NPE.packet("eth-snap");</script>
     </article>
 
-    <article class="packet" data-packet="eth-dot1q" aria-labelledby="h-pkt-eth-dot1q">
+    <article class="packet" id="pkt-eth-dot1q" data-packet="eth-dot1q" aria-labelledby="h-pkt-eth-dot1q">
       <h3 id="h-pkt-eth-dot1q">IEEE 802.1Q: C-TAG (VLAN 100, PCP 5)</h3>
-      <ul class="packet-meta" data-ref="IEEE 802.3 §3.2.3, RFC 9542 §2.1"></ul>
+      <ul class="packet-meta" data-ref="IEEE 802.3 §3.2.3, RFC 9542 §2.1"><li>64 <span data-l="fr">octets</span><span data-l="en">bytes</span><span data-l="nl">bytes</span><span data-l="de">Byte</span></li><li>Physical medium, TPID 0x8100, inner EtherType 0x0800</li><li>IEEE 802.3 §3.2.3, RFC 9542 §2.1</li></ul>
       <p><span data-l="fr">Le tag de 4 octets s'insère entre l'adresse source et le Length/Type d'origine. Le TPID 0x8100 occupe la position d'un EtherType : un équipement sans support VLAN voit un protocole inconnu. Le padding n'est plus que de 14 octets, car le tag compte dans les 60 octets minimaux. Quand un pont retire le tag, il doit recalculer le FCS et, si besoin, compléter le padding (802.1Q §6.9).</span><span data-l="en">The 4-octet tag is inserted between the source address and the original Length/Type. TPID 0x8100 sits where an EtherType would be: a VLAN-unaware device sees an unknown protocol. Padding drops to 14 octets because the tag counts towards the 60-octet minimum. When a bridge removes the tag, it must recompute the FCS and pad again if needed (802.1Q §6.9).</span><span data-l="nl">De tag van 4 octetten wordt ingevoegd tussen het bronadres en het oorspronkelijke Length/Type. TPID 0x8100 staat op de plaats van een EtherType: een apparaat zonder VLAN-ondersteuning ziet een onbekend protocol. De padding daalt tot 14 octetten omdat de tag meetelt voor het minimum van 60 octetten. Verwijdert een bridge de tag, dan moet ze de FCS herberekenen en zo nodig opnieuw padden (802.1Q §6.9).</span><span data-l="de">Der 4-Oktett-Tag wird zwischen Quelladresse und ursprünglichem Length/Type eingefügt. Die TPID 0x8100 steht an der Stelle eines EtherType: Ein Gerät ohne VLAN-Unterstützung sieht ein unbekanntes Protokoll. Das Padding sinkt auf 14 Oktette, weil der Tag zum Minimum von 60 Oktetten zählt. Entfernt eine Bridge den Tag, muss sie die FCS neu berechnen und bei Bedarf erneut auffüllen (802.1Q §6.9).</span></p>
       <figure class="diagram">
         <figcaption><span class="t"><span data-l="fr">Trame 802.1Q : diagramme de bits et arbre Wireshark synchronisés</span><span data-l="en">802.1Q frame: synchronised bit diagram and Wireshark tree</span><span data-l="nl">802.1Q-frame: gesynchroniseerd bitdiagram en Wireshark-boom</span><span data-l="de">802.1Q-Rahmen: synchronisiertes Bitdiagramm und Wireshark-Baum</span></span><span class="s"><span data-l="fr">Exemple généré par tools/packet-builder.py (64 octets, FCS calculé), adresses MAC de documentation.</span><span data-l="en">Sample generated by tools/packet-builder.py (64 bytes, computed FCS), documentation MAC addresses.</span><span data-l="nl">Voorbeeld gegenereerd door tools/packet-builder.py (64 bytes, berekende FCS), documentatie-MAC-adressen.</span><span data-l="de">Beispiel erzeugt mit tools/packet-builder.py (64 Byte, berechnete FCS), Dokumentations-MAC-Adressen.</span></span></figcaption>
@@ -1207,9 +1285,9 @@ window.NPE = (function () {
       <script>NPE.packet("eth-dot1q");</script>
     </article>
 
-    <article class="packet" data-packet="eth-qinq" aria-labelledby="h-pkt-eth-qinq">
+    <article class="packet" id="pkt-eth-qinq" data-packet="eth-qinq" aria-labelledby="h-pkt-eth-qinq">
       <h3 id="h-pkt-eth-qinq">IEEE 802.1ad Q-in-Q: S-TAG 200 + C-TAG 100</h3>
-      <ul class="packet-meta" data-ref="IEEE 802.3 §3.2.3, RFC 9542 §2.1"></ul>
+      <ul class="packet-meta" data-ref="IEEE 802.3 §3.2.3, RFC 9542 §2.1"><li>64 <span data-l="fr">octets</span><span data-l="en">bytes</span><span data-l="nl">bytes</span><span data-l="de">Byte</span></li><li>Physical medium, TPID 0x88A8 then 0x8100</li><li>IEEE 802.3 §3.2.3, RFC 9542 §2.1</li></ul>
       <p><span data-l="fr">Le fournisseur pousse un S-TAG (TPID 0x88A8, VLAN de service 200) devant le C-TAG du client, qui traverse intact. La trame grossit de 8 octets : une trame client de 1522 octets en fait 1526 dans le cœur, d'où une MTU de cœur ≥ 1526 (souvent 9216). Le bit DEI du S-TAG sert au marquage de couleur (trafic hors profil).</span><span data-l="en">The provider pushes an S-TAG (TPID 0x88A8, service VLAN 200) in front of the customer's C-TAG, which crosses untouched. The frame grows by 8 octets: a 1522-octet customer frame becomes 1526 in the core, hence a core MTU ≥ 1526 (often 9216). The S-TAG DEI bit is used for colour marking (out-of-profile traffic).</span><span data-l="nl">De provider plaatst een S-TAG (TPID 0x88A8, service-VLAN 200) vóór de C-TAG van de klant, die ongewijzigd doorgaat. Het frame groeit met 8 octetten: een klantframe van 1522 octetten wordt 1526 in de core, vandaar een core-MTU ≥ 1526 (vaak 9216). Het DEI-bit van de S-TAG dient voor kleurmarkering (verkeer buiten profiel).</span><span data-l="de">Der Provider setzt einen S-TAG (TPID 0x88A8, Service-VLAN 200) vor den C-TAG des Kunden, der unverändert durchläuft. Der Rahmen wächst um 8 Oktette: Ein 1522-Oktett-Kundenrahmen wird im Core zu 1526, daher eine Core-MTU ≥ 1526 (oft 9216). Das DEI-Bit des S-TAG dient der Farbmarkierung (Verkehr außerhalb des Profils).</span></p>
       <figure class="diagram">
         <figcaption><span class="t"><span data-l="fr">Trame Q-in-Q : diagramme de bits et arbre Wireshark synchronisés</span><span data-l="en">Q-in-Q frame: synchronised bit diagram and Wireshark tree</span><span data-l="nl">Q-in-Q-frame: gesynchroniseerd bitdiagram en Wireshark-boom</span><span data-l="de">Q-in-Q-Rahmen: synchronisiertes Bitdiagramm und Wireshark-Baum</span></span><span class="s"><span data-l="fr">Exemple généré par tools/packet-builder.py (64 octets, FCS calculé), adresses MAC de documentation.</span><span data-l="en">Sample generated by tools/packet-builder.py (64 bytes, computed FCS), documentation MAC addresses.</span><span data-l="nl">Voorbeeld gegenereerd door tools/packet-builder.py (64 bytes, berekende FCS), documentatie-MAC-adressen.</span><span data-l="de">Beispiel erzeugt mit tools/packet-builder.py (64 Byte, berechnete FCS), Dokumentations-MAC-Adressen.</span></span></figcaption>
@@ -1243,9 +1321,9 @@ window.NPE = (function () {
       <script>NPE.packet("eth-qinq");</script>
     </article>
 
-    <article class="packet" data-packet="eth-pause" aria-labelledby="h-pkt-eth-pause">
+    <article class="packet" id="pkt-eth-pause" data-packet="eth-pause" aria-labelledby="h-pkt-eth-pause">
       <h3 id="h-pkt-eth-pause">MAC Control PAUSE (IEEE 802.3x / Annex 31B)</h3>
-      <ul class="packet-meta" data-ref="IEEE 802.3 §3.2.3, RFC 9542 §2.1"></ul>
+      <ul class="packet-meta" data-ref="IEEE 802.3 §3.2.3, RFC 9542 §2.1"><li>64 <span data-l="fr">octets</span><span data-l="en">bytes</span><span data-l="nl">bytes</span><span data-l="de">Byte</span></li><li>Physical medium, EtherType 0x8808, to 01-80-C2-00-00-01</li><li>IEEE 802.3 §3.2.3, RFC 9542 §2.1</li></ul>
       <p><span data-l="fr">Le récepteur saturé demande à son voisin direct de suspendre l'émission pendant pause_time x 512 bit times. 0xFFFF ≈ 3,36 ms à 10 Gb/s ; 0 annule une pause en cours. La trame est consommée par la MAC du port voisin et n'est jamais relayée. Elle bloque tout le trafic du lien, toutes priorités confondues.</span><span data-l="en">The congested receiver asks its direct neighbour to stop transmitting for pause_time x 512 bit times. 0xFFFF ≈ 3.36 ms at 10 Gb/s; 0 cancels an ongoing pause. The frame is consumed by the neighbour port's MAC and never relayed. It stops all traffic on the link, regardless of priority.</span><span data-l="nl">De overbelaste ontvanger vraagt zijn directe buur om het zenden te onderbreken gedurende pause_time x 512 bit times. 0xFFFF ≈ 3,36 ms bij 10 Gb/s; 0 heft een lopende pauze op. Het frame wordt door de MAC van de buurpoort verwerkt en nooit doorgestuurd. Het stopt al het verkeer op de link, ongeacht de prioriteit.</span><span data-l="de">Der überlastete Empfänger fordert seinen direkten Nachbarn auf, für pause_time x 512 Bit times nicht mehr zu senden. 0xFFFF ≈ 3,36 ms bei 10 Gb/s; 0 hebt eine laufende Pause auf. Der Rahmen wird von der MAC des Nachbarports verarbeitet und nie weitergeleitet. Er stoppt den gesamten Verkehr auf dem Link, unabhängig von der Priorität.</span></p>
       <figure class="diagram">
         <figcaption><span class="t"><span data-l="fr">Trame PAUSE : diagramme de bits et arbre Wireshark synchronisés</span><span data-l="en">PAUSE frame: synchronised bit diagram and Wireshark tree</span><span data-l="nl">PAUSE-frame: gesynchroniseerd bitdiagram en Wireshark-boom</span><span data-l="de">PAUSE-Rahmen: synchronisiertes Bitdiagramm und Wireshark-Baum</span></span><span class="s"><span data-l="fr">Exemple généré par tools/packet-builder.py (64 octets, FCS calculé), adresses MAC de documentation.</span><span data-l="en">Sample generated by tools/packet-builder.py (64 bytes, computed FCS), documentation MAC addresses.</span><span data-l="nl">Voorbeeld gegenereerd door tools/packet-builder.py (64 bytes, berekende FCS), documentatie-MAC-adressen.</span><span data-l="de">Beispiel erzeugt mit tools/packet-builder.py (64 Byte, berechnete FCS), Dokumentations-MAC-Adressen.</span></span></figcaption>
@@ -1279,9 +1357,9 @@ window.NPE = (function () {
       <script>NPE.packet("eth-pause");</script>
     </article>
 
-    <article class="packet" data-packet="eth-pfc" aria-labelledby="h-pkt-eth-pfc">
+    <article class="packet" id="pkt-eth-pfc" data-packet="eth-pfc" aria-labelledby="h-pkt-eth-pfc">
       <h3 id="h-pkt-eth-pfc">Priority-based Flow Control (IEEE 802.1Qbb / Annex 31D)</h3>
-      <ul class="packet-meta" data-ref="IEEE 802.3 §3.2.3, RFC 9542 §2.1"></ul>
+      <ul class="packet-meta" data-ref="IEEE 802.3 §3.2.3, RFC 9542 §2.1"><li>64 <span data-l="fr">octets</span><span data-l="en">bytes</span><span data-l="nl">bytes</span><span data-l="de">Byte</span></li><li>Physical medium, EtherType 0x8808, opcode 0x0101</li><li>IEEE 802.3 §3.2.3, RFC 9542 §2.1</li></ul>
       <p><span data-l="fr">PFC pause chaque classe de priorité indépendamment. Le vecteur d'activation indique quels champs Time(n) sont valides : ici seule la priorité 3 (souvent RoCEv2/FCoE) est pausée ; les champs Time des autres priorités sont présents mais ignorés. Les huit champs sont toujours transmis.</span><span data-l="en">PFC pauses each priority class independently. The enable vector states which Time(n) fields are valid: here only priority 3 (often RoCEv2/FCoE) is paused; the other priorities' Time fields are present but ignored. All eight fields are always sent.</span><span data-l="nl">PFC pauzeert elke prioriteitsklasse afzonderlijk. De enable-vector geeft aan welke Time(n)-velden geldig zijn: hier wordt alleen prioriteit 3 (vaak RoCEv2/FCoE) gepauzeerd; de Time-velden van de andere prioriteiten zijn aanwezig maar worden genegeerd. Alle acht velden worden altijd verzonden.</span><span data-l="de">PFC pausiert jede Prioritätsklasse einzeln. Der Enable-Vektor gibt an, welche Time(n)-Felder gültig sind: Hier wird nur Priorität 3 (oft RoCEv2/FCoE) pausiert; die Time-Felder der anderen Prioritäten sind vorhanden, werden aber ignoriert. Alle acht Felder werden immer gesendet.</span></p>
       <figure class="diagram">
         <figcaption><span class="t"><span data-l="fr">Trame PFC : diagramme de bits et arbre Wireshark synchronisés</span><span data-l="en">PFC frame: synchronised bit diagram and Wireshark tree</span><span data-l="nl">PFC-frame: gesynchroniseerd bitdiagram en Wireshark-boom</span><span data-l="de">PFC-Rahmen: synchronisiertes Bitdiagramm und Wireshark-Baum</span></span><span class="s"><span data-l="fr">Exemple généré par tools/packet-builder.py (64 octets, FCS calculé), adresses MAC de documentation.</span><span data-l="en">Sample generated by tools/packet-builder.py (64 bytes, computed FCS), documentation MAC addresses.</span><span data-l="nl">Voorbeeld gegenereerd door tools/packet-builder.py (64 bytes, berekende FCS), documentatie-MAC-adressen.</span><span data-l="de">Beispiel erzeugt mit tools/packet-builder.py (64 Byte, berechnete FCS), Dokumentations-MAC-Adressen.</span></span></figcaption>
@@ -1314,6 +1392,8 @@ window.NPE = (function () {
       </script>
       <script>NPE.packet("eth-pfc");</script>
     </article>
+    </div>
+    <script>NPE.pktset("eth-frames");</script>
 <h3 id="values"><span data-l="fr">Tables de valeurs</span><span data-l="en">Value tables</span><span data-l="nl">Waardetabellen</span><span data-l="de">Wertetabellen</span></h3>
 <div class="table-wrap" tabindex="0"><table>
 <caption><span data-l="fr">Adresses MAC : plages et valeurs remarquables</span><span data-l="en">MAC addresses: ranges and notable values</span><span data-l="nl">MAC-adressen: bereiken en bijzondere waarden</span><span data-l="de">MAC-Adressen: Bereiche und besondere Werte</span></caption>
@@ -1767,7 +1847,7 @@ window.NPE = (function () {
 
 <section class="sec" id="vendors" aria-labelledby="h-vendors">
 <details open>
-<summary><h2 id="h-vendors"><span class="num">5</span><span data-l="fr">Configuration et vérification multi-constructeurs</span><span data-l="en">Multi-vendor configuration and verification</span><span data-l="nl">Configuratie en verificatie per vendor</span><span data-l="de">Herstellerübergreifende Konfiguration und Verifikation</span></h2></summary>
+<summary><h2 id="h-vendors"><span class="num">5</span><span data-l="fr">Configuration et vérification multi-constructeurs</span><span data-l="en">Multi-vendor configuration and verification</span><span data-l="nl">Configuratie en verificatie per vendor</span><span data-l="de">Hersteller&shy;übergreifende Konfiguration und Verifikation</span></h2></summary>
 
 
 

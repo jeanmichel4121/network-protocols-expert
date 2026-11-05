@@ -12,6 +12,17 @@ Versioning rules for this library:
 ## [Unreleased]
 
 ### Added
+- Published chapters (ADR 0009): every protocol page is also published as an overview
+  (header and one card per chapter), one URL per section with the chapter list,
+  breadcrumb and previous/next links, and a full version for print (`noindex`). The source
+  stays one self-contained file; links to anchors in another chapter are rewritten, the
+  sitemap lists every chapter and `check_site.py` checks that each one is linked.
+- Template packet set (`NPE.pktset`): the sample packets of a section are tabs, one packet
+  shown at a time (the Ethernet formats go from about 20,000 px to 8,000 px); a link into a
+  packet opens its tab; all packets are shown without JavaScript and in print. The tab list
+  and each packet's chips line are written in the page by `tools/packet-builder.py --update`
+  (checked by `check_pages.py`), so a page rendered progressively over a slow link does not
+  shift (the Ethernet formats chapter measured a CLS of 0.28 that way).
 - Ethernet page (`protocols/ethernet/`): Ethernet II, IEEE 802.3 LLC and SNAP, IEEE 802.1Q
   C-TAG and Q-in-Q, MAC Control PAUSE and PFC; eight sample frames from
   `tools/packet-builder.py` (FCS and CRC residue checked), three step-by-step animations,
@@ -41,8 +52,15 @@ Versioning rules for this library:
   disappear after another (`data-until`).
 - Template: inline markers `.tag.vend` (vendor deviation) and `.tag.err` (not supported or
   not documented), muted comments in command blocks.
+- Browser smoke test: pages checked in parallel (`SMOKE_WORKERS`, default 4), one browser
+  per worker thread; the CI job uses 2, as the NAS runner gives a job 1 GB of memory (4
+  browsers crash there).
+- Table of contents: a wrapped entry keeps its indent after the chapter number.
+
 
 ### Fixed
+- Headings break a word that is longer than the line (German compounds in a chapter title
+  overflowed by 8 px at 360 px).
 - Template: animation control icons were drawn at the width of the diagram (480 px)
   instead of 18 px; packet comment without `--`, which is invalid inside an HTML comment.
 - Template: example router IDs moved to the RFC 5737 range (198.51.100.1/2 instead of

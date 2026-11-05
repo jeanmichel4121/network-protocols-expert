@@ -10,6 +10,8 @@ Serves the site directory (default: public/) on a local port and, in headless Ch
   the URL to the matching language; canonical + hreflang (4 + x-default) are consistent;
 - mobile: no horizontal page scroll at 360 px;
 - the root page sends the visitor to a language.
+Pages are checked in parallel (SMOKE_WORKERS, default 4): one Playwright instance and one
+browser per worker thread, as Playwright requires (its API is not thread-safe).
 axe-core is downloaded once from the npm registry at a pinned version and verified
 against its pinned sha512 integrity before use.
 Exit code 1 if any page fails.
@@ -21,12 +23,14 @@ import hashlib
 import http.server
 import io
 import json
+import os
 import pathlib
 import re
 import sys
 import tarfile
 import threading
 import urllib.request
+from concurrent.futures import ThreadPoolExecutor
 
 from playwright.sync_api import sync_playwright
 
@@ -37,6 +41,7 @@ AXE_INTEGRITY = (
 )
 AXE_TAGS = ["wcag2a", "wcag2aa", "wcag21a", "wcag21aa", "wcag22aa"]
 CLS_BUDGET = 0.1
+WORKERS = max(1, int(os.environ.get("SMOKE_WORKERS", "4")))
 CACHE = pathlib.Path(".cache")
 
 CLS_PROBE = """
@@ -202,6 +207,22 @@ def check_root(browser, base: str) -> list:
     return errors
 
 
+def check_chunk(base: str, axe: str, rels: list) -> list:
+    with sync_playwright() as pw:
+        browser = pw.chromium.launch()
+        out = [(rel, check_page(browser, base, rel, axe)) for rel in rels]
+        browser.close()
+    return out
+
+
+def check_root_page(base: str) -> list:
+    with sync_playwright() as pw:
+        browser = pw.chromium.launch()
+        errors = check_root(browser, base)
+        browser.close()
+    return errors
+
+
 def main() -> int:
     root = pathlib.Path(sys.argv[1] if len(sys.argv) > 1 else "public").resolve()
     pages = sorted(
@@ -215,11 +236,12 @@ def main() -> int:
     axe = axe_source()
     srv, base = serve(root)
     failed = 0
-    with sync_playwright() as pw:
-        browser = pw.chromium.launch()
-        results = [("index.html", check_root(browser, base) if (root / "index.html").exists() else [])]
-        results += [(rel, check_page(browser, base, rel, axe)) for rel in pages]
-        browser.close()
+    chunks = [pages[k::WORKERS] for k in range(WORKERS) if pages[k::WORKERS]]
+    with ThreadPoolExecutor(max_workers=len(chunks) + 1) as pool:
+        root_job = pool.submit(check_root_page, base) if (root / "index.html").exists() else None
+        jobs = [pool.submit(check_chunk, base, axe, chunk) for chunk in chunks]
+        results = [("index.html", root_job.result() if root_job else [])]
+        results += sorted(r for job in jobs for r in job.result())
     srv.shutdown()
     for rel, errs in results:
         if errs:

@@ -12,8 +12,8 @@ body:
     id: url
     attributes:
       label: Page URL
-      description: Copy the address, including the section anchor if possible.
-      placeholder: https://learning.cuvelier.tech/en/ethernet/#packets
+      description: Copy the address of the chapter, including the anchor if there is one.
+      placeholder: https://learning.cuvelier.tech/en/ethernet/packets/
     validations:
       required: true
   - type: dropdown

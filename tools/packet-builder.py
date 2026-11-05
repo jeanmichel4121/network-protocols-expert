@@ -10,6 +10,7 @@ Usage:
 """
 
 import argparse
+import html
 import ipaddress
 import json
 import pathlib
@@ -804,7 +805,7 @@ def main() -> int:
     p.add_argument(
         "--update",
         metavar="HTML",
-        help="rewrite the data-packet JSON blocks of a page with the current samples",
+        help="rewrite the data-packet JSON blocks, chips lines and packet tab lists of a page",
     )
     p.add_argument(
         "--embed",
@@ -829,6 +830,17 @@ def main() -> int:
 PACKET_BLOCK = re.compile(
     r'(<script type="application/json" data-packet="([a-z0-9-]+)">)(.*?)(</script>)', re.S
 )
+# Markup of templates/protocol-template.html: a packet article (with what precedes it), its chips
+# line, a packet set and the set's tab list.
+PACKET_ARTICLE = re.compile(
+    r"(?:\s|<!--.*?-->)*"
+    r'<article class="packet"(?: id="([^"]+)")? data-packet="([a-z0-9-]+)"[^>]*>.*?</article>',
+    re.S,
+)
+CHIPS = re.compile(r'(<ul class="packet-meta"(?: data-ref="([^"]*)")?>).*?(</ul>)', re.S)
+PACKET_SET = re.compile(r'<div class="pkt-set" id="[a-z0-9-]+">')
+SET_TABS = re.compile(r'\s*<div role="tablist" data-aria="packets"[^>]*>.*?</div>', re.S)
+BYTES = (("fr", "octets"), ("en", "bytes"), ("nl", "bytes"), ("de", "Byte"))  # the template's "bytes"
 
 
 def update(path: str) -> int:
@@ -839,10 +851,69 @@ def update(path: str) -> int:
     if unknown:
         print(f"unknown sample(s) in {path}: {', '.join(unknown)}")
         return 1
-    new, n = PACKET_BLOCK.subn(lambda m: m.group(1) + embed(m.group(2)) + m.group(4), text)
-    page.write_text(new, encoding="utf-8")
-    print(f"{path}: {n} packet block(s) updated")
+    page.write_text(rewrite(text), encoding="utf-8")
+    print(f"{path}: {len(PACKET_BLOCK.findall(text))} packet block(s), chips lines and tab lists updated")
     return 0
+
+
+def rewrite(text: str) -> str:
+    """The page with every value taken from the samples written in: the data-packet JSON blocks,
+    each packet's chips line and each packet set's tab list. Written in the markup rather than
+    by the page script, they are there from the first paint: a page that renders progressively
+    (slow link, busy CPU) does not shift. Unknown samples are left as they are."""
+    text = PACKET_BLOCK.sub(
+        lambda m: m.group(1) + embed(m.group(2)) + m.group(4) if m.group(2) in SAMPLES else m.group(0), text
+    )
+    text = PACKET_ARTICLE.sub(with_chips, text)
+    out, pos = [], 0
+    for m in PACKET_SET.finditer(text):
+        tabs = SET_TABS.match(text, m.end())
+        arts, end = [], tabs.end() if tabs else m.end()
+        while a := PACKET_ARTICLE.match(text, end):
+            arts.append(a)
+            end = a.end()
+        body = "".join(a.group(0) if a.group(1) else with_id(a.group(0), a.group(2)) for a in arts)
+        out += [text[pos : m.end()], tablist(arts) if len(arts) > 1 else "", body]
+        pos = end
+    return "".join(out) + text[pos:]
+
+
+def with_chips(m: re.Match) -> str:
+    """A packet article with its chips line: length, encapsulation and the page's reference."""
+    sample = m.group(2)
+    if sample not in SAMPLES:
+        return m.group(0)
+    s = SAMPLES[sample]()
+    unit = "".join(f'<span data-l="{lang}">{word}</span>' for lang, word in BYTES)
+
+    def line(c: re.Match) -> str:
+        items = [f"{s['length']} {unit}", html.escape(s["encapsulation"], quote=False), c.group(2) or ""]
+        return c.group(1) + "".join(f"<li>{item}</li>" for item in items if item) + c.group(3)
+
+    return CHIPS.sub(line, m.group(0), count=1)
+
+
+def with_id(article: str, sample: str) -> str:
+    """The id NPE.pktset gives a packet of a set (aria-controls of its tab)."""
+    old = '<article class="packet" data-packet='
+    return article.replace(old, f'<article class="packet" id="pkt-{sample}" data-packet=', 1)
+
+
+def tablist(arts: list) -> str:
+    """Tab list of a packet set, adopted by NPE.pktset. Label: data-tab on the article, else the
+    sample's message; the first tab is selected, the others leave the tab order (roving tabindex)."""
+    tabs = []
+    for k, a in enumerate(arts):
+        sample = a.group(2)
+        tag = re.search(r"<article\b[^>]*>", a.group(0)).group(0)
+        own = re.search(r'\sdata-tab="([^"]*)"', tag)
+        label = own.group(1) if own else html.escape(SAMPLES[sample]()["message"], quote=False)
+        state = 'aria-selected="true"' if k == 0 else 'aria-selected="false" tabindex="-1"'
+        tabs.append(
+            f'<button type="button" role="tab" id="tab-{sample}" data-pkt="{sample}" '
+            f'aria-controls="{a.group(1) or "pkt-" + sample}" {state}>{label}</button>'
+        )
+    return '<div role="tablist" data-aria="packets" aria-label="Sample packets">' + "".join(tabs) + "</div>"
 
 
 def embed(sample: str) -> str:

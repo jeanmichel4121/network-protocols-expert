@@ -3,15 +3,21 @@
 
 Each source page holds the four languages and switches in place (CLAUDE.md). Search
 engines index one language per URL (Google: "use different URLs for each language
-version"), so every page is written four times:
+version"), so every page is written four times. A protocol page is also split into its
+chapters, one URL each (ADR 0009), so a reader gets one chapter at a time:
 
-    public/<lang>/index.html            home, <html lang> = <lang>
-    public/<lang>/<slug>/index.html     protocol pages
+    public/<lang>/index.html                  home, <html lang> = <lang>
+    public/<lang>/<slug>/index.html           overview: header, chapter cards
+    public/<lang>/<slug>/<chapter>/index.html one section (concepts, packets, ...)
+    public/<lang>/<slug>/all/index.html       the whole page, for print (noindex)
 
-Each copy gets <html lang>, <title>, description, canonical, hreflang alternates
-(+ x-default), Open Graph and JSON-LD for its language, taken from the page's
-<script type="application/json" id="page-meta">. Also written: a root language
-chooser (/), 404.html, sitemap.xml, robots.txt, version.txt and security.txt (RFC 9116).
+Chapter pages keep the page's shared CSS/JS (they stay self-contained), get the chapter
+list and previous/next links, and every #anchor that moved to another chapter is
+rewritten to that chapter's URL. Each copy gets <html lang>, <title>, description,
+canonical, hreflang alternates (+ x-default), Open Graph and JSON-LD for its language,
+taken from the page's <script type="application/json" id="page-meta">. Also written: a
+root language chooser (/), 404.html, sitemap.xml, robots.txt, version.txt and
+security.txt (RFC 9116).
 
 Usage: build_site.py [OUT_DIR]   (env SITE_URL, default https://learning.cuvelier.tech)
 Standard library only.
@@ -92,6 +98,15 @@ def head_tags(meta: dict, lang: str, path: str) -> str:
             "keywords": ", ".join(meta.get("tags", [])),
             "isPartOf": {"@type": "WebSite", "name": BRAND, "url": f"{SITE}/"},
         }
+        # Chapters belong to their protocol overview, which lists them.
+        if meta.get("part_of"):
+            name, ppath = meta["part_of"][lang], meta["part_of_path"]
+            ld["isPartOf"] = {"@type": "LearningResource", "name": name, "url": url(lang, ppath)}
+        if meta.get("parts"):
+            ld["hasPart"] = [
+                {"@type": "LearningResource", "name": p["title"][lang], "url": url(lang, p["path"])}
+                for p in meta["parts"]
+            ]
         if meta.get("updated"):
             ld["dateModified"] = meta["updated"]
     ld["license"] = "https://creativecommons.org/licenses/by-sa/4.0/"
@@ -136,11 +151,24 @@ def localise(text: str, meta: dict, lang: str, path: str, home_href: str) -> str
         r'<meta name="description" content="[^"]*">',
         lambda _: (
             f'<meta name="description" content="{esc(meta["description"][lang])}">\n'
+            + ('<meta name="robots" content="noindex">\n' if meta.get("noindex") else "")
             + head_tags(meta, lang, path)
         ),
         head,
         count=1,
     )
+    if meta.get("kind") in ("chapter", "all"):
+        # The in-page language switch retitles the page from #page-meta: give it this page's titles.
+        js_meta = {k: meta[k] for k in ("slug", "name", "kind", "title", "description") if k in meta}
+        head = META_RE.sub(
+            lambda _: (
+                '<script type="application/json" id="page-meta">\n'
+                + json.dumps(js_meta, ensure_ascii=False)
+                + "\n</script>"
+            ),
+            head,
+            count=1,
+        )
     body = re.sub(
         r'href="[^"#]*((?:#[^"]*)?)" data-home', lambda m: f'href="{home_href}{m.group(1)}" data-home', body
     )
@@ -162,6 +190,409 @@ def card(meta: dict, slug: str) -> str:
         f'<span class="pname">{html.escape(meta.get("name", slug))}</span>'
         f'{per_lang("title", "pt")}{per_lang("description", "pd")}<span class="tags">{tags}</span></a></li>'
     )
+
+
+# ----- Chapters (ADR 0009) ------------------------------------------------------------------
+
+WORDS = {
+    "overview": {"fr": "Vue d'ensemble", "en": "Overview", "nl": "Overzicht", "de": "Überblick"},
+    "chapters": {"fr": "Chapitres", "en": "Chapters", "nl": "Hoofdstukken", "de": "Kapitel"},
+    "all": {
+        "fr": "Version complète (une page)",
+        "en": "Full version (one page)",
+        "nl": "Volledige versie (één pagina)",
+        "de": "Vollständige Fassung (eine Seite)",
+    },
+    "all_note": {
+        "fr": "pour l'impression ou une lecture d'une traite",
+        "en": "to print or to read in one go",
+        "nl": "om af te drukken of in één keer te lezen",
+        "de": "zum Drucken oder zum Lesen am Stück",
+    },
+    "all_short": {
+        "fr": "version complète",
+        "en": "full version",
+        "nl": "volledige versie",
+        "de": "vollständige Fassung",
+    },
+    "prev": {"fr": "Précédent", "en": "Previous", "nl": "Vorige", "de": "Zurück"},
+    "next": {"fr": "Suivant", "en": "Next", "nl": "Volgende", "de": "Weiter"},
+}
+SEP = {"fr": " : ", "en": ": ", "nl": ": ", "de": ": "}
+# What each chapter holds: the card text on the overview and the description of the chapter URL.
+CHAPTER_DESC = {
+    "concepts": {
+        "fr": "rôle, place dans la pile, terminologie, compromis de conception et variantes.",
+        "en": "purpose, place in the stack, terminology, design trade-offs and variants.",
+        "nl": "doel, plaats in de stack, terminologie, ontwerpafwegingen en varianten.",
+        "de": "Zweck, Einordnung im Stack, Terminologie, Designabwägungen und Varianten.",
+    },
+    "packets": {
+        "fr": "chaque format de message en diagramme de bits RFC et en arbre Wireshark synchronisés, "
+        "sur des paquets générés par script.",
+        "en": "every message format as a synchronised RFC bit diagram and Wireshark tree, "
+        "on script-generated packets.",
+        "nl": "elk berichtformaat als gesynchroniseerd RFC-bitdiagram en Wireshark-boom, "
+        "op door een script gegenereerde pakketten.",
+        "de": "jedes Nachrichtenformat als synchronisiertes RFC-Bitdiagramm und Wireshark-Baum, "
+        "an per Skript erzeugten Paketen.",
+    },
+    "operation": {
+        "fr": "fonctionnement pas à pas en animations numérotées, temporisateurs et valeurs par défaut.",
+        "en": "step-by-step operation in numbered animations, timers and defaults.",
+        "nl": "werking stap voor stap in genummerde animaties, timers en standaardwaarden.",
+        "de": "Funktionsweise Schritt für Schritt in nummerierten Animationen, Timer und Standardwerte.",
+    },
+    "advanced": {
+        "fr": "cas limites, interopérabilité, sécurité, limites d'échelle et ambiguïtés des normes.",
+        "en": "edge cases, interoperability, security, scaling limits and ambiguities in the standards.",
+        "nl": "randgevallen, interoperabiliteit, beveiliging, schaalgrenzen en dubbelzinnigheden "
+        "in de standaarden.",
+        "de": "Grenzfälle, Interoperabilität, Sicherheit, Skalierungsgrenzen und Mehrdeutigkeiten "
+        "der Standards.",
+    },
+    "vendors": {
+        "fr": "configuration, vérification et debug sur Cisco, Check Point, F5, Palo Alto, NetScaler et "
+        "FortiGate, chaque commande avec sa source.",
+        "en": "configuration, verification and debug on Cisco, Check Point, F5, Palo Alto, NetScaler and "
+        "FortiGate, every command with its source.",
+        "nl": "configuratie, verificatie en debug op Cisco, Check Point, F5, Palo Alto, NetScaler en "
+        "FortiGate, elk commando met zijn bron.",
+        "de": "Konfiguration, Verifikation und Debugging auf Cisco, Check Point, F5, Palo Alto, "
+        "NetScaler und "
+        "FortiGate, jeder Befehl mit Quelle.",
+    },
+    "troubleshooting": {
+        "fr": "arbre de décision oui/non et tableau des pannes fréquentes, "
+        "avec les commandes de vérification.",
+        "en": "yes/no decision tree and table of common faults, with the verification commands.",
+        "nl": "ja/nee-beslisboom en tabel met veelvoorkomende fouten, met de verificatiecommando's.",
+        "de": "Ja/Nein-Entscheidungsbaum und Tabelle häufiger Fehler, mit den Prüfbefehlen.",
+    },
+    "quiz": {
+        "fr": "questions de niveau expert, avec explication et référence pour chaque réponse.",
+        "en": "expert-level questions, with an explanation and a reference for every answer.",
+        "nl": "vragen op expertniveau, met uitleg en referentie bij elk antwoord.",
+        "de": "Fragen auf Expertenniveau, mit Erklärung und Referenz zu jeder Antwort.",
+    },
+    "sources": {
+        "fr": "normes, registres et documentation des vendeurs utilisés, avec les sections citées.",
+        "en": "standards, registries and vendor documents used, with the sections cited.",
+        "nl": "gebruikte standaarden, registers en vendordocumentatie, met de geciteerde secties.",
+        "de": "verwendete Standards, Register und Herstellerdokumente, mit den zitierten Abschnitten.",
+    },
+}
+# Counts shown on the chapter cards: (marker counted in the section, singular, plural).
+COUNTS = {
+    "packets": (
+        '<article class="packet"',
+        {"fr": "format", "en": "format", "nl": "formaat", "de": "Format"},
+        {"fr": "formats", "en": "formats", "nl": "formaten", "de": "Formate"},
+    ),
+    "operation": (
+        '<figure class="diagram anim"',
+        {"fr": "animation", "en": "animation", "nl": "animatie", "de": "Animation"},
+        {"fr": "animations", "en": "animations", "nl": "animaties", "de": "Animationen"},
+    ),
+    "vendors": (
+        '<div role="tabpanel"',  # not the noscript CSS selector [role="tabpanel"]
+        {"fr": "plateforme", "en": "platform", "nl": "platform", "de": "Plattform"},
+        {"fr": "plateformes", "en": "platforms", "nl": "platformen", "de": "Plattformen"},
+    ),
+    "quiz": (
+        '<fieldset class="quiz-q"',
+        {"fr": "question", "en": "question", "nl": "vraag", "de": "Frage"},
+        {"fr": "questions", "en": "questions", "nl": "vragen", "de": "Fragen"},
+    ),
+    "sources": (
+        '<li id="src-',
+        {"fr": "source", "en": "source", "nl": "bron", "de": "Quelle"},
+        {"fr": "sources", "en": "sources", "nl": "bronnen", "de": "Quellen"},
+    ),
+}
+ID_RE = re.compile(r'\sid="([^"]+)"')
+
+
+def spans(words: dict) -> str:
+    return "".join(f'<span data-l="{lang}">{html.escape(words[lang])}</span>' for lang in LANGS)
+
+
+def text_of(fragment: str, lang: str) -> str:
+    """Visible text of a fragment in one language (data-l blocks of the other languages dropped)."""
+    other = "|".join(x for x in LANGS if x != lang)
+    for _ in range(3):  # data-l blocks may nest one tag deep (<span data-l><code>...)
+        fragment = re.sub(rf'<(\w+)[^>]*\sdata-l="(?:{other})"[^>]*>.*?</\1>', "", fragment, flags=re.S)
+    return " ".join(html.unescape(re.sub(r"<[^>]+>", " ", fragment)).split())
+
+
+def link_free(fragment: str) -> str:
+    """A heading reused inside a link: no nested link, no duplicate id."""
+    return ID_RE.sub("", re.sub(r"</?a\b[^>]*>", "", fragment))
+
+
+def split_page(text: str, src: str) -> dict:
+    main = re.search(r'<main id="main" tabindex="-1">(.*?)</main>', text, re.S)
+    toc = re.search(r'<nav class="toc".*?</nav>\n?', text, re.S)
+    if not main or not toc or toc.start() < main.end():
+        sys.exit(f"{src}: expected <main id=main> followed by <nav class=toc>")
+    inner = main.group(1)
+    crumbs = re.search(r'<nav class="crumbs".*?</nav>', inner, re.S).group(0)
+    hero = re.search(r'<header class="hero">.*?</header>', inner, re.S).group(0)
+    sections = [
+        (m.group(1), m.group(0))
+        for m in re.finditer(r'<section class="sec" id="([a-z0-9-]+)"[^>]*>.*?</section>', inner, re.S)
+    ]
+    rest = inner.replace(crumbs, "").replace(hero, "")
+    for _, sec in sections:
+        rest = rest.replace(sec, "")
+    if re.sub(r"<!--.*?-->|\s", "", rest, flags=re.S):
+        sys.exit(f"{src}: content outside the hero and the <section class=sec> blocks: {rest.strip()[:80]}")
+    labels = {
+        m.group(1): (m.group(2), m.group(3))
+        for m in re.finditer(
+            r'<li><a href="#([a-z0-9-]+)"><span class="n">(\d+)</span>(.*?)</a></li>', toc.group(0)
+        )
+    }
+    missing = [sid for sid, _ in sections if sid not in labels]
+    if missing:
+        sys.exit(f"{src}: sections missing from the table of contents: {', '.join(missing)}")
+    return {
+        "before": text[: main.start()],
+        "between": text[main.end() : toc.start()],
+        "after": text[toc.end() :],
+        "toc": toc.group(0),
+        "crumbs": crumbs,
+        "hero": hero,
+        "sections": sections,
+        "labels": labels,
+    }
+
+
+def heading_ids(sid: str, sec: str) -> str:
+    """Give every visible <h3> of a chapter an id, so the chapter list can link to it."""
+    seen = set(ID_RE.findall(sec))
+
+    def add(m):
+        attrs, body = m.group(1), m.group(2)
+        if ' id="' in attrs or "sr-only" in attrs:
+            return m.group(0)
+        base = re.sub(r"[^a-z0-9]+", "-", text_of(body, "en").lower()).strip("-")[:40].strip("-")
+        hid, k = f"{sid}-{base or 'part'}", 2
+        while hid in seen:
+            hid, k = f"{sid}-{base}-{k}", k + 1
+        seen.add(hid)
+        return f'<h3 id="{hid}"{attrs}>{body}</h3>'
+
+    return re.sub(r"<h3\b([^>]*)>(.*?)</h3>", add, sec, flags=re.S)
+
+
+def relink(fragment: str, here: str, owner: dict) -> str:
+    """#anchors that live in another chapter point to that chapter's URL."""
+
+    def fix(m):
+        frag = m.group(1)
+        target = owner.get(frag)
+        if target is None or target == here:
+            return m.group(0)
+        dest = ("../" if here else "") + (f"{target}/" if target else "")
+        return f'href="{dest or "./"}"' if frag == target else f'href="{dest}#{frag}"'
+
+    return re.sub(r'href="#([^"]+)"', fix, fragment)
+
+
+def chapter_nav(parts: dict, name: str, here: str) -> str:
+    up = "../" if here else ""
+    cur = ' aria-current="page"'
+    items = [
+        f'<li><a href="{up or "./"}"{cur if not here else ""}><span class="n"></span>'
+        f"{spans(WORDS['overview'])}</a></li>"
+    ]
+    for sid, sec in parts["sections"]:
+        num, label = parts["labels"][sid]
+        item = f'<li><a href="{up}{sid}/"{cur if sid == here else ""}><span class="n">{num}</span>{label}</a>'
+        if sid == here:
+            subs = [
+                f'<li><a href="#{hid}">{link_free(body)}</a></li>'
+                for hid, body in re.findall(r'<h3 id="([^"]+)"[^>]*>(.*?)</h3>', sec, re.S)
+                if not hid.startswith("h-pkt-")
+            ]
+            if subs:
+                item += '<ol class="sub">' + "".join(subs) + "</ol>"
+        items.append(item + "</li>")
+    of = {lang: f"{WORDS['chapters'][lang]} ({name})" for lang in LANGS}
+    return (
+        '<nav class="toc" aria-labelledby="toc-h">\n  <details id="toc">\n'
+        f'    <summary id="toc-h">{spans(of)}</summary>\n'
+        f"    <ol>{''.join(items)}</ol>\n"
+        f'    <p class="all"><a href="{up}all/">{spans(WORDS["all"])}</a></p>\n'
+        "  </details>\n"
+        '  <script>if (matchMedia("(min-width: 64rem)").matches) '
+        'document.getElementById("toc").open = true;</script>\n'
+        "</nav>\n"
+    )
+
+
+def pager(parts: dict, here: str) -> str:
+    ids = [sid for sid, _ in parts["sections"]]
+    k = ids.index(here)
+    links = []
+    if k == 0:
+        links.append(
+            f'<a class="prev" href="../" rel="prev"><span class="pl">{spans(WORDS["prev"])}</span>'
+            f"<span>{spans(WORDS['overview'])}</span></a>"
+        )
+    else:
+        num, label = parts["labels"][ids[k - 1]]
+        links.append(
+            f'<a class="prev" href="../{ids[k - 1]}/" rel="prev">'
+            f'<span class="pl">{spans(WORDS["prev"])}</span>'
+            f"<span>{num}. {label}</span></a>"
+        )
+    if k + 1 < len(ids):
+        num, label = parts["labels"][ids[k + 1]]
+        links.append(
+            f'<a class="next" href="../{ids[k + 1]}/" rel="next">'
+            f'<span class="pl">{spans(WORDS["next"])}</span>'
+            f"<span>{num}. {label}</span></a>"
+        )
+    return (
+        f'<nav class="pager" data-aria="pager" aria-label="Previous and next chapter">{"".join(links)}</nav>'
+    )
+
+
+def as_chapter(sec: str) -> str:
+    """The section heading becomes the page <h1>; a collapsible section is opened for good."""
+    wrap = re.search(r"<details open>\s*<summary>\s*(<h2\b.*?</h2>)\s*</summary>", sec, re.S)
+    if wrap:
+        sec = sec[: wrap.start()] + wrap.group(1) + sec[wrap.end() :]
+        sec, n = re.subn(r"</details>(\s*</section>)$", r"\1", sec)
+        if n != 1 or sec.count("<details") != sec.count("</details>"):
+            sys.exit("collapsible section: cannot find the closing </details> of its wrapper")
+    return re.sub(r"<h2\b([^>]*)>(.*?)</h2>", r"<h1\1>\2</h1>", sec, count=1, flags=re.S)
+
+
+def crumbs_to(crumbs: str, current: str) -> str:
+    """Library / Protocol (link to the overview) / this page."""
+    return re.sub(
+        r'<li aria-current="page">(.*?)</li>',
+        lambda m: f'<li><a href="../">{m.group(1)}</a></li><li aria-current="page">{current}</li>',
+        crumbs,
+        count=1,
+        flags=re.S,
+    )
+
+
+def count_label(sid: str, sec: str) -> str:
+    if sid not in COUNTS:
+        return ""
+    marker, one, many = COUNTS[sid]
+    n = sec.count(marker)
+    return spans({lang: f"{n} {(one if n == 1 else many)[lang]}" for lang in LANGS}) if n else ""
+
+
+def overview_cards(parts: dict) -> str:
+    cards = []
+    for sid, sec in parts["sections"]:
+        num, label = parts["labels"][sid]
+        desc = CHAPTER_DESC.get(sid)
+        cd = spans({lang: desc[lang][0].upper() + desc[lang][1:] for lang in LANGS}) if desc else ""
+        cc = count_label(sid, sec)
+        cards.append(
+            f'<li><a href="{sid}/"><span class="ct"><span class="n">{num}</span><span>{label}</span></span>'
+            + (f'<span class="cd">{cd}</span>' if cd else "")
+            + (f'<span class="cc">{cc}</span>' if cc else "")
+            + "</a></li>"
+        )
+    return (
+        '<section class="sec" id="chapters" aria-labelledby="h-chapters">\n'
+        f'<h2 id="h-chapters">{spans(WORDS["chapters"])}</h2>\n'
+        f'<ol class="chap-cards">{"".join(cards)}</ol>\n'
+        f'<p><a href="all/">{spans(WORDS["all"])}</a>, '
+        f"{spans(WORDS['all_note'])}.</p>\n"
+        "</section>"
+    )
+
+
+def protocol_pages(slug: str, text: str, meta: dict, src: str) -> list:
+    """[(path, meta, html)] for the overview, every chapter and the full version of one page."""
+    parts = split_page(text, src)
+    parts["sections"] = [(sid, heading_ids(sid, sec)) for sid, sec in parts["sections"]]
+    owner = {i: "" for i in ID_RE.findall(parts["hero"])}
+    for sid, sec in parts["sections"]:
+        owner.update({i: sid for i in ID_RE.findall(sec)})
+        owner[sid] = sid
+    name = meta.get("name", slug)
+    label_text = {
+        sid: {lang: text_of(lbl, lang) for lang in LANGS} for sid, (_, lbl) in parts["labels"].items()
+    }
+
+    if parts["before"].count('<div class="layout">\n') != 1:
+        sys.exit(f"{src}: expected one <div class=layout> before <main>")
+
+    def page(nav: str, content: str) -> str:
+        before = parts["before"].replace('<div class="layout">\n', f'<div class="layout chap">\n{nav}', 1)
+        return (
+            before
+            + '<main id="main" tabindex="-1">\n'
+            + content
+            + "\n</main>"
+            + parts["between"]
+            + parts["after"]
+        )
+
+    chapters = []
+    for sid, _ in parts["sections"]:
+        chapters.append(
+            {"path": f"{slug}/{sid}/", "title": {lang: f"{label_text[sid][lang]} | {name}" for lang in LANGS}}
+        )
+    overview_meta = dict(meta, parts=chapters)
+    out = [
+        (
+            f"{slug}/",
+            overview_meta,
+            page(
+                chapter_nav(parts, name, ""),
+                parts["crumbs"] + "\n" + relink(parts["hero"], "", owner) + "\n" + overview_cards(parts),
+            ),
+        )
+    ]
+    for sid, sec in parts["sections"]:
+        label = parts["labels"][sid][1]
+        cmeta = dict(
+            meta,
+            kind="chapter",
+            title={lang: f"{label_text[sid][lang]} | {name}" for lang in LANGS},
+            description={
+                lang: f"{name}{SEP[lang]}{CHAPTER_DESC[sid][lang]}"
+                if sid in CHAPTER_DESC
+                else meta["description"][lang]
+                for lang in LANGS
+            },
+            part_of=meta["title"],
+            part_of_path=f"{slug}/",
+        )
+        cmeta.pop("parts", None)
+        body = as_chapter(relink(sec, sid, owner)).replace(
+            "<h1", f'<p class="eyebrow">{html.escape(name)}</p>\n<h1', 1
+        )
+        content = crumbs_to(parts["crumbs"], label) + "\n" + body + "\n" + pager(parts, sid)
+        out.append((f"{slug}/{sid}/", cmeta, page(chapter_nav(parts, name, sid), content)))
+    full = dict(
+        meta,
+        kind="all",
+        noindex=True,
+        title={lang: f"{meta['title'][lang]} ({WORDS['all_short'][lang]})" for lang in LANGS},
+        part_of=meta["title"],
+        part_of_path=f"{slug}/",
+    )
+    out.append(
+        (
+            f"{slug}/all/",
+            full,
+            text.replace(parts["crumbs"], crumbs_to(parts["crumbs"], spans(WORDS["all"])), 1),
+        )
+    )
+    return out
 
 
 def shared_blocks(home: str) -> dict:
@@ -316,11 +747,15 @@ def main() -> int:
         target.parent.mkdir(parents=True, exist_ok=True)
         target.write_text(localise(home, home_meta, lang, "", "./"), encoding="utf-8")
     for slug, text, meta in protocols:
-        pages.append((f"{slug}/", meta))
-        for lang in LANGS:
-            target = out / lang / slug / "index.html"
-            target.parent.mkdir(parents=True, exist_ok=True)
-            target.write_text(localise(text, meta, lang, f"{slug}/", "../"), encoding="utf-8")
+        for path, pmeta, page in protocol_pages(slug, text, meta, f"protocols/{slug}/index.html"):
+            if not pmeta.get("noindex"):
+                pages.append((path, pmeta))
+            for lang in LANGS:
+                target = out / lang / path / "index.html"
+                target.parent.mkdir(parents=True, exist_ok=True)
+                target.write_text(
+                    localise(page, pmeta, lang, path, "../" * path.count("/")), encoding="utf-8"
+                )
 
     blocks = shared_blocks(home)
     (out / "index.html").write_text(chooser(blocks), encoding="utf-8")

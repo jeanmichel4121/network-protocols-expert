@@ -21,9 +21,22 @@ Last reviewed: 2026-10-25.
   (`LearningResource` for protocol pages, `WebSite` for the home page) [G1][S1]. **[CI]**
 - The language switch stays instant: it changes the language in place and rewrites the
   URL to the matching `/xx/` path (`history.replaceState`), without a reload. **[CI]**
+- Each protocol page is also published as chapters (ADR 0009): the overview
+  `/<lang>/<slug>/` (header and one card per chapter), one URL per section
+  `/<lang>/<slug>/<section id>/` and the full page `/<lang>/<slug>/all/` for print
+  (`noindex`). A chapter page keeps the shared CSS and JS, so it stays self-contained; it
+  gets the chapter list, a breadcrumb, previous/next links (`rel="prev"`/`"next"`), its
+  own title and description, and JSON-LD `isPartOf` the overview, which lists `hasPart`.
+  Links to an anchor that moved to another chapter are rewritten to that chapter. A
+  learner-paced segment at a time follows Mayer's segmenting principle [L4]. **[CI]**
+  (`check_site.py`: links, anchors, every chapter linked from its overview)
+- The sample packets of a section are tabs (`NPE.pktset`): one packet shown at a time,
+  a link to a field or heading inside a packet opens its tab; every packet is shown
+  without JavaScript and in print.
 - `/` is a language chooser (`x-default`) that sends a returning visitor to their saved
   language, else their browser language. `sitemap.xml` lists every URL with its
-  alternates; `robots.txt` points to it; `404.html` is served for unknown paths.
+  alternates (chapters included, not the full version); `robots.txt` points to it;
+  `404.html` is served for unknown paths.
 - Page metadata lives in `<script type="application/json" id="page-meta">`: `title` and
   `description` (≤ 200 characters) in the four languages, `name`, `tags`, `standards`,
   `updated`. **[CI]**
@@ -73,7 +86,10 @@ Component patterns:
   CLS ≤ 0.1 [P1]. Self-contained pages make LCP trivial; the risks are CLS and INP.
 - No layout shift: theme and language are applied by a tiny script in `<head>` before the
   first paint; each interactive component is rendered by an inline call placed right
-  after its markup; tab panels start `hidden`. CLS < 0.1 on every page. **[CI]**
+  after its markup; tab panels start `hidden`. What a script would add above a packet's
+  figure (the chips line) and the packet tab lists are written in the markup by
+  `tools/packet-builder.py --update`: a page that a slow link renders progressively
+  does not shift either. CLS < 0.1 on every page. **[CI]**
 - Interactions do small DOM updates only (class toggles, one panel re-render) to keep INP
   well under 200 ms.
 - No external request of any kind. **[CI]**

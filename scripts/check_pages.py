@@ -8,7 +8,8 @@
 - Shared blocks (first <style>, page library) identical to the template's, so a
   layout change is always made in the template first and then propagated.
 - Every <figure class="diagram"> has a title (figcaption) and a legend.
-- Sample packets: every data-packet JSON block equals tools/packet-builder.py output.
+- Sample packets: every data-packet JSON block, packet chips line and packet tab list equals
+  tools/packet-builder.py output (written in the markup, so the first paint does not shift).
 - Landing topology: the embedded scene equals tools/landing-topology.py output (icons unaltered).
 - Published protocol pages contain no TEMPLATE placeholder.
 Exit code 1 if any page fails.
@@ -148,6 +149,11 @@ def check_packets(text: str, path: pathlib.Path, pb) -> list:
                 f"packet '{sample}' differs from the builder output "
                 f"(run: python3 tools/packet-builder.py --update {path.relative_to(ROOT)})"
             )
+    if not errs and pb.rewrite(text) != text:
+        errs.append(
+            "packet chips line or packet tab list differs from the builder output "
+            f"(run: python3 tools/packet-builder.py --update {path.relative_to(ROOT)})"
+        )
     return errs
 
 

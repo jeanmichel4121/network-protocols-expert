@@ -100,6 +100,10 @@ Fortinet NSE 8, F5 Certified Solution Expert, NetScaler Expert; see README.md).
   authentication**, at **https://learning.cuvelier.tech** (one URL per language,
   built by `scripts/build_site.py`). The CSP allows inline JS/CSS and forbids network
   calls (`connect-src 'none'`).
+- Chapters (ADR 0009): the build also publishes each page as an overview
+  (`/<lang>/<slug>/`), one URL per section (`/<lang>/<slug>/<section id>/`) and the full
+  page (`/<lang>/<slug>/all/`, for print). The source stays one file; every section must
+  be listed in its table of contents.
 
 ## HTML technical rules (mandatory)
 Full rationale and sources: [`docs/web-standards.md`](docs/web-standards.md). Start every
@@ -167,7 +171,9 @@ page from `templates/protocol-template.html`; its shared blocks are copied verba
    "what breaks if..."), each with explanation and the RFC/vendor reference.
 9. **Sources**: full list (also in `sources.md`).
 
-Sections 5 to 8 can be collapsible but are open by default on screen.
+Sections 5 to 8 can be collapsible but are open by default on screen. On the published
+site each section is its own chapter page (see "Publication"); the sample packets of
+section 3 go in one packet set (`NPE.pktset`), shown as tabs.
 
 ## Packet representation (mandatory for EVERY message/packet type)
 Every message type of the protocol ALWAYS gets **both** views below, shown together
@@ -191,8 +197,8 @@ Correctness rules for sample packets:
 - **Never hand-write values or hex.** Generate every sample packet with
   `tools/packet-builder.py` (Python, struct or scapy) so lengths, checksums, padding
   and flags are correct, and take the displayed values from its output. The builder
-  also emits the field map; embed it with
-  `python3 tools/packet-builder.py --update protocols/<slug>/index.html`.
+  also emits the field map, each packet's chips line and the packet tab list; embed
+  them with `python3 tools/packet-builder.py --update protocols/<slug>/index.html`.
   CI fails if an embedded packet differs from the builder output.
 - All views of a packet describe the same packet: values in the bit diagram, the tree
   and any optional view must match.

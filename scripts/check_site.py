@@ -3,7 +3,8 @@
 
 - every .html file parses without error under the HTML5 parsing algorithm (html5lib, strict);
 - every internal href/src points to an existing file, and every #fragment to an existing id;
-- every protocol page /<lang>/<slug>/ is linked from the home page of the same language;
+- every protocol page /<lang>/<slug>/ is linked from the home page of the same language,
+  and every chapter page /<lang>/<slug>/<chapter>/ from its protocol overview;
 - security.txt is present with the RFC 9116 required fields.
 
 Usage: python3 scripts/check_site.py public
@@ -81,6 +82,21 @@ def check_index(root: pathlib.Path) -> list:
     return errs
 
 
+def check_chapters(root: pathlib.Path) -> list:
+    """Every chapter page /<lang>/<slug>/<chapter>/ is linked from its protocol overview."""
+    errs = []
+    for overview in sorted(root.glob("*/*/index.html")):
+        if overview.parent.parent.name not in LANGS:
+            continue
+        links = set(ATTR.findall(overview.read_text(encoding="utf-8")))
+        for chapter in sorted(overview.parent.glob("*/index.html")):
+            name = re.escape(chapter.parent.name)
+            if not any(re.fullmatch(rf"(\./)?{name}/(index\.html)?", u) for u in links):
+                rel = overview.parent.relative_to(root).as_posix()
+                errs.append(f"/{rel}/ does not link to its chapter {chapter.parent.name}/")
+    return errs
+
+
 def check_security_txt(root: pathlib.Path) -> list:
     path = root / ".well-known" / "security.txt"
     if not path.is_file():
@@ -106,7 +122,7 @@ def main() -> int:
                 print(f"     - {err}")
         else:
             print(f"OK   {rel}")
-    site_errs = check_index(root) + check_security_txt(root)
+    site_errs = check_index(root) + check_chapters(root) + check_security_txt(root)
     for err in site_errs:
         print(f"FAIL site: {err}")
     return 1 if failed or site_errs else 0

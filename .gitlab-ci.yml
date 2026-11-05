@@ -210,6 +210,10 @@ verify:browser:
   # smoke_test.py: axe-core WCAG 2.2 AA (light + dark theme), CLS < 0.1, reduced motion,
   # hreflang/canonical, in-place language switch, 360 px, no external request.
   # axe-core is pinned (version + sha512 integrity) in the script and cached here.
+  # The NAS runner gives a job 1 GB and 2 CPUs: 4 browsers in parallel run out of memory
+  # ("Target crashed"), 2 check the 86 pages of the site in about 10 minutes.
+  variables:
+    SMOKE_WORKERS: "2"
   cache:
     key: axe-core-4.14.0
     paths: [.cache/]
