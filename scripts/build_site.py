@@ -479,6 +479,33 @@ def count_label(sid: str, sec: str) -> str:
     return spans({lang: f"{n} {(one if n == 1 else many)[lang]}" for lang in LANGS}) if n else ""
 
 
+# One line icon per chapter (24 px grid, stroke only), drawn on the overview cards.
+CHAPTER_ICONS = {
+    "concepts": "M12 3a6 6 0 0 0-3.5 10.9V16h7v-2.1A6 6 0 0 0 12 3ZM9.5 19h5M10.5 22h3",
+    "packets": "M3 5h18v14H3zM3 10h18M3 15h18M9 5v5M15 10v5",
+    "operation": "M3 4h7v6H3zM14 14h7v6h-7zM10 7h5.5a2 2 0 0 1 2 2v5M14.5 11l3 3 3-3",
+    "advanced": "M12 3l8 3v6c0 4.5-3.2 7.8-8 9-4.8-1.2-8-4.5-8-9V6zM9 12l2.2 2.2L15.5 10",
+    "vendors": "M3 5h18v14H3zM7 10l3 2.5L7 15M12.5 15H17",
+    "troubleshooting": (
+        "M14.5 5.5a4 4 0 0 0-5.2 5.2L4 16v4h4l5.3-5.3a4 4 0 0 0 5.2-5.2l-2.7 2.7-2.6-.7-.7-2.6z"
+    ),
+    "quiz": (
+        "M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18ZM9.6 9.3a2.5 2.5 0 1 1 3.6 2.3c-.8.5-1.2 1-1.2 1.9M12 16.8v.1"
+    ),
+    "sources": "M6 3h12v18l-6-4-6 4zM9.5 8h5M9.5 11.5h5",
+}
+ICON = (
+    '<span class="ci"><svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true" fill="none" '
+    'stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">'
+    '<path d="{path}"/></svg></span>'
+)
+
+
+def chapter_icon(sid: str) -> str:
+    path = CHAPTER_ICONS.get(sid)
+    return ICON.format(path=path) if path else ""
+
+
 def overview_cards(parts: dict) -> str:
     cards = []
     for sid, sec in parts["sections"]:
@@ -487,7 +514,8 @@ def overview_cards(parts: dict) -> str:
         cd = spans({lang: desc[lang][0].upper() + desc[lang][1:] for lang in LANGS}) if desc else ""
         cc = count_label(sid, sec)
         cards.append(
-            f'<li><a href="{sid}/" data-ch="{sid}"><span class="ct"><span class="n">{num}</span>'
+            f'<li><a href="{sid}/" data-ch="{sid}">{chapter_icon(sid)}'
+            f'<span class="ct"><span class="n">{num}</span>'
             f"<span>{label}</span></span>"
             + (f'<span class="cd">{cd}</span>' if cd else "")
             + (f'<span class="cc">{cc}</span>' if cc else "")

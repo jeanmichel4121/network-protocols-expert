@@ -65,6 +65,13 @@ Versioning rules for this library:
   Security, Release), GitHub improvement form and PR notice.
 
 ### Changed
+- Visual refresh of every page: slate background with an indigo to violet accent (logo and
+  favicon included), gradient on the primary buttons, the active language, chapter numbers and
+  the selected packet tab, elevation (shadows, hover lift) on cards, diagrams, command blocks,
+  tables and quiz questions, an icon per chapter on the overview cards, a reading progress bar
+  under the header (scroll-driven, off with reduced motion), the current chapter highlighted
+  in the chapter list, bolder headings and striped table rows. The packet colour code is
+  unchanged. Contrast checked by axe in both themes.
 - UX review of the published site:
   - step-by-step diagrams show every step faintly from the initial state (the IPv4 flowchart
     started as an empty frame) and use the full width;
