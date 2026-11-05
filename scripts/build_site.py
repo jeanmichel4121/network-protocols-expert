@@ -513,6 +513,18 @@ def overview_cards(parts: dict) -> str:
     )
 
 
+PACKET_DATA = re.compile(r'<script type="application/json" data-packet="([a-z0-9-]+)">.*?</script>', re.S)
+
+
+def with_packet_data(sec: str, data: dict) -> str:
+    """A component may use a packet shown in another chapter (NPE.csum: data-packet, data-after):
+    the chapter page gets a copy of that packet's JSON block, before the component runs."""
+    present = set(PACKET_DATA.findall(sec))
+    tags = re.findall(r"<(?!script)[a-z][^>]*>", sec)
+    needed = {k for tag in tags for k in re.findall(r'\sdata-(?:packet|after)="([a-z0-9-]+)"', tag)} - present
+    return "".join(data[k] for k in sorted(needed) if k in data) + sec
+
+
 def protocol_pages(slug: str, text: str, meta: dict, src: str) -> list:
     """[(path, meta, html)] for the overview, every chapter and the full version of one page."""
     parts = split_page(text, src)
@@ -521,6 +533,7 @@ def protocol_pages(slug: str, text: str, meta: dict, src: str) -> list:
     for sid, sec in parts["sections"]:
         owner.update({i: sid for i in ID_RE.findall(sec)})
         owner[sid] = sid
+    packet_data = {m.group(1): m.group(0) for m in PACKET_DATA.finditer(text)}
     name = meta.get("name", slug)
     label_text = {
         sid: {lang: text_of(lbl, lang) for lang in LANGS} for sid, (_, lbl) in parts["labels"].items()
@@ -572,7 +585,7 @@ def protocol_pages(slug: str, text: str, meta: dict, src: str) -> list:
             part_of_path=f"{slug}/",
         )
         cmeta.pop("parts", None)
-        body = as_chapter(relink(sec, sid, owner)).replace(
+        body = as_chapter(relink(with_packet_data(sec, packet_data), sid, owner)).replace(
             "<h1", f'<p class="eyebrow">{html.escape(name)}</p>\n<h1', 1
         )
         content = crumbs_to(parts["crumbs"], label) + "\n" + body + "\n" + pager(parts, sid)

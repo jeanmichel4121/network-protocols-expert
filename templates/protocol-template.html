@@ -248,6 +248,8 @@ th { background: var(--surface-2); font-weight: 650; white-space: nowrap; }
   border-top: 3px solid; cursor: pointer; font-size: 0.75rem; line-height: 1.25; color: var(--fg);
   position: relative; /* keeps the .sr-only helpers inside the scroll container */
 }
+/* One- and two-bit cells (flags): no side padding, so DF or MF stays readable. */
+.bitgrid .bf[style*="span 1;"], .bitgrid .bf[style*="span 2;"] { padding-inline: 1px; }
 .bf .bn { font-weight: 600; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .bf .bv { font-family: var(--mono); font-size: 0.75rem; color: var(--muted); max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .l-header { background: var(--blue-bg); border-top-color: var(--blue); }
@@ -258,6 +260,8 @@ th { background: var(--surface-2); font-weight: 650; white-space: nowrap; }
 .bf.rep .bn::after { content: " …"; }
 .hl { outline: 3px solid var(--accent); outline-offset: -3px; position: relative; z-index: 1; }
 .bf.cont .bn { font-weight: 400; font-style: italic; }
+.bf.cut { border-bottom: 2px dashed var(--muted); }
+.bf.cut .bn::after { content: " …"; }
 
 .wstree { font: 0.8125rem/1.55 var(--mono); background: var(--code-bg); border: 1px solid var(--line); border-radius: 10px; padding: 0.6rem 0.4rem; overflow-x: auto; }
 .wstree details { padding-left: 1rem; }
@@ -268,6 +272,17 @@ th { background: var(--surface-2); font-weight: 650; white-space: nowrap; }
 .wstree .flt::before { content: "["; } .wstree .flt::after { content: "]"; }
 .wstree .hl { outline-offset: 0; background: color-mix(in srgb, var(--accent) 14%, transparent); }
 
+/* Structure diagram (NPE.struct): a TLV or option layout, no sample values. */
+.struct .bf { cursor: default; }
+.bf.var .bv { font-style: italic; }
+/* Checksum walk-through (NPE.csum). */
+.csum th, .csum td { padding-block: 0.3rem; }
+.csum pre { margin: 0.75rem 0 0; padding: 0.8rem 1rem; background: var(--code-bg); border: 1px solid var(--line); border-radius: 8px; overflow-x: auto; font-size: 0.8125rem; line-height: 1.55; }
+/* Field reference: one collapsible card per field (role, size, every value). */
+.fref { border: 1px solid var(--line); border-radius: 10px; background: var(--surface); margin: 0 0 0.5rem; }
+.fref > summary { cursor: pointer; padding: 0.55rem 1rem; font-weight: 600; min-height: 2.75rem; display: flex; flex-wrap: wrap; align-items: center; gap: 0.25rem 0.75rem; }
+.fref > summary .meta { font: 500 0.75rem var(--mono); color: var(--muted); }
+.fref > div { padding: 0 1rem 0.75rem; }
 .fpanel { margin-top: 1rem; border: 1px solid var(--line); border-radius: 10px; background: var(--surface-2); padding: 0.9rem 1rem; min-height: 9.5rem; }
 .fpanel .hint { color: var(--muted); margin: 0; }
 .fpanel h4 { margin: 0 0 0.5rem; font-size: 1rem; }
@@ -325,6 +340,10 @@ svg.sch .ln-err { stroke: var(--red); stroke-width: 2.5; fill: none; stroke-dash
 svg.sch .mk-flow { fill: var(--accent); }
 svg.sch .mk-ctl { fill: var(--orange); }
 svg.sch .mk-err { fill: var(--red); }
+svg.sch .ln-ok { stroke: var(--green); stroke-width: 2.5; fill: none; }
+svg.sch .ln-span { stroke: var(--muted); stroke-width: 1.5; fill: none; stroke-dasharray: 4 3; }
+svg.sch .mk-ok { fill: var(--green); }
+svg.sch .halo { paint-order: stroke; stroke: var(--surface); stroke-width: 4px; stroke-linejoin: round; }
 .anim [data-s].future, .anim [data-s].gone { visibility: hidden; }
 .anim [data-s].current [class^="sh-"], .anim [data-s].current[class^="sh-"] { stroke: var(--accent); stroke-width: 3; }
 .anim-controls { display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem; padding: 0.8rem 1.1rem; border-top: 1px solid var(--line); }
@@ -365,7 +384,7 @@ svg.sch .mk-err { fill: var(--red); }
 .ver { font: 600 0.75rem var(--mono); padding: 0.1rem 0.55rem; border-radius: 999px; border: 1px solid var(--line); background: var(--surface); color: var(--muted); }
 .copy { margin-left: auto; min-height: 2rem; min-width: 4.5rem; border: 1px solid var(--line); background: var(--surface); border-radius: 8px; cursor: pointer; font-size: 0.8125rem; }
 .cmd pre { margin: 0; padding: 0.9rem 1rem; overflow-x: auto; background: var(--code-bg); line-height: 1.55; tab-size: 4; }
-.cmd .src { margin: 0; padding: 0.55rem 1rem; font-size: 0.8125rem; color: var(--muted); border-top: 1px solid var(--line); }
+.cmd .src { margin: 0; padding: 0.55rem 1rem; font-size: 0.8125rem; color: var(--muted); border-top: 1px solid var(--line); max-width: none; }
 .cmd.debug { border-color: var(--red); }
 
 /* ===== Troubleshooting tree ========================================== */
@@ -373,9 +392,10 @@ svg.sch .mk-err { fill: var(--red); }
 .tag { display: inline-block; font: 600 0.75rem/1.5 var(--font); padding: 0 0.45em; border-radius: 4px; border: 1px solid; white-space: nowrap; }
 .tag.vend { color: var(--orange); background: var(--orange-bg); }
 .tag.err { color: var(--red); background: var(--red-bg); }
+.tag.ok { color: var(--green); background: var(--green-bg); }
 .cmd pre .c { color: var(--muted); }
 .dtree { list-style: none; padding: 0; margin: 1rem 0; display: grid; gap: 0.75rem; }
-.dtree > li { border: 1px solid var(--line); border-radius: 10px; padding: 0.8rem 1rem; background: var(--surface); }
+.dtree > li { border: 1px solid var(--line); border-radius: 10px; padding: 0.8rem 1rem; background: var(--surface); min-width: 0; }
 .dtree > li:target { outline: 3px solid var(--accent); }
 .dtree .q { font-weight: 650; margin: 0 0 0.5rem; }
 .dtree .q .id { color: var(--accent); margin-right: 0.4rem; }
@@ -458,10 +478,10 @@ window.NPE = (function () {
   "use strict";
   var LANGS = ["fr", "en", "nl", "de"];
   var UI = {
-    fr: { values: "Valeurs possibles", name: "Nom", offset: "Offset", size: "Taille", value: "Valeur", filter: "Filtre Wireshark", ref: "Référence", role: "Rôle", bits: "bits", bytes: "octets", hint: "Survolez ou sélectionnez un champ (diagramme ou arbre) pour afficher son détail.", cont: "suite", repeat: "répété", step: "Étape", start: "État initial : aucun paquet échangé.", play: "Lecture", pause: "Pause", prev: "Étape précédente", next: "Étape suivante", reset: "Recommencer", copy: "Copier", copied: "Copié ✓", correct: "✓ Correct.", wrong: "✗ Incorrect. La bonne réponse est :", choose: "Choisissez d'abord une réponse.", score: "Score :", crumbs: "Fil d'Ariane", langs: "Langue", vendors: "Vendeurs", bitdiag: "Diagramme de bits RFC", wstree: "Arbre Wireshark", theme: "Thème sombre", toc: "Sur cette page", packets: "Paquets d'exemple", chapters: "Chapitres", pager: "Chapitre précédent et suivant", footnav: "Navigation du pied de page", set: "Activé", notset: "Non activé" },
-    en: { values: "Allowed values", name: "Name", offset: "Offset", size: "Size", value: "Value", filter: "Wireshark filter", ref: "Reference", role: "Role", bits: "bits", bytes: "bytes", hint: "Hover or select a field (diagram or tree) to see its details.", cont: "cont.", repeat: "repeated", step: "Step", start: "Initial state: no packet exchanged yet.", play: "Play", pause: "Pause", prev: "Previous step", next: "Next step", reset: "Restart", copy: "Copy", copied: "Copied ✓", correct: "✓ Correct.", wrong: "✗ Incorrect. The correct answer is:", choose: "Choose an answer first.", score: "Score:", crumbs: "Breadcrumb", langs: "Language", vendors: "Vendors", bitdiag: "RFC bit diagram", wstree: "Wireshark tree", theme: "Dark theme", toc: "On this page", packets: "Sample packets", chapters: "Chapters", pager: "Previous and next chapter", footnav: "Footer navigation", set: "Set", notset: "Not set" },
-    nl: { values: "Toegestane waarden", name: "Naam", offset: "Offset", size: "Grootte", value: "Waarde", filter: "Wireshark-filter", ref: "Referentie", role: "Rol", bits: "bits", bytes: "bytes", hint: "Beweeg over een veld of selecteer het (diagram of boom) om de details te zien.", cont: "vervolg", repeat: "herhaald", step: "Stap", start: "Beginsituatie: nog geen pakket uitgewisseld.", play: "Afspelen", pause: "Pauzeren", prev: "Vorige stap", next: "Volgende stap", reset: "Opnieuw beginnen", copy: "Kopiëren", copied: "Gekopieerd ✓", correct: "✓ Juist.", wrong: "✗ Onjuist. Het juiste antwoord is:", choose: "Kies eerst een antwoord.", score: "Score:", crumbs: "Kruimelpad", langs: "Taal", vendors: "Vendors", bitdiag: "RFC-bitdiagram", wstree: "Wireshark-boom", theme: "Donker thema", toc: "Op deze pagina", packets: "Voorbeeldpakketten", chapters: "Hoofdstukken", pager: "Vorig en volgend hoofdstuk", footnav: "Voettekstnavigatie", set: "Ingesteld", notset: "Niet ingesteld" },
-    de: { values: "Zulässige Werte", name: "Name", offset: "Offset", size: "Größe", value: "Wert", filter: "Wireshark-Filter", ref: "Referenz", role: "Funktion", bits: "Bit", bytes: "Byte", hint: "Bewegen Sie den Zeiger über ein Feld oder wählen Sie es aus (Diagramm oder Baum), um Details zu sehen.", cont: "Forts.", repeat: "wiederholt", step: "Schritt", start: "Ausgangszustand: noch kein Paket ausgetauscht.", play: "Abspielen", pause: "Pause", prev: "Vorheriger Schritt", next: "Nächster Schritt", reset: "Neu starten", copy: "Kopieren", copied: "Kopiert ✓", correct: "✓ Richtig.", wrong: "✗ Falsch. Richtig ist:", choose: "Wählen Sie zuerst eine Antwort.", score: "Punkte:", crumbs: "Brotkrumennavigation", langs: "Sprache", vendors: "Hersteller", bitdiag: "RFC-Bitdiagramm", wstree: "Wireshark-Baum", theme: "Dunkles Design", toc: "Auf dieser Seite", packets: "Beispielpakete", chapters: "Kapitel", pager: "Vorheriges und nächstes Kapitel", footnav: "Fußzeilennavigation", set: "Gesetzt", notset: "Nicht gesetzt" }
+    fr: { values: "Valeurs possibles", name: "Nom", offset: "Offset", size: "Taille", value: "Valeur", filter: "Filtre Wireshark", ref: "Référence", role: "Rôle", bits: "bits", bytes: "octets", hint: "Survolez ou sélectionnez un champ (diagramme ou arbre) pour afficher son détail.", cont: "suite", repeat: "répété", step: "Étape", start: "État initial : aucun paquet échangé.", play: "Lecture", pause: "Pause", prev: "Étape précédente", next: "Étape suivante", reset: "Recommencer", copy: "Copier", copied: "Copié ✓", correct: "✓ Correct.", wrong: "✗ Incorrect. La bonne réponse est :", choose: "Choisissez d'abord une réponse.", score: "Score :", crumbs: "Fil d'Ariane", langs: "Langue", vendors: "Vendeurs", bitdiag: "Diagramme de bits RFC", wstree: "Arbre Wireshark", theme: "Thème sombre", toc: "Sur cette page", var: "variable", cs_sum: "Somme des {n} mots (champ Checksum compté 0)", cs_fold: "Report des retenues", cs_cpl: "Complément à un", cs_hdr: "valeur dans l'en-tête :", cs_inc: "Mise à jour incrémentale (RFC 1624, équation 3)", cs_word: "Mot", cs_fields: "Champs", cs_after: "Après modification", cs_chg: "(modifié)", packets: "Paquets d'exemple", chapters: "Chapitres", pager: "Chapitre précédent et suivant", footnav: "Navigation du pied de page", set: "Activé", notset: "Non activé" },
+    en: { values: "Allowed values", name: "Name", offset: "Offset", size: "Size", value: "Value", filter: "Wireshark filter", ref: "Reference", role: "Role", bits: "bits", bytes: "bytes", hint: "Hover or select a field (diagram or tree) to see its details.", cont: "cont.", repeat: "repeated", step: "Step", start: "Initial state: no packet exchanged yet.", play: "Play", pause: "Pause", prev: "Previous step", next: "Next step", reset: "Restart", copy: "Copy", copied: "Copied ✓", correct: "✓ Correct.", wrong: "✗ Incorrect. The correct answer is:", choose: "Choose an answer first.", score: "Score:", crumbs: "Breadcrumb", langs: "Language", vendors: "Vendors", bitdiag: "RFC bit diagram", wstree: "Wireshark tree", theme: "Dark theme", toc: "On this page", var: "variable", cs_sum: "Sum of the {n} words (Checksum field counted as 0)", cs_fold: "Carries folded back", cs_cpl: "One's complement", cs_hdr: "value in the header:", cs_inc: "Incremental update (RFC 1624, eqn. 3)", cs_word: "Word", cs_fields: "Fields", cs_after: "After the change", cs_chg: "(changed)", packets: "Sample packets", chapters: "Chapters", pager: "Previous and next chapter", footnav: "Footer navigation", set: "Set", notset: "Not set" },
+    nl: { values: "Toegestane waarden", name: "Naam", offset: "Offset", size: "Grootte", value: "Waarde", filter: "Wireshark-filter", ref: "Referentie", role: "Rol", bits: "bits", bytes: "bytes", hint: "Beweeg over een veld of selecteer het (diagram of boom) om de details te zien.", cont: "vervolg", repeat: "herhaald", step: "Stap", start: "Beginsituatie: nog geen pakket uitgewisseld.", play: "Afspelen", pause: "Pauzeren", prev: "Vorige stap", next: "Volgende stap", reset: "Opnieuw beginnen", copy: "Kopiëren", copied: "Gekopieerd ✓", correct: "✓ Juist.", wrong: "✗ Onjuist. Het juiste antwoord is:", choose: "Kies eerst een antwoord.", score: "Score:", crumbs: "Kruimelpad", langs: "Taal", vendors: "Vendors", bitdiag: "RFC-bitdiagram", wstree: "Wireshark-boom", theme: "Donker thema", toc: "Op deze pagina", var: "variabel", cs_sum: "Som van de {n} woorden (Checksum-veld telt als 0)", cs_fold: "Overdrachten opgeteld", cs_cpl: "One's complement", cs_hdr: "waarde in de header:", cs_inc: "Incrementele update (RFC 1624, vergelijking 3)", cs_word: "Woord", cs_fields: "Velden", cs_after: "Na de wijziging", cs_chg: "(gewijzigd)", packets: "Voorbeeldpakketten", chapters: "Hoofdstukken", pager: "Vorig en volgend hoofdstuk", footnav: "Voettekstnavigatie", set: "Ingesteld", notset: "Niet ingesteld" },
+    de: { values: "Zulässige Werte", name: "Name", offset: "Offset", size: "Größe", value: "Wert", filter: "Wireshark-Filter", ref: "Referenz", role: "Funktion", bits: "Bit", bytes: "Byte", hint: "Bewegen Sie den Zeiger über ein Feld oder wählen Sie es aus (Diagramm oder Baum), um Details zu sehen.", cont: "Forts.", repeat: "wiederholt", step: "Schritt", start: "Ausgangszustand: noch kein Paket ausgetauscht.", play: "Abspielen", pause: "Pause", prev: "Vorheriger Schritt", next: "Nächster Schritt", reset: "Neu starten", copy: "Kopieren", copied: "Kopiert ✓", correct: "✓ Richtig.", wrong: "✗ Falsch. Richtig ist:", choose: "Wählen Sie zuerst eine Antwort.", score: "Punkte:", crumbs: "Brotkrumennavigation", langs: "Sprache", vendors: "Hersteller", bitdiag: "RFC-Bitdiagramm", wstree: "Wireshark-Baum", theme: "Dunkles Design", toc: "Auf dieser Seite", var: "variabel", cs_sum: "Summe der {n} Wörter (Feld Checksum als 0 gezählt)", cs_fold: "Überträge addiert", cs_cpl: "Einerkomplement", cs_hdr: "Wert im Header:", cs_inc: "Inkrementelle Aktualisierung (RFC 1624, Gleichung 3)", cs_word: "Wort", cs_fields: "Felder", cs_after: "Nach der Änderung", cs_chg: "(geändert)", packets: "Beispielpakete", chapters: "Kapitel", pager: "Vorheriges und nächstes Kapitel", footnav: "Fußzeilennavigation", set: "Gesetzt", notset: "Nicht gesetzt" }
   };
   var root = document.documentElement;
   function lang() { return LANGS.indexOf(root.lang) < 0 ? "en" : root.lang; }
@@ -498,7 +518,9 @@ window.NPE = (function () {
   function packet(id) {
     var el = document.querySelector('.packet[data-packet="' + id + '"]');
     var data = json('script[data-packet="' + id + '"]');
-    var docs = json('script[data-field-docs="' + id + '"]') || {};
+    /* Field docs: a page-wide block (data-field-docs="*", shared by every packet of the page)
+       completed or overridden by the packet's own block. */
+    var docs = Object.assign({}, json('script[data-field-docs="*"]') || {}, json('script[data-field-docs="' + id + '"]') || {});
     if (!el || !data) return;
     var byId = {};
     data.fields.forEach(function (f) { byId[f.id] = f; });
@@ -512,12 +534,16 @@ window.NPE = (function () {
     for (b = 0; b < 32; b++) r += "<span>" + (b % 10) + "</span>";
     ruler.innerHTML = r;
 
-    var g = "";
+    /* data.grid_from: the bit diagram starts at that bit (e.g. 112 to draw an IPv4 header on its own
+       32-bit rows, as in RFC 791, while the tree and the hex dump keep the Ethernet header). */
+    var g = "", origin = data.grid_from || 0;
     data.fields.forEach(function (f) {
-      var start = f.offset, left = f.bits, first = true;
+      if (f.offset < origin) return;
+      /* f.rows: a long field (Data) is drawn on that many rows only, the last one cut ("…"). */
+      var start = f.offset - origin, left = f.bits, first = true, row = 1;
       while (left > 0) {
-        var col = start % 32, take = Math.min(left, 32 - col);
-        var cls = "bf l-" + f.layer + (f.repeat ? " rep" : "") + (first ? "" : " cont");
+        var col = start % 32, take = Math.min(left, 32 - col), cut = f.rows && row === f.rows && left > take;
+        var cls = "bf l-" + f.layer + (f.repeat ? " rep" : "") + (first ? "" : " cont") + (cut ? " cut" : "");
         var pos = ' style="grid-column:' + (col + 1) + " / span " + take + ";grid-row:" + (Math.floor(start / 32) + 1) + '"';
         if (first) {
           g += '<button type="button" class="' + cls + '" data-f="' + f.id + '"' + pos + ">" +
@@ -526,7 +552,8 @@ window.NPE = (function () {
         } else {
           g += '<div class="' + cls + '" data-f="' + f.id + '"' + pos + ' aria-hidden="true"><span class="bn">' + esc(f.name) + "</span></div>";
         }
-        start += take; left -= take; first = false;
+        if (cut) break;
+        start += take; left -= take; first = false; row++;
       }
     });
     grid.innerHTML = g;
@@ -541,12 +568,32 @@ window.NPE = (function () {
     }
     /* Tree groups: f.tree (Wireshark protocol layer) when it differs from the colour layer
        (e.g. an 802.1Q TPID is eth.type in Wireshark but drawn as a tag). No ws_root: one
-       top-level entry per protocol, as Wireshark shows a frame. f.ws_bits: bit-mask prefix. */
+       top-level entry per protocol, as Wireshark shows a frame. f.ws_bits: bit-mask prefix.
+       f.ws_group: the field sits under a line of data.ws_groups ({label, ws, parent}), as
+       Wireshark nests DSCP and ECN under "Differentiated Services Field", or an option's
+       fields under that option; groups nest through "parent". */
+    var groups = data.ws_groups || {};
+    function chain(gid) { var c = []; while (gid) { c.unshift(gid); gid = groups[gid].parent; } return c; }
     var t = "";
     Object.keys(data.ws_layers).forEach(function (layer) {
       t += '<details open><summary>' + esc(data.ws_layers[layer]) + "</summary>";
+      var open = [];
       data.fields.filter(function (f) { return (f.tree || f.layer) === layer; }).forEach(function (f) {
-        var line = esc((f.ws_bits ? f.ws_bits + " = " : "") + f.ws_label + ": " + f.value) + '<code class="flt">' + esc(f.ws) + "</code>";
+        var want = chain(f.ws_group), k = 0;
+        while (k < open.length && open[k] === want[k]) k++;
+        while (open.length > k) { t += "</details>"; open.pop(); }
+        for (; k < want.length; k++) {
+          var gr = groups[want[k]];
+          t += '<details open><summary class="tl-g">' + esc(gr.label) + (gr.ws ? '<code class="flt">' + esc(gr.ws) + "</code>" : "") + "</summary>";
+          open.push(want[k]);
+        }
+        /* f.ws_value: what Wireshark prints when it differs from the raw value (Fragment Offset
+           185 is shown as 1480 bytes); f.ws_pre / f.ws_more: generated lines before / after the
+           field ([IGMP Version: 2], [Calculated Checksum: ...]). */
+        (f.ws_pre || []).forEach(function (x) {
+          t += '<div class="tl" data-f="' + f.id + '">' + esc(x.label) + (x.ws ? '<code class="flt">' + esc(x.ws) + "</code>" : "") + "</div>";
+        });
+        var line = esc((f.ws_bits ? f.ws_bits + " = " : "") + f.ws_label + ": " + (f.ws_value !== undefined ? f.ws_value : f.value)) + '<code class="flt">' + esc(f.ws) + "</code>";
         if (f.flags) {
           t += '<details><summary class="tl-s" data-f="' + f.id + '">' + line + "</summary>";
           f.flags.forEach(function (x) {
@@ -557,7 +604,11 @@ window.NPE = (function () {
         } else {
           t += '<div class="tl" data-f="' + f.id + '">' + line + "</div>";
         }
+        (f.ws_more || []).forEach(function (x) {
+          t += '<div class="tl" data-f="' + f.id + '">' + esc(x.label) + (x.ws ? '<code class="flt">' + esc(x.ws) + "</code>" : "") + "</div>";
+        });
       });
+      while (open.length) { t += "</details>"; open.pop(); }
       t += "</details>";
     });
     tree.innerHTML = data.ws_root ? '<details open><summary>' + esc(data.ws_root) + "</summary>" + t + "</details>" : t;
@@ -589,7 +640,7 @@ window.NPE = (function () {
       var d = docs[fid.replace(/\d+$/, "")] || {}, role = d.role || d, vals = d.values;
       function inBytes(n) { return n % 8 ? "" : " (" + n / 8 + " " + ui("bytes") + ")"; }
       panel.innerHTML = "<h4>" + esc(f.name) + "</h4><dl>" +
-        "<dt>" + ui("value") + "</dt><dd><code>" + esc(f.value) + "</code> (<code>" + esc(f.hex) + "</code>)</dd>" +
+        "<dt>" + ui("value") + "</dt><dd><code>" + esc(f.value) + "</code> (<code>" + esc(f.hex.length > 47 ? f.hex.slice(0, 47) + " …" : f.hex) + "</code>)</dd>" +
         "<dt>" + ui("offset") + "</dt><dd>" + f.offset + " " + ui("bits") + inBytes(f.offset) + "</dd>" +
         "<dt>" + ui("size") + "</dt><dd>" + f.bits + " " + ui("bits") + inBytes(f.bits) + (f.repeat ? ", " + ui("repeat") : "") + "</dd>" +
         (vals ? "<dt>" + ui("values") + "</dt><dd>" + esc(vals[lang()] || "") + "</dd>" : "") +
@@ -612,6 +663,91 @@ window.NPE = (function () {
     roving(tree, "summary, .tl");
     show(null); paintFlags();
     onLang(function () { show(active); paintFlags(); });
+  }
+
+  /* ---------- Structure: a TLV or option drawn on the 32-bit grid, without sample values ----------
+     Data: a JSON script element with data-struct="ID" holding {"fields": [{name, bits, layer,
+     value (optional), var (optional)}]}. A variable-length field is drawn at a nominal width
+     and marked "variable". */
+  function struct(id) {
+    var fig = document.getElementById(id), data = json('script[data-struct="' + id + '"]');
+    if (!fig || !data) return;
+    var r = "";
+    for (var b = 0; b < 32; b++) r += "<span>" + (b % 10 === 0 ? b / 10 : "") + "</span>";
+    for (b = 0; b < 32; b++) r += "<span>" + (b % 10) + "</span>";
+    fig.querySelector(".ruler").innerHTML = r;
+    function paint() {
+      var g = "", start = 0;
+      data.fields.forEach(function (f) {
+        var left = f.bits, first = true;
+        while (left > 0) {
+          var col = start % 32, take = Math.min(left, 32 - col);
+          var note = f.value !== undefined ? f.value : f["var"] ? ui("var") : f.bits + " " + ui("bits");
+          g += '<div class="bf l-' + f.layer + (f["var"] ? " var" : "") + (first ? "" : " cont") + '" style="grid-column:' + (col + 1) +
+            " / span " + take + ";grid-row:" + (Math.floor(start / 32) + 1) + '"><span class="bn">' + esc(f.name) + "</span>" +
+            (first ? '<span class="bv">' + esc(note) + "</span>" : "") + "</div>";
+          start += take; left -= take; first = false;
+        }
+      });
+      fig.querySelector(".bitgrid").innerHTML = g;
+    }
+    paint();
+    onLang(paint);
+  }
+
+  /* ---------- Checksum walk-through (RFC 1071), computed from the sample packet's bytes ----------
+     On the figure: data-packet (packet id), data-start / data-len (covered bytes), data-sum (offset
+     of the checksum field in them), data-skip (excluded bytes, e.g. "16-23"), data-after (the same
+     packet after some fields changed: its checksum is derived incrementally, RFC 1624 eqn. 3). */
+  function csum(id) {
+    var fig = document.getElementById(id);
+    if (!fig) return;
+    var d = fig.dataset, start = +d.start, len = +d.len, at = +d.sum;
+    var a = json('script[data-packet="' + d.packet + '"]'), z = d.after ? json('script[data-packet="' + d.after + '"]') : null;
+    if (!a) return;
+    var skip = (d.skip || "").split(",").filter(Boolean).map(function (s) { return s.split("-").map(Number); });
+    function skipped(k) { return k === at / 2 || skip.some(function (s) { return 2 * k >= s[0] && 2 * k <= s[1]; }); }
+    function words(p) {
+      var x = p.hex.split(" ").slice(start, start + len).map(function (h) { return parseInt(h, 16); }), w = [];
+      for (var k = 0; k < x.length; k += 2) w.push((x[k] << 8) | (x[k + 1] || 0));
+      return w;
+    }
+    function hx(n, w) { return "0x" + ("0000" + n.toString(16)).slice(-(w || 4)); }
+    function fold(s) { while (s > 0xffff) s = (s & 0xffff) + Math.floor(s / 0x10000); return s; }
+    function names(k) {
+      var lo = (start + 2 * k) * 8, out = [];
+      a.fields.forEach(function (f) { if (f.offset < lo + 16 && f.offset + f.bits > lo && out.indexOf(f.name) < 0) out.push(f.name); });
+      return out.join(", ");
+    }
+    var wa = words(a), wz = z ? words(z) : null, body = fig.querySelector(".csum-body");
+    function paint() {
+      var sum = 0, n = 0;
+      wa.forEach(function (w, k) { if (!skipped(k)) { sum += w; n++; } });
+      var f1 = fold(sum), c = ~f1 & 0xffff, hdr = wa[at / 2];
+      var rows = wa.map(function (w, k) {
+        var chg = wz && wz[k] !== w && k !== at / 2;
+        return "<tr><td>" + k + "</td><td>" + esc(names(k)) + "</td><td><code>" + (skipped(k) ? "(" + hx(w) + ")" : hx(w)) + "</code></td>" +
+          (wz ? "<td><code>" + hx(wz[k]) + "</code>" + (chg ? " " + esc(ui("cs_chg")) : "") + "</td>" : "") + "</tr>";
+      }).join("");
+      var out = ui("cs_sum").replace("{n}", n) + " = " + hx(sum, sum > 0xffff ? 5 : 4) + "\n" +
+        ui("cs_fold") + ": " + hx(sum & 0xffff) + " + 0x" + Math.floor(sum / 0x10000).toString(16) + " = " + hx(f1) + "\n" +
+        ui("cs_cpl") + " ~" + hx(f1) + " = " + hx(c) + "   " + ui("cs_hdr") + " " + hx(hdr) + " " + (c === hdr ? "✓" : "✗");
+      if (wz) {
+        var acc = ~hdr & 0xffff, lines = "";
+        wa.forEach(function (w, k) {
+          if (k === at / 2 || wz[k] === w) return;
+          acc += (~w & 0xffff) + wz[k];
+          lines += "\n  " + ui("cs_word") + " " + k + ": m = " + hx(w) + ", m' = " + hx(wz[k]);
+        });
+        var inc = ~fold(acc) & 0xffff, real = wz[at / 2];
+        out += "\n\n" + ui("cs_inc") + ": HC' = ~(~HC + ~m + m')" + lines + "\n  HC' = " + hx(inc) + "   " + ui("cs_hdr") + " " + hx(real) + " " + (inc === real ? "✓" : "✗");
+      }
+      body.innerHTML = '<div class="table-wrap" tabindex="0"><table><thead><tr><th scope="col">#</th><th scope="col">' + esc(ui("cs_fields")) +
+        '</th><th scope="col">' + esc(ui("cs_word")) + "</th>" + (wz ? '<th scope="col">' + esc(ui("cs_after")) + "</th>" : "") +
+        "</tr></thead><tbody>" + rows + "</tbody></table></div><pre tabindex=\"0\"><code>" + esc(out) + "</code></pre>";
+    }
+    paint();
+    onLang(paint);
   }
 
   /* ---------- Step-by-step exchange: play / pause / previous / next ---------- */
@@ -946,7 +1082,7 @@ window.NPE = (function () {
     setLang(lang(), false);
   }
 
-  return { packet: packet, pktset: pktset, animation: animation, tabs: tabs, quiz: quiz, network: network, chrome: chrome, onLang: onLang };
+  return { packet: packet, pktset: pktset, struct: struct, csum: csum, animation: animation, tabs: tabs, quiz: quiz, network: network, chrome: chrome, onLang: onLang };
 })();
 </script>
 </head>
@@ -1103,6 +1239,42 @@ window.NPE = (function () {
     </article>
     </div>
     <script>NPE.pktset("pkt-set");</script>
+
+    <!-- A structure without sample values (TLV, option): NPE.struct draws it on the same grid. -->
+    <h3 id="h-struct-lls"><span data-l="fr">Structure d'un TLV LLS</span><span data-l="en">Structure of an LLS TLV</span><span data-l="nl">Structuur van een LLS-TLV</span><span data-l="de">Aufbau eines LLS-TLV</span></h3>
+    <figure class="diagram struct" id="st-lls" aria-labelledby="st-lls-t">
+      <figcaption>
+        <span class="t" id="st-lls-t"><span data-l="fr">Structure : TLV du bloc LLS (RFC 5613 §2.3), sans valeur d'exemple</span><span data-l="en">Structure: LLS block TLV (RFC 5613 §2.3), no sample values</span><span data-l="nl">Structuur: TLV van het LLS-blok (RFC 5613 §2.3), zonder voorbeeldwaarden</span><span data-l="de">Aufbau: TLV des LLS-Blocks (RFC 5613 §2.3), ohne Beispielwerte</span></span>
+        <span class="s"><span data-l="fr">Length donne la longueur de Value en octets ; le TLV est complété jusqu'à 32 bits, padding non compté.</span><span data-l="en">Length gives the length of Value in bytes; the TLV is padded to 32 bits, padding not counted.</span><span data-l="nl">Length geeft de lengte van Value in bytes; de TLV wordt aangevuld tot 32 bits, padding niet meegeteld.</span><span data-l="de">Length gibt die Länge von Value in Byte an; das TLV wird auf 32 Bit aufgefüllt, das Padding zählt nicht mit.</span><a class="ref-link" href="#src-4">[4]</a></span>
+      </figcaption>
+      <div class="body">
+        <div class="scroll-x" tabindex="0">
+          <div class="ruler" aria-hidden="true"></div>
+          <div class="bitgrid" role="group" data-aria="bitdiag" aria-label="RFC bit diagram"></div>
+        </div>
+      </div>
+      <dl class="legend">
+        <div><dt><span class="sw l-tlv"></span></dt><dd><span data-l="fr">TLV (violet, pointillé)</span><span data-l="en">TLV (purple, dotted)</span><span data-l="nl">TLV (paars, gestippeld)</span><span data-l="de">TLV (violett, gepunktet)</span></dd></div>
+        <div><dt><em><span data-l="fr">variable</span><span data-l="en">variable</span><span data-l="nl">variabel</span><span data-l="de">variabel</span></em></dt><dd><span data-l="fr">Champ de longueur variable, dessiné sur une largeur nominale</span><span data-l="en">Variable-length field, drawn at a nominal width</span><span data-l="nl">Veld met variabele lengte, getekend op een nominale breedte</span><span data-l="de">Feld variabler Länge, in nominaler Breite gezeichnet</span></dd></div>
+      </dl>
+      <script type="application/json" data-struct="st-lls">{"fields":[{"name":"Type","bits":16,"layer":"tlv"},{"name":"Length","bits":16,"layer":"tlv"},{"name":"Value","bits":32,"layer":"tlv","var":true}]}</script>
+    </figure>
+    <script>NPE.struct("st-lls");</script>
+
+    <!-- A checksum walk-through, computed by NPE.csum from the builder's bytes (never typed). -->
+    <h3 id="h-csum-hello"><span data-l="fr">Calcul du checksum du Hello</span><span data-l="en">Computing the Hello checksum</span><span data-l="nl">De checksum van de Hello berekenen</span><span data-l="de">Berechnung der Hello-Prüfsumme</span></h3>
+    <figure class="diagram csum" id="cs-hello" aria-labelledby="cs-hello-t" data-packet="ospf-hello" data-start="0" data-len="48" data-sum="12" data-skip="16-23">
+      <figcaption>
+        <span class="t" id="cs-hello-t"><span data-l="fr">Checksum OSPF du Hello ci-dessus : somme en complément à un des mots de 16 bits, champ Authentication exclu</span><span data-l="en">OSPF checksum of the Hello above: one's complement sum of the 16-bit words, Authentication field excluded</span><span data-l="nl">OSPF-checksum van de Hello hierboven: one's-complementsom van de 16-bitwoorden, zonder het Authentication-veld</span><span data-l="de">OSPF-Prüfsumme des Hellos oben: Einerkomplement-Summe der 16-Bit-Wörter, ohne das Feld Authentication</span><a class="ref-link" href="#src-1">[1]</a></span>
+        <span class="s"><span data-l="fr">Calculé par la page à partir des octets générés par tools/packet-builder.py.</span><span data-l="en">Computed by the page from the bytes generated by tools/packet-builder.py.</span><span data-l="nl">Door de pagina berekend uit de bytes die tools/packet-builder.py genereert.</span><span data-l="de">Von der Seite aus den Bytes berechnet, die tools/packet-builder.py erzeugt.</span></span>
+      </figcaption>
+      <div class="body csum-body"></div>
+      <dl class="legend">
+        <div><dt><code>(0x0000)</code></dt><dd><span data-l="fr">Mot exclu de la somme (champ Checksum, champ Authentication)</span><span data-l="en">Word left out of the sum (Checksum field, Authentication field)</span><span data-l="nl">Woord dat niet in de som telt (Checksum-veld, Authentication-veld)</span><span data-l="de">Wort, das nicht in die Summe eingeht (Feld Checksum, Feld Authentication)</span></dd></div>
+        <div><dt>✓ / ✗</dt><dd><span data-l="fr">Résultat égal / différent de la valeur de l'en-tête</span><span data-l="en">Result equal to / different from the value in the header</span><span data-l="nl">Resultaat gelijk aan / verschillend van de waarde in de header</span><span data-l="de">Ergebnis gleich / verschieden vom Wert im Header</span></dd></div>
+      </dl>
+    </figure>
+    <script>NPE.csum("cs-hello");</script>
   </section>
 
   <!-- ===== 4. Operation (animated) ===== -->
@@ -1299,6 +1471,7 @@ window.NPE = (function () {
       <li id="src-1"><cite>RFC 2328, OSPF Version 2</cite>, J. Moy, IETF, April 1998: §A.2, §A.3.1, §A.3.2, §10.1 to §10.5, §C.3, §D.4. <a href="https://www.rfc-editor.org/rfc/rfc2328">https://www.rfc-editor.org/rfc/rfc2328</a></li>
       <li id="src-2"><cite>IANA, Open Shortest Path First v2 (OSPFv2) Parameters</cite>, registry "OSPFv2 Options". <a href="https://www.iana.org/assignments/ospfv2-parameters/ospfv2-parameters.xhtml">https://www.iana.org/assignments/ospfv2-parameters/ospfv2-parameters.xhtml</a></li>
       <li id="src-3"><cite>Wireshark, Display Filter Reference: Open Shortest Path First</cite>. <a href="https://www.wireshark.org/docs/dfref/o/ospf.html">https://www.wireshark.org/docs/dfref/o/ospf.html</a></li>
+      <li id="src-4"><cite>RFC 5613, OSPF Link-Local Signaling</cite>, A. Zinin, A. Roy, L. Nguyen, B. Friedman, D. Yeung, IETF, August 2009: §2.3. <a href="https://www.rfc-editor.org/rfc/rfc5613">https://www.rfc-editor.org/rfc/rfc5613</a></li>
     </ol>
   </section>
 </main>

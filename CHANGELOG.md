@@ -23,6 +23,17 @@ Versioning rules for this library:
   and each packet's chips line are written in the page by `tools/packet-builder.py --update`
   (checked by `check_pages.py`), so a page rendered progressively over a slow link does not
   shift (the Ethernet formats chapter measured a CLS of 0.28 that way).
+- Template components (needed by IPv4): nested Wireshark tree groups (`ws_groups`,
+  `ws_group`), the value Wireshark prints when it differs from the raw one (`ws_value`), its
+  generated lines (`ws_pre`, `ws_more`) and long data fields drawn on a few rows only
+  (`rows`, cut mark), a bit diagram that starts at a given bit (`grid_from`: the IPv4 header on
+  its own 32-bit rows, Ethernet kept in the tree and hex dump); structure diagrams without sample
+  values for TLVs and options (`NPE.struct`); a checksum walk-through computed from the builder bytes
+  (`NPE.csum`, RFC 1071, incremental update per RFC 1624); collapsible field reference
+  cards (`.fref`); one page-wide block of field docs shared by every packet (`data-field-docs="*"`);
+  green and measured-span lines (`ln-ok`, `ln-span`), text halo and a green `.tag.ok`. A chapter
+  page gets a copy of the packet data its components use (`data-packet`, `data-after`). The template
+  shows them on an OSPF LLS TLV and the Hello checksum.
 - Ethernet page (`protocols/ethernet/`): Ethernet II, IEEE 802.3 LLC and SNAP, IEEE 802.1Q
   C-TAG and Q-in-Q, MAC Control PAUSE and PFC; eight sample frames from
   `tools/packet-builder.py` (FCS and CRC residue checked), three step-by-step animations,
