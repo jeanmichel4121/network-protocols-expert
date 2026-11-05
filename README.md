@@ -84,6 +84,7 @@ links; the switch in the header changes language without reloading the page.
 | Protocol | Scope | Status |
 |---|---|---|
 | [Ethernet](https://learning.cuvelier.tech/en/ethernet/) | Ethernet II, IEEE 802.3 LLC/SNAP, IEEE 802.1Q and Q-in-Q, MAC Control (PAUSE, PFC) | Published |
+| [IPv4](https://learning.cuvelier.tech/en/ipv4/) | Full header, DS field (DSCP, ECN), fragmentation and PMTUD, every IP option | Published |
 
 The list on the [home page](https://learning.cuvelier.tech) is always current.
 

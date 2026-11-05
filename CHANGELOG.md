@@ -12,6 +12,13 @@ Versioning rules for this library:
 ## [Unreleased]
 
 ### Added
+- IPv4 page (`protocols/ipv4/`): full header, DS field (DSCP, ECN), fragmentation and PMTUD,
+  every IP option (registry with the RFC 7126 advice and the layout of each option); ten sample
+  packets from `tools/packet-builder.py` (checksums, fragments and the RFC 1624 update checked by the
+  self-test), field-by-field reference, value tables (DSCP, ECN, protocol numbers, special-purpose
+  addresses, ICMP), checksum walk-through, three step-by-step animations, six platforms with sourced
+  commands, decision tree, 20 quiz questions, 109 sources in `sources.md`. Listed on the home page;
+  label `protocol::ipv4`.
 - Published chapters (ADR 0009): every protocol page is also published as an overview
   (header and one card per chapter), one URL per section with the chapter list,
   breadcrumb and previous/next links, and a full version for print (`noindex`). The source

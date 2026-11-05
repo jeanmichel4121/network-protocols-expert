@@ -43,3 +43,4 @@
 - {name: "vendor::netscaler", color: "#117a65", description: "NetScaler"}
 - {name: "vendor::fortinet", color: "#117a65", description: "Fortinet FortiGate FortiOS"}
 - {name: "protocol::ethernet", color: "#34495e", description: "Ethernet II, IEEE 802.3, 802.1Q"}
+- {name: "protocol::ipv4", color: "#34495e", description: "IPv4 header, fragmentation, options, DSCP/ECN"}
