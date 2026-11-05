@@ -7,7 +7,7 @@
 <meta name="color-scheme" content="light dark">
 <title>Ethernet: frame format, 802.1Q and flow control | Network Protocols Expert</title>
 <meta name="description" content="The Ethernet frame at expert level: Ethernet II, 802.3 LLC/SNAP, 802.1Q and Q-in-Q, PAUSE and PFC, FCS, MTU, with configuration on six platforms.">
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%234f46e5'/%3E%3Cpath d='M7 10h18M7 16h12M7 22h15' stroke='%23fff' stroke-width='3' stroke-linecap='round'/%3E%3C/svg%3E">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%230369a1'/%3E%3Cpath d='M7 10h18M7 16h12M7 22h15' stroke='%23fff' stroke-width='3' stroke-linecap='round'/%3E%3C/svg%3E">
 <script type="application/json" id="page-meta">
 {"slug": "ethernet", "name": "Ethernet", "kind": "protocol", "updated": "2026-10-26", "title": {"fr": "Ethernet : format de trame, 802.1Q et contrôle de flux", "en": "Ethernet: frame format, 802.1Q and flow control", "nl": "Ethernet: frameformaat, 802.1Q en flow control", "de": "Ethernet: Rahmenformat, 802.1Q und Flusskontrolle"}, "description": {"fr": "La trame Ethernet au niveau expert : Ethernet II, 802.3 LLC/SNAP, 802.1Q et Q-in-Q, PAUSE et PFC, FCS, MTU, avec configuration sur six plateformes.", "en": "The Ethernet frame at expert level: Ethernet II, 802.3 LLC/SNAP, 802.1Q and Q-in-Q, PAUSE and PFC, FCS, MTU, with configuration on six platforms.", "nl": "Het Ethernet-frame op expertniveau: Ethernet II, 802.3 LLC/SNAP, 802.1Q en Q-in-Q, PAUSE en PFC, FCS, MTU, met configuratie op zes platformen.", "de": "Der Ethernet-Rahmen auf Expertenniveau: Ethernet II, 802.3 LLC/SNAP, 802.1Q und Q-in-Q, PAUSE und PFC, FCS, MTU, mit Konfiguration auf sechs Plattformen."}, "tags": ["Layer 2", "Ethernet", "VLAN", "802.1Q"], "standards": ["IEEE 802.3", "IEEE 802.1Q", "RFC 894", "RFC 1042", "RFC 9542"]}
 </script>
@@ -36,15 +36,15 @@
   --fg: light-dark(#0f172a, #e8ecf4);
   --muted: light-dark(#475569, #a3b0c6);
   --line: light-dark(#dce1eb, #2b3649);
-  --accent: light-dark(#4338ca, #a5b4fc);
+  --accent: light-dark(#0c4a6e, #38bdf8);
   --accent-ink: light-dark(#ffffff, #0b1020);
   --code-bg: light-dark(#f3f5fa, #0a0d14);
   /* Accent gradient (white text stays above 4.5:1 on both stops) and elevation */
-  --g1: light-dark(#4338ca, #a5b4fc);
-  --g2: light-dark(#7c3aed, #c4b5fd);
+  --g1: light-dark(#0c4a6e, #38bdf8);
+  --g2: light-dark(#0e7490, #67e8f9);
   --grad: linear-gradient(135deg, var(--g1), var(--g2));
   --shadow-1: 0 1px 2px light-dark(rgb(15 23 42 / 0.06), rgb(0 0 0 / 0.45)), 0 8px 22px -12px light-dark(rgb(15 23 42 / 0.2), rgb(0 0 0 / 0.75));
-  --shadow-2: 0 2px 6px light-dark(rgb(15 23 42 / 0.08), rgb(0 0 0 / 0.5)), 0 22px 44px -18px light-dark(rgb(67 56 202 / 0.38), rgb(0 0 0 / 0.85));
+  --shadow-2: 0 2px 6px light-dark(rgb(15 23 42 / 0.08), rgb(0 0 0 / 0.5)), 0 22px 44px -18px light-dark(rgb(12 74 110 / 0.38), rgb(0 0 0 / 0.85));
   /* Library colour code (CLAUDE.md "Visual standards") — fill / border pairs */
   --grey-bg: light-dark(#ebe9e3, #2d2c29);     --grey: light-dark(#6b685f, #a3a097);
   --blue-bg: light-dark(#dbe8fa, #1b3456);     --blue: light-dark(#1a5fb4, #7fb0f5);
@@ -1180,7 +1180,7 @@ window.NPE = (function () {
 <header class="site-header">
   <div class="bar">
     <a class="brand" href="../../index.html" data-home>
-      <svg width="28" height="28" viewBox="0 0 32 32" aria-hidden="true"><rect width="32" height="32" rx="7" fill="#4f46e5"/><path d="M7 10h18M7 16h12M7 22h15" stroke="#fff" stroke-width="3" stroke-linecap="round"/></svg>
+      <svg width="28" height="28" viewBox="0 0 32 32" aria-hidden="true"><rect width="32" height="32" rx="7" fill="#0369a1"/><path d="M7 10h18M7 16h12M7 22h15" stroke="#fff" stroke-width="3" stroke-linecap="round"/></svg>
       <span>Network Protocols Expert</span>
     </a>
     <a class="nav-link" href="https://about.cuvelier.tech"><span data-l="fr">À propos</span><span data-l="en">About</span><span data-l="nl">Over</span><span data-l="de">Über</span></a>
@@ -2427,7 +2427,7 @@ diagnose sniffer packet any 'host 192.0.2.10' 6 0 a</code></pre><p class="src"><
   <div class="cols">
     <div class="f-brand">
       <a class="brand" href="../../index.html" data-home>
-        <svg width="28" height="28" viewBox="0 0 32 32" aria-hidden="true"><rect width="32" height="32" rx="7" fill="#4f46e5"/><path d="M7 10h18M7 16h12M7 22h15" stroke="#fff" stroke-width="3" stroke-linecap="round"/></svg>
+        <svg width="28" height="28" viewBox="0 0 32 32" aria-hidden="true"><rect width="32" height="32" rx="7" fill="#0369a1"/><path d="M7 10h18M7 16h12M7 22h15" stroke="#fff" stroke-width="3" stroke-linecap="round"/></svg>
         <span>Network Protocols Expert</span>
       </a>
       <p><span data-l="fr">Fondé sur les RFC et la documentation officielle des vendeurs.</span><span data-l="en">Based on the RFCs and official vendor documentation.</span><span data-l="nl">Gebaseerd op de RFC's en officiële documentatie van de vendors.</span><span data-l="de">Basierend auf den RFCs und der offiziellen Herstellerdokumentation.</span></p>

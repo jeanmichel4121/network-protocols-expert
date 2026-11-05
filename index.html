@@ -9,7 +9,7 @@
 <meta name="color-scheme" content="light dark">
 <title>Network Protocols Expert | CCIE-level network protocol library</title>
 <meta name="description" content="Expert-level network protocol library: RFC bit diagrams next to Wireshark trees, animated state machines, sourced configuration for six vendors and CCIE-level quizzes.">
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%234f46e5'/%3E%3Cpath d='M7 10h18M7 16h12M7 22h15' stroke='%23fff' stroke-width='3' stroke-linecap='round'/%3E%3C/svg%3E">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%230369a1'/%3E%3Cpath d='M7 10h18M7 16h12M7 22h15' stroke='%23fff' stroke-width='3' stroke-linecap='round'/%3E%3C/svg%3E">
 <script type="application/json" id="page-meta">
 {"slug":"","name":"Network Protocols Expert","kind":"home",
  "title":{"fr":"Network Protocols Expert | protocoles réseau niveau CCIE","en":"Network Protocols Expert | CCIE-level network protocol library","nl":"Network Protocols Expert | netwerkprotocollen op CCIE-niveau","de":"Network Protocols Expert | Netzwerkprotokolle auf CCIE-Niveau"},
@@ -40,15 +40,15 @@
   --fg: light-dark(#0f172a, #e8ecf4);
   --muted: light-dark(#475569, #a3b0c6);
   --line: light-dark(#dce1eb, #2b3649);
-  --accent: light-dark(#4338ca, #a5b4fc);
+  --accent: light-dark(#0c4a6e, #38bdf8);
   --accent-ink: light-dark(#ffffff, #0b1020);
   --code-bg: light-dark(#f3f5fa, #0a0d14);
   /* Accent gradient (white text stays above 4.5:1 on both stops) and elevation */
-  --g1: light-dark(#4338ca, #a5b4fc);
-  --g2: light-dark(#7c3aed, #c4b5fd);
+  --g1: light-dark(#0c4a6e, #38bdf8);
+  --g2: light-dark(#0e7490, #67e8f9);
   --grad: linear-gradient(135deg, var(--g1), var(--g2));
   --shadow-1: 0 1px 2px light-dark(rgb(15 23 42 / 0.06), rgb(0 0 0 / 0.45)), 0 8px 22px -12px light-dark(rgb(15 23 42 / 0.2), rgb(0 0 0 / 0.75));
-  --shadow-2: 0 2px 6px light-dark(rgb(15 23 42 / 0.08), rgb(0 0 0 / 0.5)), 0 22px 44px -18px light-dark(rgb(67 56 202 / 0.38), rgb(0 0 0 / 0.85));
+  --shadow-2: 0 2px 6px light-dark(rgb(15 23 42 / 0.08), rgb(0 0 0 / 0.5)), 0 22px 44px -18px light-dark(rgb(12 74 110 / 0.38), rgb(0 0 0 / 0.85));
   /* Library colour code (CLAUDE.md "Visual standards") — fill / border pairs */
   --grey-bg: light-dark(#ebe9e3, #2d2c29);     --grey: light-dark(#6b685f, #a3a097);
   --blue-bg: light-dark(#dbe8fa, #1b3456);     --blue: light-dark(#1a5fb4, #7fb0f5);
@@ -665,8 +665,8 @@ svg.sch .halo { paint-order: stroke; stroke: var(--surface); stroke-width: 4px; 
 .about-band {
   position: relative; overflow: hidden; isolation: isolate; text-align: center;
   padding: clamp(2.5rem, 7vw, 4.5rem) clamp(1.25rem, 5vw, 3rem); border-radius: 24px; color: #fff;
-  background: linear-gradient(135deg, #3730a3 0%, #4f46e5 45%, #7c3aed 100%);
-  box-shadow: 0 40px 80px -40px rgba(67, 56, 202, 0.6);
+  background: linear-gradient(135deg, #082f49 0%, #0c4a6e 45%, #0e7490 100%);
+  box-shadow: 0 40px 80px -40px rgba(12, 74, 110, 0.6);
 }
 .about-band::before {
   content: ""; position: absolute; inset: 0; z-index: -1;
@@ -676,7 +676,7 @@ svg.sch .halo { paint-order: stroke; stroke: var(--surface); stroke-width: 4px; 
 }
 .about-band h2 { font-size: clamp(1.75rem, 1.3rem + 2vw, 2.75rem); letter-spacing: -0.02em; margin: 0 auto 0.75rem; max-width: 22ch; color: #fff; }
 .about-band p { margin: 0 auto 2rem; max-width: 58ch; color: #e4ebf7; font-size: 1.0625rem; }
-.about-band .cta.primary { background: #fff; border-color: #fff; color: #3730a3; box-shadow: 0 12px 30px -12px rgba(0, 0, 0, 0.45); }
+.about-band .cta.primary { background: #fff; border-color: #fff; color: #0c4a6e; box-shadow: 0 12px 30px -12px rgba(0, 0, 0, 0.45); }
 .about-band .cta:focus-visible { outline-color: #fff; }
 </style>
 <script>
@@ -1321,7 +1321,7 @@ window.NPE = (function () {
 <header class="site-header">
   <div class="bar">
     <a class="brand" href="index.html" data-home>
-      <svg width="28" height="28" viewBox="0 0 32 32" aria-hidden="true"><rect width="32" height="32" rx="7" fill="#4f46e5"/><path d="M7 10h18M7 16h12M7 22h15" stroke="#fff" stroke-width="3" stroke-linecap="round"/></svg>
+      <svg width="28" height="28" viewBox="0 0 32 32" aria-hidden="true"><rect width="32" height="32" rx="7" fill="#0369a1"/><path d="M7 10h18M7 16h12M7 22h15" stroke="#fff" stroke-width="3" stroke-linecap="round"/></svg>
       <span>Network Protocols Expert</span>
     </a>
     <a class="nav-link" href="https://about.cuvelier.tech"><span data-l="fr">À propos</span><span data-l="en">About</span><span data-l="nl">Over</span><span data-l="de">Über</span></a>
@@ -1782,7 +1782,7 @@ window.NPE = (function () {
   <div class="cols">
     <div class="f-brand">
       <a class="brand" href="../../index.html" data-home>
-        <svg width="28" height="28" viewBox="0 0 32 32" aria-hidden="true"><rect width="32" height="32" rx="7" fill="#4f46e5"/><path d="M7 10h18M7 16h12M7 22h15" stroke="#fff" stroke-width="3" stroke-linecap="round"/></svg>
+        <svg width="28" height="28" viewBox="0 0 32 32" aria-hidden="true"><rect width="32" height="32" rx="7" fill="#0369a1"/><path d="M7 10h18M7 16h12M7 22h15" stroke="#fff" stroke-width="3" stroke-linecap="round"/></svg>
         <span>Network Protocols Expert</span>
       </a>
       <p><span data-l="fr">Fondé sur les RFC et la documentation officielle des vendeurs.</span><span data-l="en">Based on the RFCs and official vendor documentation.</span><span data-l="nl">Gebaseerd op de RFC's en officiële documentatie van de vendors.</span><span data-l="de">Basierend auf den RFCs und der offiziellen Herstellerdokumentation.</span></p>

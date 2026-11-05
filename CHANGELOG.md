@@ -17,6 +17,8 @@ Versioning rules for this library:
   always shows its 32 columns, with the field detail under it and the Wireshark tree below
   (side by side on very wide screens only).
 - Ethernet: the seven value tables are collapsible cards, closed by default.
+- Accent colour: night blue to cyan (logo, links, buttons, gradient) instead of indigo to
+  violet, which was too close to the purple of TLVs in the diagrams.
 
 ## [0.1.0] - 2026-11-05
 

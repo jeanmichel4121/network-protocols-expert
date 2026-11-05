@@ -7,7 +7,7 @@
 <meta name="color-scheme" content="light dark">
 <title>IPv4: header, fragmentation, options and DSCP/ECN | Network Protocols Expert</title>
 <meta name="description" content="The IPv4 datagram at expert level: full header, DSCP and ECN, fragmentation, PMTUD, every option, with configuration and verification on six platforms.">
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%234f46e5'/%3E%3Cpath d='M7 10h18M7 16h12M7 22h15' stroke='%23fff' stroke-width='3' stroke-linecap='round'/%3E%3C/svg%3E">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%230369a1'/%3E%3Cpath d='M7 10h18M7 16h12M7 22h15' stroke='%23fff' stroke-width='3' stroke-linecap='round'/%3E%3C/svg%3E">
 <script type="application/json" id="page-meta">
 {"slug": "ipv4", "name": "IPv4", "kind": "protocol", "updated": "2026-11-05", "title": {"fr": "IPv4 : en-tête, fragmentation, options et DSCP/ECN", "en": "IPv4: header, fragmentation, options and DSCP/ECN", "nl": "IPv4: header, fragmentatie, opties en DSCP/ECN", "de": "IPv4: Header, Fragmentierung, Optionen und DSCP/ECN"}, "description": {"fr": "Le datagramme IPv4 au niveau expert : en-tête complet, DSCP et ECN, fragmentation, PMTUD, toutes les options, avec configuration et vérification sur six plateformes.", "en": "The IPv4 datagram at expert level: full header, DSCP and ECN, fragmentation, PMTUD, every option, with configuration and verification on six platforms.", "nl": "Het IPv4-datagram op expertniveau: volledige header, DSCP en ECN, fragmentatie, PMTUD, alle opties, met configuratie en verificatie op zes platformen.", "de": "Das IPv4-Datagramm auf Expertenniveau: vollständiger Header, DSCP und ECN, Fragmentierung, PMTUD, alle Optionen, mit Konfiguration und Verifikation auf sechs Plattformen."}, "tags": ["Layer 3", "IPv4", "Fragmentation", "DSCP/ECN"], "standards": ["RFC 791", "RFC 1122", "RFC 1812", "RFC 2474", "RFC 3168", "RFC 6864"]}
 </script>
@@ -36,15 +36,15 @@
   --fg: light-dark(#0f172a, #e8ecf4);
   --muted: light-dark(#475569, #a3b0c6);
   --line: light-dark(#dce1eb, #2b3649);
-  --accent: light-dark(#4338ca, #a5b4fc);
+  --accent: light-dark(#0c4a6e, #38bdf8);
   --accent-ink: light-dark(#ffffff, #0b1020);
   --code-bg: light-dark(#f3f5fa, #0a0d14);
   /* Accent gradient (white text stays above 4.5:1 on both stops) and elevation */
-  --g1: light-dark(#4338ca, #a5b4fc);
-  --g2: light-dark(#7c3aed, #c4b5fd);
+  --g1: light-dark(#0c4a6e, #38bdf8);
+  --g2: light-dark(#0e7490, #67e8f9);
   --grad: linear-gradient(135deg, var(--g1), var(--g2));
   --shadow-1: 0 1px 2px light-dark(rgb(15 23 42 / 0.06), rgb(0 0 0 / 0.45)), 0 8px 22px -12px light-dark(rgb(15 23 42 / 0.2), rgb(0 0 0 / 0.75));
-  --shadow-2: 0 2px 6px light-dark(rgb(15 23 42 / 0.08), rgb(0 0 0 / 0.5)), 0 22px 44px -18px light-dark(rgb(67 56 202 / 0.38), rgb(0 0 0 / 0.85));
+  --shadow-2: 0 2px 6px light-dark(rgb(15 23 42 / 0.08), rgb(0 0 0 / 0.5)), 0 22px 44px -18px light-dark(rgb(12 74 110 / 0.38), rgb(0 0 0 / 0.85));
   /* Library colour code (CLAUDE.md "Visual standards") — fill / border pairs */
   --grey-bg: light-dark(#ebe9e3, #2d2c29);     --grey: light-dark(#6b685f, #a3a097);
   --blue-bg: light-dark(#dbe8fa, #1b3456);     --blue: light-dark(#1a5fb4, #7fb0f5);
@@ -1180,7 +1180,7 @@ window.NPE = (function () {
 <header class="site-header">
   <div class="bar">
     <a class="brand" href="../../index.html" data-home>
-      <svg width="28" height="28" viewBox="0 0 32 32" aria-hidden="true"><rect width="32" height="32" rx="7" fill="#4f46e5"/><path d="M7 10h18M7 16h12M7 22h15" stroke="#fff" stroke-width="3" stroke-linecap="round"/></svg>
+      <svg width="28" height="28" viewBox="0 0 32 32" aria-hidden="true"><rect width="32" height="32" rx="7" fill="#0369a1"/><path d="M7 10h18M7 16h12M7 22h15" stroke="#fff" stroke-width="3" stroke-linecap="round"/></svg>
       <span>Network Protocols Expert</span>
     </a>
     <a class="nav-link" href="https://about.cuvelier.tech"><span data-l="fr">À propos</span><span data-l="en">About</span><span data-l="nl">Over</span><span data-l="de">Über</span></a>
@@ -2299,7 +2299,7 @@ show ip route 198.51.100.20</code></pre></td></tr><tr><td>Check Point</td><td><p
   <div class="cols">
     <div class="f-brand">
       <a class="brand" href="../../index.html" data-home>
-        <svg width="28" height="28" viewBox="0 0 32 32" aria-hidden="true"><rect width="32" height="32" rx="7" fill="#4f46e5"/><path d="M7 10h18M7 16h12M7 22h15" stroke="#fff" stroke-width="3" stroke-linecap="round"/></svg>
+        <svg width="28" height="28" viewBox="0 0 32 32" aria-hidden="true"><rect width="32" height="32" rx="7" fill="#0369a1"/><path d="M7 10h18M7 16h12M7 22h15" stroke="#fff" stroke-width="3" stroke-linecap="round"/></svg>
         <span>Network Protocols Expert</span>
       </a>
       <p><span data-l="fr">Fondé sur les RFC et la documentation officielle des vendeurs.</span><span data-l="en">Based on the RFCs and official vendor documentation.</span><span data-l="nl">Gebaseerd op de RFC's en officiële documentatie van de vendors.</span><span data-l="de">Basierend auf den RFCs und der offiziellen Herstellerdokumentation.</span></p>
