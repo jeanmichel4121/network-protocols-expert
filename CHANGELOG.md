@@ -67,6 +67,10 @@ Versioning rules for this library:
   Security, Release), GitHub improvement form and PR notice.
 
 ### Changed
+- Ethernet page, clarity pass: the Concepts chapter opens in plain language with a new diagram of
+  the five fields of a frame, the stack diagram is redrawn as "what each layer adds", the CSMA/CD
+  sequence is a numbered list, the packet and advanced chapters say where to start, and the ASCII
+  arrows are gone from the prose (drawn arrows in diagrams and legends).
 - Visual refresh of every page: slate background with an indigo to violet accent (logo and
   favicon included), gradient on the primary buttons, the active language, chapter numbers and
   the selected packet tab, elevation (shadows, hover lift) on cards, diagrams, command blocks,
