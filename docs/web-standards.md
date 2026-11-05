@@ -92,7 +92,8 @@ Component patterns:
   after its markup; tab panels start `hidden`. What a script would add above a packet's
   figure (the chips line) and the packet tab lists are written in the markup by
   `tools/packet-builder.py --update`: a page that a slow link renders progressively
-  does not shift either. CLS < 0.1 on every page. **[CI]**
+  does not shift either. CLS < 0.1 on every page, and on the packets chapters also over a
+  64 KB/s link, which makes the browser paint the page in parts. **[CI]**
 - Interactions do small DOM updates only (class toggles, one panel re-render) to keep INP
   well under 200 ms.
 - No external request of any kind. **[CI]**

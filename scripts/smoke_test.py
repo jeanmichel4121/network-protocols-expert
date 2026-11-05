@@ -4,7 +4,8 @@
 Serves the site directory (default: public/) on a local port and, in headless Chromium:
 - every page: no request leaves the local server, no console error, no uncaught exception;
 - accessibility: axe-core, WCAG 2.0/2.1/2.2 A+AA rules, in the light AND the dark theme;
-- layout stability: cumulative layout shift below 0.1 (Core Web Vitals "good");
+- layout stability: cumulative layout shift below 0.1 (Core Web Vitals "good"), and on the
+  packets chapters also over a slow link that makes the browser paint the page in parts;
 - reduced motion: no CSS animation running at load when the user asks for less motion;
 - language pages (/xx/...): the FR/EN/NL/DE buttons switch <html lang> in place and move
   the URL to the matching language; canonical + hreflang (4 + x-default) are consistent;
@@ -41,6 +42,7 @@ AXE_INTEGRITY = (
 )
 AXE_TAGS = ["wcag2a", "wcag2aa", "wcag21a", "wcag21aa", "wcag22aa"]
 CLS_BUDGET = 0.1
+SLOW_LINK = 64 * 1024  # bytes/s: slow enough for the browser to paint a page in parts
 WORKERS = max(1, int(os.environ.get("SMOKE_WORKERS", "4")))
 CACHE = pathlib.Path(".cache")
 
@@ -132,6 +134,29 @@ def check_alternates(page, base: str, rel: str) -> list:
     return errors
 
 
+def check_slow_link(browser, base: str, rel: str) -> list:
+    """Progressive render: a packets chapter starts with packets, so what a script would add after
+    the first paint moves its first screen. Over a slow link the browser paints the page in parts
+    before the page script runs: the CLS must hold there too (ADR 0009)."""
+    # No request routing here (the other passes check for external requests): a routed request
+    # skips the network emulation, and the page would arrive at full speed.
+    ctx = browser.new_context(viewport={"width": 1280, "height": 900})
+    page = ctx.new_page()
+    page.add_init_script(CLS_PROBE)
+    errors = []
+    cdp = ctx.new_cdp_session(page)
+    cdp.send("Network.enable")
+    link = {"offline": False, "latency": 40, "downloadThroughput": SLOW_LINK, "uploadThroughput": SLOW_LINK}
+    cdp.send("Network.emulateNetworkConditions", link)
+    page.goto(f"{base}/{rel}", wait_until="load", timeout=120_000)
+    page.wait_for_timeout(400)
+    cls = page.evaluate("window.__cls")
+    if cls > CLS_BUDGET:
+        errors.append(f"cumulative layout shift {cls:.3f} > {CLS_BUDGET} over a 64 KB/s link")
+    ctx.close()
+    return errors
+
+
 def check_page(browser, base: str, rel: str, axe: str) -> list:
     errors = []
     built = re.match(r"^(fr|en|nl|de)/", rel)
@@ -195,6 +220,9 @@ def check_page(browser, base: str, rel: str, axe: str) -> list:
     if overflow > 0:
         errors.append(f"horizontal scroll at 360 px ({overflow} px overflow)")
     ctx.close()
+
+    if rel.endswith("/packets/index.html"):
+        errors += check_slow_link(browser, base, rel)
     return errors
 
 

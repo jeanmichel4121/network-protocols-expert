@@ -82,6 +82,9 @@ Versioning rules for this library:
 - `scripts/sync_labels.py` and `scripts/audit_repos.py` read `GITLAB_PERSONAL_ACCESS_TOKEN` and
   `GITHUB_PERSONAL_ACCESS_TOKEN` (the names used everywhere else) instead of `GITLAB_TOKEN` and
   `GITHUB_TOKEN`; the CI pipeline name and the docs no longer use a middle dot as separator.
+- Browser smoke test: the packets chapters are also loaded over a 64 KB/s link, so a script
+  that changes the first screen after a partial paint fails every time (the CLS check alone
+  caught the Ethernet formats shift only when the runner was busy).
 - Template packet view: fields narrower than a byte (802.1Q PCP, DEI, VID), one Wireshark
   tree entry per protocol (`tree` key, optional `ws_root`), bit-mask prefix in tree lines,
   flag texts and widths, and an "Allowed values" row in the field details.
