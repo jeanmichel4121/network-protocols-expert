@@ -156,13 +156,13 @@ explanations shown, source URLs printed after each source.
 
 | Check | Job / script |
 |---|---|
-| No external resource, four languages, balanced translations, page-meta complete | `test:pages-static` · `scripts/check_pages.py` |
+| No external resource, four languages, balanced translations, page-meta complete | `test:pages-static`, `scripts/check_pages.py` |
 | Shared style block and page library identical to the template | `test:pages-static` |
 | Every diagram has a title and a legend | `test:pages-static` |
 | Sample packets identical to `tools/packet-builder.py` output | `test:pages-static` (fix with `--update`) |
 | No `TEMPLATE` placeholder in a published page | `test:pages-static` |
 | Field map tiles the packet exactly; checksums verify | `test:packet-builder` |
-| axe WCAG 2.2 AA light + dark, CLS < 0.1, reduced motion, hreflang/canonical, URL switch, 360 px, no external request, no console error | `verify:browser` · `scripts/smoke_test.py` |
+| axe WCAG 2.2 AA light + dark, CLS < 0.1, reduced motion, hreflang/canonical, URL switch, 360 px, no external request, no console error | `verify:browser`, `scripts/smoke_test.py` |
 
 ## Sources
 

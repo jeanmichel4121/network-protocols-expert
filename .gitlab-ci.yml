@@ -17,7 +17,7 @@
 # Updating an image: change the tag and its digest together (see CONTRIBUTING.md).
 
 workflow:
-  name: "$CI_COMMIT_REF_NAME · $CI_PIPELINE_SOURCE"
+  name: "$CI_COMMIT_REF_NAME ($CI_PIPELINE_SOURCE)"
   auto_cancel:
     on_new_commit: interruptible
   rules:

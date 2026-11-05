@@ -5,7 +5,7 @@ an id; `scripts/audit_repos.py` checks the live value of each automated control 
 this baseline and prints PASS/FAIL (read-only tokens are enough):
 
 ```sh
-GITLAB_TOKEN=... GITHUB_TOKEN=... python3 scripts/audit_repos.py
+GITLAB_PERSONAL_ACCESS_TOKEN=... GITHUB_PERSONAL_ACCESS_TOKEN=... python3 scripts/audit_repos.py
 ```
 
 References used for the baseline: GitLab documentation (protected branches, merge request

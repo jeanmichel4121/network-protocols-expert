@@ -1,7 +1,7 @@
 # Changelog
 
 All notable changes to this project are documented in this file.
-Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) ·
+Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 Versioning: [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 Versioning rules for this library:
@@ -79,6 +79,9 @@ Versioning rules for this library:
     starts a line (`build_site.py`).
 - CI tooling: ruff 0.17.3 (package and pre-commit hook), reuse 6.3.0 and cyclonedx-bom 8.0.1,
   as reported by the weekly dependency check; pins recompiled with hashes for Python 3.12.
+- `scripts/sync_labels.py` and `scripts/audit_repos.py` read `GITLAB_PERSONAL_ACCESS_TOKEN` and
+  `GITHUB_PERSONAL_ACCESS_TOKEN` (the names used everywhere else) instead of `GITLAB_TOKEN` and
+  `GITHUB_TOKEN`; the CI pipeline name and the docs no longer use a middle dot as separator.
 - Template packet view: fields narrower than a byte (802.1Q PCP, DEI, VID), one Wireshark
   tree entry per protocol (`tree` key, optional `ws_root`), bit-mask prefix in tree lines,
   flag texts and widths, and an "Allowed values" row in the field details.
@@ -154,6 +157,6 @@ Versioning rules for this library:
 ## [0.1.0] - 2026-10-25
 
 ### Added
-- Project scaffold, `CLAUDE.md` authoring rules, home page in FR · EN · NL · DE.
+- Project scaffold, `CLAUDE.md` authoring rules, home page in French, English, Dutch and German.
 - `tools/packet-builder.py` with OSPFv2 Hello sample and RFC 1071 checksum self-test.
 - Self-hosted GitLab Runner setup for the NAS (`infra/nas-runner`).

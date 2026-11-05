@@ -6,7 +6,7 @@ docs/repository-settings.md and prints one PASS/FAIL line per control, so an aud
 (or a drift after a manual change in a web UI) is answered in one command.
 
 Usage:
-    GITLAB_TOKEN=... GITHUB_TOKEN=... python3 scripts/audit_repos.py
+    GITLAB_PERSONAL_ACCESS_TOKEN=... GITHUB_PERSONAL_ACCESS_TOKEN=... python3 scripts/audit_repos.py
 
 Tokens are read from the environment only; read access is enough. A missing token
 skips that forge. Exit 1 if any control fails.
@@ -248,7 +248,11 @@ def audit_github(rep, token):
 
 def main() -> int:
     rep = Report()
-    for name, var, fn in (("GitLab", "GITLAB_TOKEN", audit_gitlab), ("GitHub", "GITHUB_TOKEN", audit_github)):
+    forges = (
+        ("GitLab", "GITLAB_PERSONAL_ACCESS_TOKEN", audit_gitlab),
+        ("GitHub", "GITHUB_PERSONAL_ACCESS_TOKEN", audit_github),
+    )
+    for name, var, fn in forges:
         print(f"== {name}")
         if os.environ.get(var):
             fn(rep, os.environ[var])

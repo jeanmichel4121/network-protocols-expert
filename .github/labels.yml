@@ -1,5 +1,5 @@
 # Label taxonomy, the single source for GitLab (source of truth) and the GitHub mirror.
-# Apply with: python3 scripts/sync_labels.py (needs GITLAB_TOKEN / GITHUB_TOKEN, see the script).
+# Apply with: python3 scripts/sync_labels.py (needs GITLAB_PERSONAL_ACCESS_TOKEN / GITHUB_PERSONAL_ACCESS_TOKEN, see the script).
 # Scopes use the GitLab "key::value" form; pick one value per scope on an issue or MR.
 # Colours: one family per scope, so a board reads at a glance.
 - {name: "type::page", color: "#1f75cb", description: "New protocol page"}

@@ -5,7 +5,8 @@ Creates missing labels and updates colour/description of existing ones. Labels t
 are not in the file are listed, and deleted only with --prune.
 
 Usage:
-    GITLAB_TOKEN=... GITHUB_TOKEN=... python3 scripts/sync_labels.py [--prune] [--dry-run]
+    GITLAB_PERSONAL_ACCESS_TOKEN=... GITHUB_PERSONAL_ACCESS_TOKEN=... \
+        python3 scripts/sync_labels.py [--prune] [--dry-run]
 
 Tokens are read from the environment only (never pass them on the command line).
 A missing token skips that forge.
@@ -37,10 +38,11 @@ def call(method, url, headers, body=None):
 
 def sync(forge, wanted, prune, dry):
     if forge == "gitlab":
-        h = {"PRIVATE-TOKEN": os.environ["GITLAB_TOKEN"]}
+        h = {"PRIVATE-TOKEN": os.environ["GITLAB_PERSONAL_ACCESS_TOKEN"]}
         have = {x["name"]: x for x in call("GET", f"{GITLAB}/labels?per_page=100", h)}
     else:
-        h = {"Authorization": f"Bearer {os.environ['GITHUB_TOKEN']}", "Accept": "application/vnd.github+json"}
+        token = os.environ["GITHUB_PERSONAL_ACCESS_TOKEN"]
+        h = {"Authorization": f"Bearer {token}", "Accept": "application/vnd.github+json"}
         have = {x["name"]: x for x in call("GET", f"{GITHUB}/labels?per_page=100", h)}
     for lab in wanted:
         name, color, desc = lab["name"], lab["color"], lab["description"]
@@ -70,7 +72,8 @@ def sync(forge, wanted, prune, dry):
 def main() -> int:
     wanted = yaml.safe_load((ROOT / ".github" / "labels.yml").read_text(encoding="utf-8"))
     prune, dry = "--prune" in sys.argv, "--dry-run" in sys.argv
-    for forge, var in (("gitlab", "GITLAB_TOKEN"), ("github", "GITHUB_TOKEN")):
+    tokens = (("gitlab", "GITLAB_PERSONAL_ACCESS_TOKEN"), ("github", "GITHUB_PERSONAL_ACCESS_TOKEN"))
+    for forge, var in tokens:
         if os.environ.get(var):
             sync(forge, wanted, prune, dry)
         else:
