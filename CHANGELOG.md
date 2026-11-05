@@ -77,6 +77,8 @@ Versioning rules for this library:
     score (both per reader, in `localStorage`);
   - French text gets a no-break space before `: ; ? !` and inside guillemets, so a mark never
     starts a line (`build_site.py`).
+- CI tooling: ruff 0.17.3 (package and pre-commit hook), reuse 6.3.0 and cyclonedx-bom 8.0.1,
+  as reported by the weekly dependency check; pins recompiled with hashes for Python 3.12.
 - Template packet view: fields narrower than a byte (802.1Q PCP, DEI, VID), one Wireshark
   tree entry per protocol (`tree` key, optional `ws_root`), bit-mask prefix in tree lines,
   flag texts and widths, and an "Allowed values" row in the field details.
