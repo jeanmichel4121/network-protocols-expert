@@ -71,6 +71,10 @@ Versioning rules for this library:
   the five fields of a frame, the stack diagram is redrawn as "what each layer adds", the CSMA/CD
   sequence is a numbered list, the packet and advanced chapters say where to start, and the ASCII
   arrows are gone from the prose (drawn arrows in diagrams and legends).
+- Home page: plain wording in the four languages (hero, section headings, feature cards and the
+  four steps), the key-numbers band is removed and the card no longer mentions a prediction step
+  the pages do not have. IPv4 page: `...` replaces the ellipsis character in text and diagram
+  labels, and the `⇒` shorthand and one vague adjective are written out in words.
 - Visual refresh of every page: slate background with an indigo to violet accent (logo and
   favicon included), gradient on the primary buttons, the active language, chapter numbers and
   the selected packet tab, elevation (shadows, hover lift) on cards, diagrams, command blocks,
