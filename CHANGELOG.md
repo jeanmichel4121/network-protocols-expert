@@ -23,6 +23,14 @@ Versioning rules for this library:
   for the frame variants; the two reference tables are collapsible; the sizes table states its
   units, and its throughput formula has its multiplication signs back.
 
+### Fixed
+- Ethernet: 01-80-C2-00-00-08 is filtered by customer bridges too (802.1Q Table 8-1); 4092
+  usable VLANs in the 0x003-0xFFE range; Q-in-Q adds 4 octets per tag; the IPv4 PMTUD message
+  is "Fragmentation Needed".
+- IPv4: comparison signs shown as `&lt;` and `&gt;`; one untranslated cell; IPComp is RFC 3173
+  and SCTP RFC 9260; Timestamp overflow wording; CS3 usage per RFC 4594; Palo Alto counter
+  command and description, NetScaler counter labels, as documented.
+
 ## [0.2.0] - 2026-11-05
 
 ### Changed
