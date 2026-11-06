@@ -17,7 +17,7 @@
 <meta name="description" content="Reference template for every protocol page of the Network Protocols Expert library.">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%230369a1'/%3E%3Cpath d='M7 10h18M7 16h12M7 22h15' stroke='%23fff' stroke-width='3' stroke-linecap='round'/%3E%3C/svg%3E">
 <script type="application/json" id="page-meta">
-{"slug":"_template","name":"OSPFv2","kind":"protocol","updated":"2026-10-25",
+{"slug":"_template","name":"OSPFv2","kind":"protocol","order":100,"updated":"2026-10-25",
  "title":{"fr":"Modèle de page protocole","en":"Protocol page template","nl":"Sjabloon voor protocolpagina","de":"Vorlage für Protokollseiten"},
  "description":{"fr":"Modèle de référence de chaque page protocole de la bibliothèque Network Protocols Expert.","en":"Reference template for every protocol page of the Network Protocols Expert library.","nl":"Referentiesjabloon voor elke protocolpagina van de bibliotheek Network Protocols Expert.","de":"Referenzvorlage für jede Protokollseite der Bibliothek Network Protocols Expert."},
  "tags":["IGP","link-state","IPv4"],"standards":["RFC 2328"]}
@@ -267,6 +267,13 @@ th { background: var(--surface-2); font-weight: 650; white-space: nowrap; }
 .legend div { display: flex; align-items: center; gap: 0.45rem; }
 .legend dt { display: flex; }
 .legend dd { margin: 0; }
+/* Field list under a diagram: one row per field (name, what it holds and what it is for). */
+.fields-t { max-width: none; margin: 0; padding: 0.75rem 1.1rem 0; border-top: 1px solid var(--line); font-size: 0.8125rem; font-weight: 650; color: var(--muted); }
+dl.fields { display: grid; grid-template-columns: minmax(6rem, max-content) 1fr; gap: 0.4rem 1rem; margin: 0; padding: 0.5rem 1.1rem 0.9rem; font-size: 0.875rem; }
+dl.fields div { display: contents; }
+dl.fields dt { font: 600 0.8125rem/1.5 var(--mono); }
+dl.fields dd { margin: 0; }
+@media (max-width: 40rem) { dl.fields { grid-template-columns: 1fr; gap: 0.1rem; } dl.fields dd { margin-bottom: 0.45rem; } }
 .sw { width: 1.4rem; height: 0.95rem; border-radius: 3px; border: 2px solid; display: inline-block; }
 .sw.l-header { background: var(--blue-bg); border-color: var(--blue); }
 .sw.l-body { background: var(--teal-bg); border-color: var(--teal); border-style: dashed; }
@@ -1540,7 +1547,7 @@ window.NPE = (function () {
   <section class="sec" id="quiz" aria-labelledby="h-quiz">
     <details open>
       <summary><h2 id="h-quiz"><span class="num">7</span>Quiz</h2></summary>
-      <p class="tpl" data-tpl><strong>TEMPLATE</strong> <span data-l="fr">Au moins 15 questions niveau CCIE (scénario, lecture de paquet, « que se passe-t-il si… »), chacune avec explication et référence.</span><span data-l="en">At least 15 CCIE-level questions (scenario, packet reading, "what breaks if…"), each with an explanation and a reference.</span><span data-l="nl">Minstens 15 vragen op CCIE-niveau (scenario, pakket lezen, "wat gaat er mis als…"), elk met uitleg en referentie.</span><span data-l="de">Mindestens 15 Fragen auf CCIE-Niveau (Szenario, Paket lesen, "was passiert, wenn…"), jeweils mit Erklärung und Referenz.</span></p>
+      <p class="tpl" data-tpl><strong>TEMPLATE</strong> <span data-l="fr">Au moins 15 questions de niveau expert (scénario, lecture de paquet, « que se passe-t-il si… »), chacune avec explication et référence.</span><span data-l="en">At least 15 expert-level questions (scenario, packet reading, "what breaks if…"), each with an explanation and a reference.</span><span data-l="nl">Minstens 15 vragen op expertniveau (scenario, pakket lezen, "wat gaat er mis als…"), elk met uitleg en referentie.</span><span data-l="de">Mindestens 15 Fragen auf Expertenniveau (Szenario, Paket lesen, "was passiert, wenn…"), jeweils mit Erklärung und Referenz.</span></p>
       <form id="quiz-form" novalidate>
         <fieldset class="quiz-q" data-answer="c">
           <legend>1. <span data-l="fr">R1 (198.51.100.1) reçoit de R2 un Hello dont le champ Neighbor contient 198.51.100.1. Quel événement R1 exécute-t-il pour R2 ?</span><span data-l="en">R1 (198.51.100.1) receives a Hello from R2 whose Neighbor field contains 198.51.100.1. Which event does R1 execute for R2?</span><span data-l="nl">R1 (198.51.100.1) ontvangt van R2 een Hello waarvan het Neighbor-veld 198.51.100.1 bevat. Welk event voert R1 uit voor R2?</span><span data-l="de">R1 (198.51.100.1) empfängt von R2 ein Hello, dessen Feld Neighbor 198.51.100.1 enthält. Welches Ereignis führt R1 für R2 aus?</span></legend>

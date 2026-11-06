@@ -87,3 +87,9 @@ Accessed 24-25 October 2026. Same list as section 8 (Sources) of `index.html`.
 - CLI Reference 7.4.4, config system interface: https://docs.fortinet.com/document/fortigate/7.4.4/cli-reference/317104469/config-system-interface
 - New Features 6.4.3, FortiSwitch flow control: https://docs.fortinet.com/document/fortigate/6.4.0/new-features/359959/add-option-to-enable-flow-control-and-pause-metering-6-4-3
 - Not documented officially: 802.3x flow control on FortiGate ports.
+
+## Physical layers
+
+22. IEEE 802.3 Ethernet Working Group: https://www.ieee802.org/3/index.html, archive https://www.ieee802.org/3/archive.html, task forces P802.3dj https://www.ieee802.org/3/dj/index.html, 802.3df https://www.ieee802.org/3/df/index.html, 802.3dk https://www.ieee802.org/3/dk/index.html, 802.3da https://www.ieee802.org/3/da/index.html, maintenance request 1066 https://www.ieee802.org/3/maint/requests/maint_1066.pdf
+23. TIA FOTC, IEEE 802.3 standards update: https://www.tiafotc.org/ieee-802-3-ethernet-standards-update/singlemode-standards-update/, https://www.tiafotc.org/ieee-802-3-ethernet-standards-update/multimode-standards-update/
+24. Wikipedia, Ethernet physical layer (cross-check only): https://en.wikipedia.org/wiki/Ethernet_physical_layer

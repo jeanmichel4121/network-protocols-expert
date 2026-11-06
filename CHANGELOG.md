@@ -11,6 +11,21 @@ Versioning rules for this library:
 
 ## [Unreleased]
 
+### Added
+- Ethernet, Concepts: the physical layers from 1BASE5 to 800GBASE (134 IEEE 802.3 types), with a
+  diagram on how to read a name, the meaning of every letter, one collapsible table per rate and the
+  names seen on optics that are not IEEE 802.3.
+- Template: a field list under a diagram (`.fields-t`, `dl.fields`), one row per field with what it
+  holds and what it is for; used under the seven diagrams of the Ethernet Concepts chapter.
+
+### Changed
+- Ethernet, Concepts: an envelope diagram under the first paragraph (host A sends host B a frame:
+  to, from, contains, content and the FCS as the seal).
+- Home page: the pages are listed in a suggested reading order (page-meta `order`): the layered
+  model first, then each layer bottom-up, with one sentence saying so.
+- Site: no certification is named any more ("expert level" instead of "CCIE level") on the home
+  page, in the page titles and descriptions, in the template and in the Ethernet quiz.
+
 ## [0.3.0] - 2026-11-06
 
 ### Added

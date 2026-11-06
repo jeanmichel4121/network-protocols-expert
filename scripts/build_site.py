@@ -767,7 +767,7 @@ def chooser(blocks: dict) -> str:
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="color-scheme" content="light dark">
 <title>{BRAND}</title>
-<meta name="description" content="CCIE-level network protocol library in French, English, Dutch and German.">
+<meta name="description" content="Expert-level network protocols in French, English, Dutch and German.">
 <link rel="canonical" href="{SITE}/">
 {alts}
 <link rel="alternate" hreflang="x-default" href="{SITE}/">
@@ -884,6 +884,9 @@ def main() -> int:
         text = src.read_text(encoding="utf-8")
         protocols.append((src.parent.name, text, meta_of(text, src)))
 
+    # Suggested reading order (page-meta "order"), then slug: the layered model first,
+    # then each layer bottom-up.
+    protocols.sort(key=lambda p: (p[2].get("order", 999), p[0]))
     cards = "\n".join(card(meta, slug) for slug, _, meta in protocols)
     if cards:
         home = re.sub(r"<!--PROTOCOLS-->.*?<!--/PROTOCOLS-->", lambda _: cards, home, flags=re.S)
