@@ -11,6 +11,11 @@ Versioning rules for this library:
 
 ## [Unreleased]
 
+### Changed
+- Ethernet, Concepts: three diagrams for the terminology (sizes, MAC address, VLAN tag) and one
+  for the frame variants; the two reference tables are collapsible; the sizes table states its
+  units, and its throughput formula has its multiplication signs back.
+
 ## [0.2.0] - 2026-11-05
 
 ### Changed
