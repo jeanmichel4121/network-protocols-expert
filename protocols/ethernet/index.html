@@ -306,6 +306,10 @@ details.check > div > p { margin: 0; }
 .ruler { font: 0.6875rem/1.3 var(--mono); color: var(--muted); text-align: center; }
 .ruler span:nth-child(-n+32) { text-align: left; }
 .bitgrid { gap: 0; border-left: 1px solid var(--line); border-top: 1px solid var(--line); }
+/* Height reserved before the page script draws them (--rows is written by tools/packet-builder.py
+   --update): what follows the diagram does not move when it is filled in. */
+.ruler { min-height: 1.7875rem; }
+.bitgrid { min-height: calc(var(--rows, 0) * 3.1rem + 1px); }
 .bf {
   min-height: 3.1rem; padding: 0.3rem 0.4rem; border: 0; border-right: 1px solid var(--line); border-bottom: 1px solid var(--line);
   display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; min-width: 0;
@@ -861,6 +865,11 @@ window.NPE = (function () {
     fig.querySelectorAll("[data-act]").forEach(function (b) { btn[b.dataset.act] = b; });
     var initial = {};
     svg.querySelectorAll(".badge").forEach(function (g) { initial[g.id] = { text: g.querySelector("text").textContent, cls: g.getAttribute("class") }; });
+    /* A badge shows a protocol state (kept in English) or a short explanation ("idle"): the latter
+       is translated through the figure's dictionary, <script type="application/json" data-anim-i18n>. */
+    var words = fig.querySelector("script[data-anim-i18n]");
+    words = words ? JSON.parse(words.textContent) : {};
+    function tr(t) { return words[t] ? words[t][lang()] || t : t; }
     function render() {
       svg.querySelectorAll(".msg").forEach(function (g) {
         var s = +g.dataset.step;
@@ -882,7 +891,7 @@ window.NPE = (function () {
       }
       Object.keys(state).forEach(function (bid) {
         var g = document.getElementById(bid);
-        g.querySelector("text").textContent = state[bid].text;
+        g.querySelector("text").textContent = tr(state[bid].text);
         g.setAttribute("class", state[bid].cls);
       });
       steps.forEach(function (li, k) {
@@ -1838,7 +1847,7 @@ window.NPE = (function () {
               <p class="view-title"><span data-l="fr">Diagramme de bits (RFC)</span><span data-l="en">Bit diagram (RFC)</span><span data-l="nl">Bitdiagram (RFC)</span><span data-l="de">Bitdiagramm (RFC)</span></p>
               <div class="scroll-x">
                 <div class="ruler" aria-hidden="true"></div>
-                <div class="bitgrid" role="group" data-aria="bitdiag" aria-label="RFC bit diagram"></div>
+                <div class="bitgrid" style="--rows:4" role="group" data-aria="bitdiag" aria-label="RFC bit diagram"></div>
               </div>
             </div>
             <div>
@@ -1877,7 +1886,7 @@ window.NPE = (function () {
               <p class="view-title"><span data-l="fr">Diagramme de bits (RFC)</span><span data-l="en">Bit diagram (RFC)</span><span data-l="nl">Bitdiagram (RFC)</span><span data-l="de">Bitdiagramm (RFC)</span></p>
               <div class="scroll-x">
                 <div class="ruler" aria-hidden="true"></div>
-                <div class="bitgrid" role="group" data-aria="bitdiag" aria-label="RFC bit diagram"></div>
+                <div class="bitgrid" style="--rows:8" role="group" data-aria="bitdiag" aria-label="RFC bit diagram"></div>
               </div>
             </div>
             <div>
@@ -1916,7 +1925,7 @@ window.NPE = (function () {
               <p class="view-title"><span data-l="fr">Diagramme de bits (RFC)</span><span data-l="en">Bit diagram (RFC)</span><span data-l="nl">Bitdiagram (RFC)</span><span data-l="de">Bitdiagramm (RFC)</span></p>
               <div class="scroll-x">
                 <div class="ruler" aria-hidden="true"></div>
-                <div class="bitgrid" role="group" data-aria="bitdiag" aria-label="RFC bit diagram"></div>
+                <div class="bitgrid" style="--rows:9" role="group" data-aria="bitdiag" aria-label="RFC bit diagram"></div>
               </div>
             </div>
             <div>
@@ -1955,7 +1964,7 @@ window.NPE = (function () {
               <p class="view-title"><span data-l="fr">Diagramme de bits (RFC)</span><span data-l="en">Bit diagram (RFC)</span><span data-l="nl">Bitdiagram (RFC)</span><span data-l="de">Bitdiagramm (RFC)</span></p>
               <div class="scroll-x">
                 <div class="ruler" aria-hidden="true"></div>
-                <div class="bitgrid" role="group" data-aria="bitdiag" aria-label="RFC bit diagram"></div>
+                <div class="bitgrid" style="--rows:10" role="group" data-aria="bitdiag" aria-label="RFC bit diagram"></div>
               </div>
             </div>
             <div>
@@ -1994,7 +2003,7 @@ window.NPE = (function () {
               <p class="view-title"><span data-l="fr">Diagramme de bits (RFC)</span><span data-l="en">Bit diagram (RFC)</span><span data-l="nl">Bitdiagram (RFC)</span><span data-l="de">Bitdiagramm (RFC)</span></p>
               <div class="scroll-x">
                 <div class="ruler" aria-hidden="true"></div>
-                <div class="bitgrid" role="group" data-aria="bitdiag" aria-label="RFC bit diagram"></div>
+                <div class="bitgrid" style="--rows:9" role="group" data-aria="bitdiag" aria-label="RFC bit diagram"></div>
               </div>
             </div>
             <div>
@@ -2033,7 +2042,7 @@ window.NPE = (function () {
               <p class="view-title"><span data-l="fr">Diagramme de bits (RFC)</span><span data-l="en">Bit diagram (RFC)</span><span data-l="nl">Bitdiagram (RFC)</span><span data-l="de">Bitdiagramm (RFC)</span></p>
               <div class="scroll-x">
                 <div class="ruler" aria-hidden="true"></div>
-                <div class="bitgrid" role="group" data-aria="bitdiag" aria-label="RFC bit diagram"></div>
+                <div class="bitgrid" style="--rows:10" role="group" data-aria="bitdiag" aria-label="RFC bit diagram"></div>
               </div>
             </div>
             <div>
@@ -2072,7 +2081,7 @@ window.NPE = (function () {
               <p class="view-title"><span data-l="fr">Diagramme de bits (RFC)</span><span data-l="en">Bit diagram (RFC)</span><span data-l="nl">Bitdiagram (RFC)</span><span data-l="de">Bitdiagramm (RFC)</span></p>
               <div class="scroll-x">
                 <div class="ruler" aria-hidden="true"></div>
-                <div class="bitgrid" role="group" data-aria="bitdiag" aria-label="RFC bit diagram"></div>
+                <div class="bitgrid" style="--rows:7" role="group" data-aria="bitdiag" aria-label="RFC bit diagram"></div>
               </div>
             </div>
             <div>
@@ -2111,7 +2120,7 @@ window.NPE = (function () {
               <p class="view-title"><span data-l="fr">Diagramme de bits (RFC)</span><span data-l="en">Bit diagram (RFC)</span><span data-l="nl">Bitdiagram (RFC)</span><span data-l="de">Bitdiagramm (RFC)</span></p>
               <div class="scroll-x">
                 <div class="ruler" aria-hidden="true"></div>
-                <div class="bitgrid" role="group" data-aria="bitdiag" aria-label="RFC bit diagram"></div>
+                <div class="bitgrid" style="--rows:11" role="group" data-aria="bitdiag" aria-label="RFC bit diagram"></div>
               </div>
             </div>
             <div>
@@ -2303,29 +2312,29 @@ window.NPE = (function () {
         <svg aria-labelledby="anim-txrx-t anim-txrx-now" class="sch" role="img" viewbox="0 0 780 330">
 <defs><marker id="aA" markerheight="7" markerwidth="7" orient="auto" refx="9" refy="5" viewbox="0 0 10 10"><path class="mk-flow" d="M0,0L10,5L0,10z"></path></marker>
 <marker id="aAr" markerheight="7" markerwidth="7" orient="auto" refx="9" refy="5" viewbox="0 0 10 10"><path class="mk-err" d="M0,0L10,5L0,10z"></path></marker></defs>
-<rect class="sh-box" height="210" rx="6" width="300" x="10" y="10"></rect><text class="lbl" x="22" y="30">Host A, MAC TX (00:00:5e:00:53:01)</text>
-<rect class="sh-box" height="210" rx="6" width="300" x="470" y="10"></rect><text class="lbl" x="482" y="30">Host B, MAC RX (00:00:5e:00:53:02)</text>
+<rect class="sh-box" height="210" rx="6" width="300" x="10" y="10"></rect><text class="lbl" x="22" y="30"><tspan data-l="fr">Host A, émission MAC (00:00:5e:00:53:01)</tspan><tspan data-l="en">Host A, MAC TX (00:00:5e:00:53:01)</tspan><tspan data-l="nl">Host A, MAC zendt (00:00:5e:00:53:01)</tspan><tspan data-l="de">Host A, MAC sendet (00:00:5e:00:53:01)</tspan></text>
+<rect class="sh-box" height="210" rx="6" width="300" x="470" y="10"></rect><text class="lbl" x="482" y="30"><tspan data-l="fr">Host B, réception MAC (00:00:5e:00:53:02)</tspan><tspan data-l="en">Host B, MAC RX (00:00:5e:00:53:02)</tspan><tspan data-l="nl">Host B, MAC ontvangt (00:00:5e:00:53:02)</tspan><tspan data-l="de">Host B, MAC empfängt (00:00:5e:00:53:02)</tspan></text>
 
-<g data-s="1"><rect class="sh-body" height="26" width="96" x="200" y="44"></rect><text x="206" y="62">IPv4 28 o</text></g>
-<g data-s="2"><rect class="sh-body" height="26" style="stroke-dasharray:4 3" width="96" x="200" y="74"></rect><text x="206" y="92">+ pad 18 o</text></g>
-<g data-s="3"><rect class="sh-hdr" height="56" width="172" x="22" y="44"></rect><text x="28" y="62">DA 6, SA 6</text><text x="28" y="80">Type 0x0800 2 o</text><text class="muted" x="28" y="96">→ 60 o</text></g>
-<g data-s="4"><rect class="sh-hdr" height="26" style="stroke-width:3" width="274" x="22" y="106"></rect><text x="28" y="124">FCS = CRC-32(DA...pad) → 64 o</text></g>
-<g data-s="5"><rect class="sh-enc" height="26" width="274" x="22" y="138"></rect><text x="28" y="156">Preamble 7 x 0x55 + SFD 0xD5 → 72 o</text></g>
-<g data-s="6"><rect class="sh-enc" height="40" width="274" x="22" y="170"></rect><text x="28" y="188">Serialise LSB-first (FCS: x³¹ first)</text><text class="muted" x="28" y="204">then IFG ≥ 96 bit times (12 o)</text></g>
+<g data-s="1"><rect class="sh-body" height="26" width="96" x="200" y="44"></rect><text x="206" y="62"><tspan data-l="fr">IPv4 28 o</tspan><tspan data-l="en">IPv4 28 B</tspan><tspan data-l="nl">IPv4 28 B</tspan><tspan data-l="de">IPv4 28 B</tspan></text></g>
+<g data-s="2"><rect class="sh-body" height="26" style="stroke-dasharray:4 3" width="96" x="200" y="74"></rect><text x="206" y="92"><tspan data-l="fr">+ pad 18 o</tspan><tspan data-l="en">+ pad 18 B</tspan><tspan data-l="nl">+ pad 18 B</tspan><tspan data-l="de">+ pad 18 B</tspan></text></g>
+<g data-s="3"><rect class="sh-hdr" height="56" width="172" x="22" y="44"></rect><text x="28" y="62">DA 6, SA 6</text><text x="28" y="80"><tspan data-l="fr">Type 0x0800 2 o</tspan><tspan data-l="en">Type 0x0800 2 B</tspan><tspan data-l="nl">Type 0x0800 2 B</tspan><tspan data-l="de">Type 0x0800 2 B</tspan></text><text class="muted" x="28" y="96"><tspan data-l="fr">→ 60 o</tspan><tspan data-l="en">→ 60 B</tspan><tspan data-l="nl">→ 60 B</tspan><tspan data-l="de">→ 60 B</tspan></text></g>
+<g data-s="4"><rect class="sh-hdr" height="26" style="stroke-width:3" width="274" x="22" y="106"></rect><text x="28" y="124"><tspan data-l="fr">FCS = CRC-32(DA...pad) → 64 o</tspan><tspan data-l="en">FCS = CRC-32(DA...pad) → 64 B</tspan><tspan data-l="nl">FCS = CRC-32(DA...pad) → 64 B</tspan><tspan data-l="de">FCS = CRC-32(DA...pad) → 64 B</tspan></text></g>
+<g data-s="5"><rect class="sh-enc" height="26" width="274" x="22" y="138"></rect><text x="28" y="156"><tspan data-l="fr">Preamble 7 x 0x55 + SFD 0xD5 → 72 o</tspan><tspan data-l="en">Preamble 7 x 0x55 + SFD 0xD5 → 72 B</tspan><tspan data-l="nl">Preamble 7 x 0x55 + SFD 0xD5 → 72 B</tspan><tspan data-l="de">Preamble 7 x 0x55 + SFD 0xD5 → 72 B</tspan></text></g>
+<g data-s="6"><rect class="sh-enc" height="40" width="274" x="22" y="170"></rect><text x="28" y="188"><tspan data-l="fr">Envoi LSB d'abord (FCS : x³¹ d'abord)</tspan><tspan data-l="en">Serialise LSB-first (FCS: x³¹ first)</tspan><tspan data-l="nl">Verzenden, LSB eerst (FCS: x³¹ eerst)</tspan><tspan data-l="de">Senden, LSB zuerst (FCS: x³¹ zuerst)</tspan></text><text class="muted" x="28" y="204"><tspan data-l="fr">puis IFG ≥ 96 temps bit (12 o)</tspan><tspan data-l="en">then IFG ≥ 96 bit times (12 B)</tspan><tspan data-l="nl">daarna IFG ≥ 96 bittijden (12 B)</tspan><tspan data-l="de">dann IFG ≥ 96 Bitzeiten (12 B)</tspan></text></g>
 
 <line class="ln-wire" x1="310" x2="470" y1="190" y2="190"></line>
-<g data-s="6"><path class="ln-flow" d="M312 182 H466" marker-end="url(#aA)"></path><text x="318" y="174">72 o packet + 12 o IFG</text><text class="muted" x="318" y="208">= 84 o on the wire</text></g>
+<g data-s="6"><path class="ln-flow" d="M312 182 H466" marker-end="url(#aA)"></path><text x="318" y="174"><tspan data-l="fr">paquet 72 o + IFG 12 o</tspan><tspan data-l="en">72 B packet + 12 B IFG</tspan><tspan data-l="nl">pakket 72 B + IFG 12 B</tspan><tspan data-l="de">Paket 72 B + IFG 12 B</tspan></text><text class="muted" x="318" y="208"><tspan data-l="fr">= 84 o sur le fil</tspan><tspan data-l="en">= 84 B on the wire</tspan><tspan data-l="nl">= 84 B op de draad</tspan><tspan data-l="de">= 84 B auf der Leitung</tspan></text></g>
 
-<g data-s="7"><rect class="sh-enc" height="26" width="276" x="482" y="44"></rect><text x="488" y="62">Strip preamble, lock on SFD</text></g>
-<g data-s="8"><rect class="sh-ok" height="26" width="276" x="482" y="74"></rect><text x="488" y="92">OK DA = own / bcast / joined mcast</text></g>
-<g data-s="9"><rect class="sh-ok" height="26" width="276" x="482" y="104"></rect><text x="488" y="122">OK CRC residue OK, 64 ≤ len ≤ 1518</text></g>
-<g data-s="10"><rect class="sh-body" height="40" width="276" x="482" y="134"></rect><text x="488" y="152">Type 0x0800 ≥ 0x0600 → IPv4</text><text class="muted" x="488" y="168">pass 46 o; IP removes 18 o pad</text></g>
+<g data-s="7"><rect class="sh-enc" height="26" width="276" x="482" y="44"></rect><text x="488" y="62"><tspan data-l="fr">Retire le préambule, se cale sur le SFD</tspan><tspan data-l="en">Strip preamble, lock on SFD</tspan><tspan data-l="nl">Preamble weg, synchroniseert op SFD</tspan><tspan data-l="de">Präambel entfernen, auf SFD einrasten</tspan></text></g>
+<g data-s="8"><rect class="sh-ok" height="26" width="276" x="482" y="74"></rect><text x="488" y="92"><tspan data-l="fr">OK DA = propre / bcast / mcast rejoint</tspan><tspan data-l="en">OK DA = own / bcast / joined mcast</tspan><tspan data-l="nl">OK DA = eigen / bcast / gevolgde mcast</tspan><tspan data-l="de">OK DA = eigene / Bcast / Mcast-Gruppe</tspan></text></g>
+<g data-s="9"><rect class="sh-ok" height="26" width="276" x="482" y="104"></rect><text x="488" y="122"><tspan data-l="fr">OK résidu CRC bon, 64 ≤ long. ≤ 1518</tspan><tspan data-l="en">OK CRC residue OK, 64 ≤ len ≤ 1518</tspan><tspan data-l="nl">OK CRC-rest klopt, 64 ≤ lengte ≤ 1518</tspan><tspan data-l="de">OK CRC-Rest stimmt, 64 ≤ Länge ≤ 1518</tspan></text></g>
+<g data-s="10"><rect class="sh-body" height="40" width="276" x="482" y="134"></rect><text x="488" y="152">Type 0x0800 ≥ 0x0600 → IPv4</text><text class="muted" x="488" y="168"><tspan data-l="fr">remet 46 o ; IP retire 18 o de pad</tspan><tspan data-l="en">pass 46 B; IP removes 18 B pad</tspan><tspan data-l="nl">geeft 46 B door; IP haalt 18 B pad weg</tspan><tspan data-l="de">reicht 46 B weiter; IP entfernt 18 B Pad</tspan></text></g>
 
 <g data-s="11"><rect class="sh-err" height="84" rx="6" width="300" x="470" y="236"></rect>
-<text class="lbl" x="482" y="256">NOK Discard silently (no NACK):</text>
-<text x="482" y="274">FCS bad → CRC / FCS error counter</text>
-<text x="482" y="290">&lt; 64 o → runt (fragment if FCS bad)</text>
-<text x="482" y="306">&gt; max → giant / jabber, DA mismatch</text></g>
+<text class="lbl" x="482" y="256"><tspan data-l="fr">NOK Rejet silencieux (pas de NACK) :</tspan><tspan data-l="en">NOK Discard silently (no NACK):</tspan><tspan data-l="nl">NOK Stil weggooien (geen NACK):</tspan><tspan data-l="de">NOK Still verwerfen (kein NACK):</tspan></text>
+<text x="482" y="274"><tspan data-l="fr">FCS faux → compteur d'erreurs CRC / FCS</tspan><tspan data-l="en">FCS bad → CRC / FCS error counter</tspan><tspan data-l="nl">FCS fout → foutteller CRC / FCS</tspan><tspan data-l="de">FCS falsch → Fehlerzähler CRC / FCS</tspan></text>
+<text x="482" y="290"><tspan data-l="fr">&lt; 64 o → runt (fragment si FCS faux)</tspan><tspan data-l="en">&lt; 64 B → runt (fragment if FCS bad)</tspan><tspan data-l="nl">&lt; 64 B → runt (fragment bij foute FCS)</tspan><tspan data-l="de">&lt; 64 B → Runt (Fragment bei falscher FCS)</tspan></text>
+<text x="482" y="306"><tspan data-l="fr">&gt; max → giant / jabber, DA étrangère</tspan><tspan data-l="en">&gt; max → giant / jabber, DA mismatch</tspan><tspan data-l="nl">&gt; max → giant / jabber, andere DA</tspan><tspan data-l="de">&gt; max → Giant / Jabber, fremde DA</tspan></text></g>
 <g data-s="11"><path class="ln-err" d="M620 186 V232" marker-end="url(#aAr)"></path></g>
 </svg>
       </div>
@@ -2353,22 +2362,22 @@ window.NPE = (function () {
         <svg aria-labelledby="anim-bridge-t anim-bridge-now" class="sch" role="img" viewbox="0 0 780 340">
 <defs><marker id="aB" markerheight="7" markerwidth="7" orient="auto" refx="9" refy="5" viewbox="0 0 10 10"><path class="mk-flow" d="M0,0L10,5L0,10z"></path></marker>
 <marker id="aBr" markerheight="7" markerwidth="7" orient="auto" refx="9" refy="5" viewbox="0 0 10 10"><path class="mk-err" d="M0,0L10,5L0,10z"></path></marker></defs>
-<rect class="sh-hdr" height="70" rx="6" width="150" x="300" y="130"></rect><text class="lbl" x="312" y="152">SW1 (VLAN 100)</text><text x="312" y="170">Gi1, Gi2, Gi3</text><text class="muted" x="312" y="188">ageing 300 s</text>
+<rect class="sh-hdr" height="70" rx="6" width="150" x="300" y="130"></rect><text class="lbl" x="312" y="152">SW1 (VLAN 100)</text><text x="312" y="170">Gi1, Gi2, Gi3</text><text class="muted" x="312" y="188"><tspan data-l="fr">vieillissement 300 s</tspan><tspan data-l="en">ageing 300 s</tspan><tspan data-l="nl">veroudering 300 s</tspan><tspan data-l="de">Alterung 300 s</tspan></text>
 <rect class="sh-body" height="50" rx="6" width="140" x="20" y="140"></rect><text class="lbl" x="30" y="160">H1, Gi1</text><text x="30" y="178">...:53:01</text>
 <rect class="sh-body" height="50" rx="6" width="150" x="610" y="40"></rect><text class="lbl" x="620" y="60">H2, Gi2</text><text x="620" y="78">...:53:02</text>
 <rect class="sh-body" height="50" rx="6" width="150" x="610" y="240"></rect><text class="lbl" x="620" y="260">H3, Gi3</text><text x="620" y="278">...:53:03</text>
 <line class="ln-wire" x1="160" x2="300" y1="165" y2="165"></line><line class="ln-wire" x1="450" x2="610" y1="150" y2="65"></line><line class="ln-wire" x1="450" x2="610" y1="180" y2="265"></line>
 
-<rect class="sh-box" height="96" rx="6" width="290" x="230" y="226"></rect><text class="lbl" x="242" y="246">MAC address table (VLAN 100)</text>
+<rect class="sh-box" height="96" rx="6" width="290" x="230" y="226"></rect><text class="lbl" x="242" y="246"><tspan data-l="fr">Table d'adresses MAC (VLAN 100)</tspan><tspan data-l="en">MAC address table (VLAN 100)</tspan><tspan data-l="nl">MAC-adrestabel (VLAN 100)</tspan><tspan data-l="de">MAC-Adresstabelle (VLAN 100)</tspan></text>
 <g data-s="2" data-until="8"><text x="242" y="268">00:00:5e:00:53:01 → Gi1  (dynamic)</text></g>
 <g data-s="6" data-until="8"><text x="242" y="288">00:00:5e:00:53:02 → Gi2  (dynamic)</text></g>
-<g data-s="8"><text style="fill:var(--red)" x="242" y="288">NOK ...:53:01 aged out after 300 s idle</text></g>
+<g data-s="8"><text style="fill:var(--red)" x="242" y="288"><tspan data-l="fr">NOK ...:53:01 expirée après 300 s sans trafic</tspan><tspan data-l="en">NOK ...:53:01 aged out after 300 s idle</tspan><tspan data-l="nl">NOK ...:53:01 verlopen na 300 s zonder verkeer</tspan><tspan data-l="de">NOK ...:53:01 nach 300 s ohne Verkehr gelöscht</tspan></text></g>
 
 <g data-s="1" data-until="1"><path class="ln-flow" d="M162 156 H296" marker-end="url(#aB)"></path><text x="166" y="132">DA ...:02, SA ...:01</text></g>
-<g data-s="3" data-until="4"><path class="ln-flow" d="M452 142 L606 60" marker-end="url(#aB)"></path><path class="ln-flow" d="M452 188 L606 268" marker-end="url(#aB)"></path><text x="470" y="110">flood (unknown unicast)</text></g>
-<g data-s="4" data-until="4"><text style="fill:var(--green)" x="616" y="110">OK accept</text><text style="fill:var(--red)" x="616" y="312">NOK DA ≠ own → drop</text></g>
+<g data-s="3" data-until="4"><path class="ln-flow" d="M452 142 L606 60" marker-end="url(#aB)"></path><path class="ln-flow" d="M452 188 L606 268" marker-end="url(#aB)"></path><text x="470" y="110"><tspan data-l="fr">inondé (unicast inconnu)</tspan><tspan data-l="en">flood (unknown unicast)</tspan><tspan data-l="nl">flood (unicast onbekend)</tspan><tspan data-l="de">Fluten (unbek. Unicast)</tspan></text></g>
+<g data-s="4" data-until="4"><text style="fill:var(--green)" x="616" y="110"><tspan data-l="fr">OK accepte</tspan><tspan data-l="en">OK accept</tspan><tspan data-l="nl">OK accepteert</tspan><tspan data-l="de">OK nimmt an</tspan></text><text style="fill:var(--red)" x="616" y="312"><tspan data-l="fr">NOK autre DA → rejet</tspan><tspan data-l="en">NOK DA ≠ own → drop</tspan><tspan data-l="nl">NOK DA ≠ eigen → weg</tspan><tspan data-l="de">NOK fremde DA → Drop</tspan></text></g>
 <g data-s="5" data-until="7"><path class="ln-flow" d="M606 74 L452 154" marker-end="url(#aB)"></path><text x="470" y="96">DA ...:01, SA ...:02</text></g>
-<g data-s="7" data-until="7"><path class="ln-flow" d="M298 174 H164" marker-end="url(#aB)"></path><text x="166" y="210">known unicast → Gi1 only</text></g>
+<g data-s="7" data-until="7"><path class="ln-flow" d="M298 174 H164" marker-end="url(#aB)"></path><text x="166" y="210"><tspan data-l="fr">unicast connu → Gi1 seulement</tspan><tspan data-l="en">known unicast → Gi1 only</tspan><tspan data-l="nl">bekende unicast → alleen Gi1</tspan><tspan data-l="de">bekannter Unicast → nur Gi1</tspan></text></g>
 </svg>
       </div>
       <div class="anim-controls">
@@ -2395,8 +2404,8 @@ window.NPE = (function () {
         <svg aria-labelledby="anim-pause-t anim-pause-now" class="sch" role="img" viewbox="0 0 780 300">
 <defs><marker id="aC" markerheight="7" markerwidth="7" orient="auto" refx="9" refy="5" viewbox="0 0 10 10"><path class="mk-flow" d="M0,0L10,5L0,10z"></path></marker>
 <marker id="aCo" markerheight="7" markerwidth="7" orient="auto" refx="9" refy="5" viewbox="0 0 10 10"><path class="mk-ctl" d="M0,0L10,5L0,10z"></path></marker></defs>
-<rect class="sh-hdr" height="150" rx="6" width="170" x="20" y="60"></rect><text class="lbl" x="32" y="82">SW-A (sender)</text><text x="32" y="100">...:53:01</text>
-<rect class="sh-hdr" height="150" rx="6" width="170" x="590" y="60"></rect><text class="lbl" x="602" y="82">SW-B (receiver)</text><text x="602" y="100">...:53:02</text>
+<rect class="sh-hdr" height="150" rx="6" width="170" x="20" y="60"></rect><text class="lbl" x="32" y="82"><tspan data-l="fr">SW-A (émetteur)</tspan><tspan data-l="en">SW-A (sender)</tspan><tspan data-l="nl">SW-A (zender)</tspan><tspan data-l="de">SW-A (Sender)</tspan></text><text x="32" y="100">...:53:01</text>
+<rect class="sh-hdr" height="150" rx="6" width="170" x="590" y="60"></rect><text class="lbl" x="602" y="82"><tspan data-l="fr">SW-B (récepteur)</tspan><tspan data-l="en">SW-B (receiver)</tspan><tspan data-l="nl">SW-B (ontvanger)</tspan><tspan data-l="de">SW-B (Empfänger)</tspan></text><text x="602" y="100">...:53:02</text>
 
 <rect class="sh-box" height="90" width="40" x="700" y="110"></rect>
 <line stroke="var(--red)" stroke-dasharray="4 2" stroke-width="2" x1="694" x2="746" y1="130" y2="130"></line><text class="muted" x="604" y="134">XOFF</text>
@@ -2405,16 +2414,16 @@ window.NPE = (function () {
 <g data-s="2" data-until="4"><rect class="sh-err" height="74" width="36" x="702" y="124"></rect></g>
 <g data-s="5" data-until="9"><rect class="sh-ok" height="12" width="36" x="702" y="186"></rect></g>
 
-<g data-s="1" data-until="2"><path class="ln-flow" d="M192 110 H586" marker-end="url(#aC)"></path><text x="230" y="102">data frames, all PCP, 10 Gb/s</text></g>
+<g data-s="1" data-until="2"><path class="ln-flow" d="M192 110 H586" marker-end="url(#aC)"></path><text x="230" y="102"><tspan data-l="fr">trames de données, tous PCP, 10 Gb/s</tspan><tspan data-l="en">data frames, all PCP, 10 Gb/s</tspan><tspan data-l="nl">dataframes, alle PCP, 10 Gb/s</tspan><tspan data-l="de">Datenrahmen, alle PCP, 10 Gb/s</tspan></text></g>
 <g data-s="3" data-until="3"><path class="ln-ctl" d="M586 160 H194" marker-end="url(#aCo)"></path><text x="230" y="152">PAUSE, opcode 0x0001, quanta 0xFFFF</text><text class="muted" x="230" y="178">DA 01-80-C2-00-00-01, EtherType 0x8808</text></g>
-<g data-s="4" data-until="4"><rect class="sh-err" height="40" width="146" x="32" y="120"></rect><text x="40" y="138">NOK TX halted</text><text x="40" y="154">≤ 3.36 ms @10G</text></g>
-<g data-s="5" data-until="5"><path class="ln-ctl" d="M586 160 H194" marker-end="url(#aCo)"></path><text x="230" y="152">PAUSE, quanta 0x0000 (XON) → resume now</text></g>
-<g data-s="6" data-until="6"><path class="ln-flow" d="M192 110 H586" marker-end="url(#aC)"></path><text x="230" y="102">OK traffic resumes</text></g>
+<g data-s="4" data-until="4"><rect class="sh-err" height="40" width="146" x="32" y="120"></rect><text x="40" y="138"><tspan data-l="fr">NOK émission arrêtée</tspan><tspan data-l="en">NOK TX halted</tspan><tspan data-l="nl">NOK zenden gestopt</tspan><tspan data-l="de">NOK Senden gestoppt</tspan></text><text x="40" y="154">≤ 3.36 ms @10G</text></g>
+<g data-s="5" data-until="5"><path class="ln-ctl" d="M586 160 H194" marker-end="url(#aCo)"></path><text x="230" y="152"><tspan data-l="fr">PAUSE, quanta 0x0000 (XON) → reprise immédiate</tspan><tspan data-l="en">PAUSE, quanta 0x0000 (XON) → resume now</tspan><tspan data-l="nl">PAUSE, quanta 0x0000 (XON) → meteen hervatten</tspan><tspan data-l="de">PAUSE, quanta 0x0000 (XON) → sofort weiter</tspan></text></g>
+<g data-s="6" data-until="6"><path class="ln-flow" d="M192 110 H586" marker-end="url(#aC)"></path><text x="230" y="102"><tspan data-l="fr">OK le trafic reprend</tspan><tspan data-l="en">OK traffic resumes</tspan><tspan data-l="nl">OK verkeer loopt weer</tspan><tspan data-l="de">OK Verkehr läuft wieder</tspan></text></g>
 
-<g data-s="7"><rect class="sh-ext" height="80" rx="6" width="280" x="250" y="210"></rect><text class="lbl" x="262" y="230">PFC: 8 queues per port</text>
-<text x="262" y="250">P0 P1 P2 [P3] P4 P5 P6 P7</text><text class="muted" x="262" y="270">only P3 paused, others flow</text></g>
+<g data-s="7"><rect class="sh-ext" height="80" rx="6" width="280" x="250" y="210"></rect><text class="lbl" x="262" y="230"><tspan data-l="fr">PFC : 8 files par port</tspan><tspan data-l="en">PFC: 8 queues per port</tspan><tspan data-l="nl">PFC: 8 wachtrijen per poort</tspan><tspan data-l="de">PFC: 8 Warteschlangen je Port</tspan></text>
+<text x="262" y="250">P0 P1 P2 [P3] P4 P5 P6 P7</text><text class="muted" x="262" y="270"><tspan data-l="fr">seule P3 en pause, les autres passent</tspan><tspan data-l="en">only P3 paused, others flow</tspan><tspan data-l="nl">alleen P3 gepauzeerd, de rest loopt</tspan><tspan data-l="de">nur P3 pausiert, der Rest läuft</tspan></text></g>
 <g data-s="8" data-until="8"><path class="ln-ctl" d="M586 196 H194" marker-end="url(#aCo)"></path><text x="230" y="190">PFC, opcode 0x0101, e[3]=1, Time(3)=0xFFFF</text></g>
-<g data-s="9"><path class="ln-flow" d="M192 110 H586" marker-end="url(#aC)"></path><text x="230" y="102">P0-P2, P4-P7 continue, P3 held</text></g>
+<g data-s="9"><path class="ln-flow" d="M192 110 H586" marker-end="url(#aC)"></path><text x="230" y="102"><tspan data-l="fr">P0-P2, P4-P7 continuent, P3 retenue</tspan><tspan data-l="en">P0-P2, P4-P7 continue, P3 held</tspan><tspan data-l="nl">P0-P2, P4-P7 lopen door, P3 wacht</tspan><tspan data-l="de">P0-P2, P4-P7 laufen weiter, P3 wartet</tspan></text></g>
 </svg>
       </div>
       <div class="anim-controls">

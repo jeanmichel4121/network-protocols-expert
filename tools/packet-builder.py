@@ -2163,6 +2163,7 @@ PACKET_ARTICLE = re.compile(
 CHIPS = re.compile(r'(<ul class="packet-meta"(?: data-ref="([^"]*)")?>).*?(</ul>)', re.S)
 PACKET_SET = re.compile(r'<div class="pkt-set" id="[a-z0-9-]+">')
 SET_TABS = re.compile(r'\s*<div role="tablist" data-aria="packets"[^>]*>.*?</div>', re.S)
+GRID = re.compile(r'<div class="bitgrid"(?: style="--rows:\d+")?')
 BYTES = (("fr", "octets"), ("en", "bytes"), ("nl", "bytes"), ("de", "Byte"))  # the template's "bytes"
 
 
@@ -2213,7 +2214,31 @@ def with_chips(m: re.Match) -> str:
         items = [f"{s['length']} {unit}", html.escape(s["encapsulation"], quote=False), c.group(2) or ""]
         return c.group(1) + "".join(f"<li>{item}</li>" for item in items if item) + c.group(3)
 
-    return CHIPS.sub(line, m.group(0), count=1)
+    article = CHIPS.sub(line, m.group(0), count=1)
+    return GRID.sub(f'<div class="bitgrid" style="--rows:{grid_rows(s)}"', article, count=1)
+
+
+def grid_rows(sample: dict) -> int:
+    """Rows the page script draws in the bit diagram (same walk as NPE.packet in the template):
+    the page reserves that height, so the diagram does not push the content below it when the
+    script fills it in after the first paint."""
+    origin, rows = sample.get("grid_from", 0), set()
+    for f in sample["fields"]:
+        if f["offset"] < origin:
+            continue
+        start, left, first, row = f["offset"] - origin, f["bits"], True, 1
+        while left > 0:
+            col = start % 32
+            take = min(left, 32 - col)
+            more = left // 32 if not first and not f.get("rows") and col == 0 else 0
+            rows.add(start // 32)
+            if more > 1:
+                start, left = start + more * 32, left - more * 32
+                continue
+            if f.get("rows") and row == f["rows"] and left > take:
+                break
+            start, left, first, row = start + take, left - take, False, row + 1
+    return len(rows)
 
 
 def with_id(article: str, sample: str) -> str:

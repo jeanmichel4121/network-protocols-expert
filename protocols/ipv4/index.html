@@ -306,6 +306,10 @@ details.check > div > p { margin: 0; }
 .ruler { font: 0.6875rem/1.3 var(--mono); color: var(--muted); text-align: center; }
 .ruler span:nth-child(-n+32) { text-align: left; }
 .bitgrid { gap: 0; border-left: 1px solid var(--line); border-top: 1px solid var(--line); }
+/* Height reserved before the page script draws them (--rows is written by tools/packet-builder.py
+   --update): what follows the diagram does not move when it is filled in. */
+.ruler { min-height: 1.7875rem; }
+.bitgrid { min-height: calc(var(--rows, 0) * 3.1rem + 1px); }
 .bf {
   min-height: 3.1rem; padding: 0.3rem 0.4rem; border: 0; border-right: 1px solid var(--line); border-bottom: 1px solid var(--line);
   display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; min-width: 0;
@@ -861,6 +865,11 @@ window.NPE = (function () {
     fig.querySelectorAll("[data-act]").forEach(function (b) { btn[b.dataset.act] = b; });
     var initial = {};
     svg.querySelectorAll(".badge").forEach(function (g) { initial[g.id] = { text: g.querySelector("text").textContent, cls: g.getAttribute("class") }; });
+    /* A badge shows a protocol state (kept in English) or a short explanation ("idle"): the latter
+       is translated through the figure's dictionary, <script type="application/json" data-anim-i18n>. */
+    var words = fig.querySelector("script[data-anim-i18n]");
+    words = words ? JSON.parse(words.textContent) : {};
+    function tr(t) { return words[t] ? words[t][lang()] || t : t; }
     function render() {
       svg.querySelectorAll(".msg").forEach(function (g) {
         var s = +g.dataset.step;
@@ -882,7 +891,7 @@ window.NPE = (function () {
       }
       Object.keys(state).forEach(function (bid) {
         var g = document.getElementById(bid);
-        g.querySelector("text").textContent = state[bid].text;
+        g.querySelector("text").textContent = tr(state[bid].text);
         g.setAttribute("class", state[bid].cls);
       });
       steps.forEach(function (li, k) {
@@ -1386,7 +1395,7 @@ window.NPE = (function () {
               <p class="view-title"><span data-l="fr">Diagramme de bits (RFC)</span><span data-l="en">Bit diagram (RFC)</span><span data-l="nl">Bitdiagram (RFC)</span><span data-l="de">Bitdiagramm (RFC)</span></p>
               <div class="scroll-x">
                 <div class="ruler" aria-hidden="true"></div>
-                <div class="bitgrid" role="group" data-aria="bitdiag" aria-label="RFC bit diagram"></div>
+                <div class="bitgrid" style="--rows:9" role="group" data-aria="bitdiag" aria-label="RFC bit diagram"></div>
               </div>
             </div>
             <div>
@@ -1418,7 +1427,7 @@ window.NPE = (function () {
               <p class="view-title"><span data-l="fr">Diagramme de bits (RFC)</span><span data-l="en">Bit diagram (RFC)</span><span data-l="nl">Bitdiagram (RFC)</span><span data-l="de">Bitdiagramm (RFC)</span></p>
               <div class="scroll-x">
                 <div class="ruler" aria-hidden="true"></div>
-                <div class="bitgrid" role="group" data-aria="bitdiag" aria-label="RFC bit diagram"></div>
+                <div class="bitgrid" style="--rows:9" role="group" data-aria="bitdiag" aria-label="RFC bit diagram"></div>
               </div>
             </div>
             <div>
@@ -1450,7 +1459,7 @@ window.NPE = (function () {
               <p class="view-title"><span data-l="fr">Diagramme de bits (RFC)</span><span data-l="en">Bit diagram (RFC)</span><span data-l="nl">Bitdiagram (RFC)</span><span data-l="de">Bitdiagramm (RFC)</span></p>
               <div class="scroll-x">
                 <div class="ruler" aria-hidden="true"></div>
-                <div class="bitgrid" role="group" data-aria="bitdiag" aria-label="RFC bit diagram"></div>
+                <div class="bitgrid" style="--rows:7" role="group" data-aria="bitdiag" aria-label="RFC bit diagram"></div>
               </div>
             </div>
             <div>
@@ -1482,7 +1491,7 @@ window.NPE = (function () {
               <p class="view-title"><span data-l="fr">Diagramme de bits (RFC)</span><span data-l="en">Bit diagram (RFC)</span><span data-l="nl">Bitdiagram (RFC)</span><span data-l="de">Bitdiagramm (RFC)</span></p>
               <div class="scroll-x">
                 <div class="ruler" aria-hidden="true"></div>
-                <div class="bitgrid" role="group" data-aria="bitdiag" aria-label="RFC bit diagram"></div>
+                <div class="bitgrid" style="--rows:7" role="group" data-aria="bitdiag" aria-label="RFC bit diagram"></div>
               </div>
             </div>
             <div>
@@ -1514,7 +1523,7 @@ window.NPE = (function () {
               <p class="view-title"><span data-l="fr">Diagramme de bits (RFC)</span><span data-l="en">Bit diagram (RFC)</span><span data-l="nl">Bitdiagram (RFC)</span><span data-l="de">Bitdiagramm (RFC)</span></p>
               <div class="scroll-x">
                 <div class="ruler" aria-hidden="true"></div>
-                <div class="bitgrid" role="group" data-aria="bitdiag" aria-label="RFC bit diagram"></div>
+                <div class="bitgrid" style="--rows:8" role="group" data-aria="bitdiag" aria-label="RFC bit diagram"></div>
               </div>
             </div>
             <div>
@@ -1546,7 +1555,7 @@ window.NPE = (function () {
               <p class="view-title"><span data-l="fr">Diagramme de bits (RFC)</span><span data-l="en">Bit diagram (RFC)</span><span data-l="nl">Bitdiagram (RFC)</span><span data-l="de">Bitdiagramm (RFC)</span></p>
               <div class="scroll-x">
                 <div class="ruler" aria-hidden="true"></div>
-                <div class="bitgrid" role="group" data-aria="bitdiag" aria-label="RFC bit diagram"></div>
+                <div class="bitgrid" style="--rows:19" role="group" data-aria="bitdiag" aria-label="RFC bit diagram"></div>
               </div>
             </div>
             <div>
@@ -1578,7 +1587,7 @@ window.NPE = (function () {
               <p class="view-title"><span data-l="fr">Diagramme de bits (RFC)</span><span data-l="en">Bit diagram (RFC)</span><span data-l="nl">Bitdiagram (RFC)</span><span data-l="de">Bitdiagramm (RFC)</span></p>
               <div class="scroll-x">
                 <div class="ruler" aria-hidden="true"></div>
-                <div class="bitgrid" role="group" data-aria="bitdiag" aria-label="RFC bit diagram"></div>
+                <div class="bitgrid" style="--rows:18" role="group" data-aria="bitdiag" aria-label="RFC bit diagram"></div>
               </div>
             </div>
             <div>
@@ -1610,7 +1619,7 @@ window.NPE = (function () {
               <p class="view-title"><span data-l="fr">Diagramme de bits (RFC)</span><span data-l="en">Bit diagram (RFC)</span><span data-l="nl">Bitdiagram (RFC)</span><span data-l="de">Bitdiagramm (RFC)</span></p>
               <div class="scroll-x">
                 <div class="ruler" aria-hidden="true"></div>
-                <div class="bitgrid" role="group" data-aria="bitdiag" aria-label="RFC bit diagram"></div>
+                <div class="bitgrid" style="--rows:12" role="group" data-aria="bitdiag" aria-label="RFC bit diagram"></div>
               </div>
             </div>
             <div>
@@ -1642,7 +1651,7 @@ window.NPE = (function () {
               <p class="view-title"><span data-l="fr">Diagramme de bits (RFC)</span><span data-l="en">Bit diagram (RFC)</span><span data-l="nl">Bitdiagram (RFC)</span><span data-l="de">Bitdiagramm (RFC)</span></p>
               <div class="scroll-x">
                 <div class="ruler" aria-hidden="true"></div>
-                <div class="bitgrid" role="group" data-aria="bitdiag" aria-label="RFC bit diagram"></div>
+                <div class="bitgrid" style="--rows:9" role="group" data-aria="bitdiag" aria-label="RFC bit diagram"></div>
               </div>
             </div>
             <div>
@@ -1674,7 +1683,7 @@ window.NPE = (function () {
               <p class="view-title"><span data-l="fr">Diagramme de bits (RFC)</span><span data-l="en">Bit diagram (RFC)</span><span data-l="nl">Bitdiagram (RFC)</span><span data-l="de">Bitdiagramm (RFC)</span></p>
               <div class="scroll-x">
                 <div class="ruler" aria-hidden="true"></div>
-                <div class="bitgrid" role="group" data-aria="bitdiag" aria-label="RFC bit diagram"></div>
+                <div class="bitgrid" style="--rows:9" role="group" data-aria="bitdiag" aria-label="RFC bit diagram"></div>
               </div>
             </div>
             <div>
@@ -1854,28 +1863,28 @@ window.NPE = (function () {
 <marker id="aAr" markerheight="7" markerwidth="7" orient="auto-start-reverse" refx="9" refy="5" viewbox="0 0 10 10"><path class="mk-err" d="M0,0L10,5L0,10z"></path></marker>
 <marker id="aAg" markerheight="7" markerwidth="7" orient="auto-start-reverse" refx="9" refy="5" viewbox="0 0 10 10"><path class="mk-ok" d="M0,0L10,5L0,10z"></path></marker>
 </defs>
-<g data-s="1"><rect class="sh-enc" height="60" rx="5" width="150" x="20" y="30"></rect><text class="lbl" style="font-size:13px" text-anchor="middle" x="95" y="55">1. Receive</text><text class="mono" style="font-size:9.5px" text-anchor="middle" x="95" y="74">EtherType 0x0800</text></g>
-<g data-s="2"><path class="ln-flow" d="M170 60H198" marker-end="url(#aA)"></path><rect class="sh-hdr" height="60" rx="5" width="150" x="200" y="30"></rect><text class="lbl" style="font-size:13px" text-anchor="middle" x="275" y="55">2. Validate</text><text class="mono" style="font-size:9.5px" text-anchor="middle" x="275" y="74">len, csum, ver, IHL, TL</text>
-<path class="ln-err" d="M275 90V118" marker-end="url(#aAr)"></path><text class="muted" style="font-size:10px" x="282" y="108">✗ fail</text>
-<rect class="sh-err" height="44" rx="5" width="150" x="200" y="120"></rect><text class="lbl" style="font-size:12px" text-anchor="middle" x="275" y="140">✗ silent discard</text><text style="font-size:10px" text-anchor="middle" x="275" y="156">+ log (SHOULD)</text></g>
-<g data-s="3"><path class="ln-flow" d="M350 60H378" marker-end="url(#aA)"></path><text class="muted" style="font-size:10px" x="352" y="52">✓</text><rect class="sh-hdr" height="60" rx="5" width="150" x="380" y="30"></rect><text class="lbl" style="font-size:13px" text-anchor="middle" x="455" y="55">3. For me?</text><text class="mono" style="font-size:9.5px" text-anchor="middle" x="455" y="74">dst = local / bcast / mcast</text>
-<path class="ln-ok" d="M455 90V118" marker-end="url(#aAg)"></path><text class="muted" style="font-size:10px" x="462" y="108">yes</text>
-<rect class="sh-body" height="44" rx="5" width="150" x="380" y="120"></rect><text class="lbl" style="font-size:12px" text-anchor="middle" x="455" y="139">deliver locally</text><text style="font-size:10px" text-anchor="middle" x="455" y="155">reassemble: Protocol</text></g>
-<g data-s="4"><path class="ln-flow" d="M530 60H558" marker-end="url(#aA)"></path><text class="muted" style="font-size:10px" x="534" y="52">no</text><rect class="sh-hdr" height="60" rx="5" width="150" x="560" y="30"></rect><text class="lbl" style="font-size:13px" text-anchor="middle" x="635" y="55">4. TTL − 1</text><text class="mono" style="font-size:9.5px" text-anchor="middle" x="635" y="74">result = 0 ?</text>
+<g data-s="1"><rect class="sh-enc" height="60" rx="5" width="150" x="20" y="30"></rect><text class="lbl" style="font-size:13px" text-anchor="middle" x="95" y="55"><tspan data-l="fr">1. Réception</tspan><tspan data-l="en">1. Receive</tspan><tspan data-l="nl">1. Ontvangst</tspan><tspan data-l="de">1. Empfang</tspan></text><text class="mono" style="font-size:9.5px" text-anchor="middle" x="95" y="74">EtherType 0x0800</text></g>
+<g data-s="2"><path class="ln-flow" d="M170 60H198" marker-end="url(#aA)"></path><rect class="sh-hdr" height="60" rx="5" width="150" x="200" y="30"></rect><text class="lbl" style="font-size:13px" text-anchor="middle" x="275" y="55"><tspan data-l="fr">2. Validation</tspan><tspan data-l="en">2. Validate</tspan><tspan data-l="nl">2. Controle</tspan><tspan data-l="de">2. Prüfung</tspan></text><text class="mono" style="font-size:9.5px" text-anchor="middle" x="275" y="74">len, csum, ver, IHL, TL</text>
+<path class="ln-err" d="M275 90V118" marker-end="url(#aAr)"></path><text class="muted" style="font-size:10px" x="282" y="108"><tspan data-l="fr">✗ échec</tspan><tspan data-l="en">✗ fail</tspan><tspan data-l="nl">✗ fout</tspan><tspan data-l="de">✗ Fehler</tspan></text>
+<rect class="sh-err" height="44" rx="5" width="150" x="200" y="120"></rect><text class="lbl" style="font-size:12px" text-anchor="middle" x="275" y="140"><tspan data-l="fr">✗ rejet silencieux</tspan><tspan data-l="en">✗ silent discard</tspan><tspan data-l="nl">✗ stil weggooien</tspan><tspan data-l="de">✗ still verwerfen</tspan></text><text style="font-size:10px" text-anchor="middle" x="275" y="156"><tspan data-l="fr">+ journal (SHOULD)</tspan><tspan data-l="en">+ log (SHOULD)</tspan><tspan data-l="nl">+ log (SHOULD)</tspan><tspan data-l="de">+ Log (SHOULD)</tspan></text></g>
+<g data-s="3"><path class="ln-flow" d="M350 60H378" marker-end="url(#aA)"></path><text class="muted" style="font-size:10px" x="352" y="52">✓</text><rect class="sh-hdr" height="60" rx="5" width="150" x="380" y="30"></rect><text class="lbl" style="font-size:13px" text-anchor="middle" x="455" y="55"><tspan data-l="fr">3. Pour moi ?</tspan><tspan data-l="en">3. For me?</tspan><tspan data-l="nl">3. Voor mij?</tspan><tspan data-l="de">3. Für mich?</tspan></text><text class="mono" style="font-size:9.5px" text-anchor="middle" x="455" y="74">dst = local / bcast / mcast</text>
+<path class="ln-ok" d="M455 90V118" marker-end="url(#aAg)"></path><text class="muted" style="font-size:10px" x="462" y="108"><tspan data-l="fr">oui</tspan><tspan data-l="en">yes</tspan><tspan data-l="nl">ja</tspan><tspan data-l="de">ja</tspan></text>
+<rect class="sh-body" height="44" rx="5" width="150" x="380" y="120"></rect><text class="lbl" style="font-size:12px" text-anchor="middle" x="455" y="139"><tspan data-l="fr">remise locale</tspan><tspan data-l="en">deliver locally</tspan><tspan data-l="nl">lokaal afleveren</tspan><tspan data-l="de">lokal zustellen</tspan></text><text style="font-size:10px" text-anchor="middle" x="455" y="155"><tspan data-l="fr">réassemblage : Protocol</tspan><tspan data-l="en">reassemble: Protocol</tspan><tspan data-l="nl">herassembleren: Protocol</tspan><tspan data-l="de">reassemblieren: Protocol</tspan></text></g>
+<g data-s="4"><path class="ln-flow" d="M530 60H558" marker-end="url(#aA)"></path><text class="muted" style="font-size:10px" x="534" y="52"><tspan data-l="fr">non</tspan><tspan data-l="en">no</tspan><tspan data-l="nl">nee</tspan><tspan data-l="de">nein</tspan></text><rect class="sh-hdr" height="60" rx="5" width="150" x="560" y="30"></rect><text class="lbl" style="font-size:13px" text-anchor="middle" x="635" y="55">4. TTL − 1</text><text class="mono" style="font-size:9.5px" text-anchor="middle" x="635" y="74"><tspan data-l="fr">résultat = 0 ?</tspan><tspan data-l="en">result = 0?</tspan><tspan data-l="nl">resultaat = 0?</tspan><tspan data-l="de">Ergebnis = 0?</tspan></text>
 <path class="ln-err" d="M635 90V118" marker-end="url(#aAr)"></path><text class="muted" style="font-size:10px" x="642" y="108">0</text>
-<rect class="sh-err" height="44" rx="5" width="150" x="560" y="120"></rect><text class="lbl" style="font-size:12px" text-anchor="middle" x="635" y="139">✗ drop + ICMP 11/0</text><text style="font-size:10px" text-anchor="middle" x="635" y="155">not for multicast</text></g>
-<g data-s="5"><path class="ln-flow" d="M710 60H738" marker-end="url(#aA)"></path><rect class="sh-ext" height="60" rx="5" width="145" x="740" y="30"></rect><text class="lbl" style="font-size:13px" text-anchor="middle" x="812" y="55">5. Options?</text><text class="mono" style="font-size:9.5px" text-anchor="middle" x="812" y="74">IHL &gt; 5: slow path</text></g>
-<g data-s="6"><path class="ln-flow" d="M812 90V198" marker-end="url(#aA)"></path><rect class="sh-hdr" height="60" rx="5" width="145" x="740" y="200"></rect><text class="lbl" style="font-size:13px" text-anchor="middle" x="812" y="225">6. Route lookup</text><text class="mono" style="font-size:9.5px" text-anchor="middle" x="812" y="244">longest prefix</text>
-<path class="ln-err" d="M812 260V308" marker-end="url(#aAr)"></path><text class="muted" style="font-size:10px" x="819" y="290">no route</text>
-<rect class="sh-err" height="44" rx="5" width="145" x="740" y="310"></rect><text class="lbl" style="font-size:12px" text-anchor="middle" x="812" y="329">✗ drop + ICMP 3</text><text style="font-size:10px" text-anchor="middle" x="812" y="345">Destination Unreachable</text></g>
-<g data-s="7"><path class="ln-flow" d="M740 230H672" marker-end="url(#aA)"></path><rect class="sh-hdr" height="60" rx="5" width="170" x="500" y="200"></rect><text class="lbl" style="font-size:13px" text-anchor="middle" x="585" y="225">7. Size vs egress MTU</text><text class="mono" style="font-size:9.5px" text-anchor="middle" x="585" y="244">Total Length ≤ MTU ?</text>
+<rect class="sh-err" height="44" rx="5" width="150" x="560" y="120"></rect><text class="lbl" style="font-size:12px" text-anchor="middle" x="635" y="139"><tspan data-l="fr">✗ rejet + ICMP 11/0</tspan><tspan data-l="en">✗ drop + ICMP 11/0</tspan><tspan data-l="nl">✗ drop + ICMP 11/0</tspan><tspan data-l="de">✗ verwerfen + ICMP 11/0</tspan></text><text style="font-size:10px" text-anchor="middle" x="635" y="155"><tspan data-l="fr">pas pour le multicast</tspan><tspan data-l="en">not for multicast</tspan><tspan data-l="nl">niet voor multicast</tspan><tspan data-l="de">nicht bei Multicast</tspan></text></g>
+<g data-s="5"><path class="ln-flow" d="M710 60H738" marker-end="url(#aA)"></path><rect class="sh-ext" height="60" rx="5" width="145" x="740" y="30"></rect><text class="lbl" style="font-size:13px" text-anchor="middle" x="812" y="55"><tspan data-l="fr">5. Options ?</tspan><tspan data-l="en">5. Options?</tspan><tspan data-l="nl">5. Opties?</tspan><tspan data-l="de">5. Optionen?</tspan></text><text class="mono" style="font-size:9.5px" text-anchor="middle" x="812" y="74"><tspan data-l="fr">IHL &gt; 5 : chemin lent</tspan><tspan data-l="en">IHL &gt; 5: slow path</tspan><tspan data-l="nl">IHL &gt; 5: traag pad</tspan><tspan data-l="de">IHL &gt; 5: Slow Path</tspan></text></g>
+<g data-s="6"><path class="ln-flow" d="M812 90V198" marker-end="url(#aA)"></path><rect class="sh-hdr" height="60" rx="5" width="145" x="740" y="200"></rect><text class="lbl" style="font-size:13px" text-anchor="middle" x="812" y="225"><tspan data-l="fr">6. Recherche de route</tspan><tspan data-l="en">6. Route lookup</tspan><tspan data-l="nl">6. Route opzoeken</tspan><tspan data-l="de">6. Routensuche</tspan></text><text class="mono" style="font-size:9.5px" text-anchor="middle" x="812" y="244"><tspan data-l="fr">préfixe le plus long</tspan><tspan data-l="en">longest prefix</tspan><tspan data-l="nl">langste prefix</tspan><tspan data-l="de">längstes Präfix</tspan></text>
+<path class="ln-err" d="M812 260V308" marker-end="url(#aAr)"></path><text class="muted" style="font-size:10px" x="819" y="290"><tspan data-l="fr">pas de route</tspan><tspan data-l="en">no route</tspan><tspan data-l="nl">geen route</tspan><tspan data-l="de">keine Route</tspan></text>
+<rect class="sh-err" height="44" rx="5" width="145" x="740" y="310"></rect><text class="lbl" style="font-size:12px" text-anchor="middle" x="812" y="329"><tspan data-l="fr">✗ rejet + ICMP 3</tspan><tspan data-l="en">✗ drop + ICMP 3</tspan><tspan data-l="nl">✗ drop + ICMP 3</tspan><tspan data-l="de">✗ verwerfen + ICMP 3</tspan></text><text style="font-size:10px" text-anchor="middle" x="812" y="345">Destination Unreachable</text></g>
+<g data-s="7"><path class="ln-flow" d="M740 230H672" marker-end="url(#aA)"></path><rect class="sh-hdr" height="60" rx="5" width="170" x="500" y="200"></rect><text class="lbl" style="font-size:13px" text-anchor="middle" x="585" y="225"><tspan data-l="fr">7. Taille et MTU de sortie</tspan><tspan data-l="en">7. Size vs egress MTU</tspan><tspan data-l="nl">7. Grootte en uitgaande MTU</tspan><tspan data-l="de">7. Größe und Ausgangs-MTU</tspan></text><text class="mono" style="font-size:9.5px" text-anchor="middle" x="585" y="244"><tspan data-l="fr">Total Length ≤ MTU ?</tspan><tspan data-l="en">Total Length ≤ MTU?</tspan><tspan data-l="nl">Total Length ≤ MTU?</tspan><tspan data-l="de">Total Length ≤ MTU?</tspan></text>
 <path class="ln-err" d="M585 260V308" marker-end="url(#aAr)"></path><text class="muted" style="font-size:10px" x="592" y="290">&gt; MTU, DF=1</text>
-<rect class="sh-err" height="44" rx="5" width="170" x="500" y="310"></rect><text class="lbl" style="font-size:12px" text-anchor="middle" x="585" y="329">✗ drop + ICMP 3/4</text><text class="mono" style="font-size:10px" text-anchor="middle" x="585" y="345">Next-Hop MTU</text>
+<rect class="sh-err" height="44" rx="5" width="170" x="500" y="310"></rect><text class="lbl" style="font-size:12px" text-anchor="middle" x="585" y="329"><tspan data-l="fr">✗ rejet + ICMP 3/4</tspan><tspan data-l="en">✗ drop + ICMP 3/4</tspan><tspan data-l="nl">✗ drop + ICMP 3/4</tspan><tspan data-l="de">✗ verwerfen + ICMP 3/4</tspan></text><text class="mono" style="font-size:10px" text-anchor="middle" x="585" y="345">Next-Hop MTU</text>
 <path class="ln-flow" d="M500 250L372 300" marker-end="url(#aA)"></path><text class="muted" style="font-size:10px" x="400" y="268">&gt; MTU, DF=0</text>
-<rect class="sh-hdr" height="44" rx="5" width="120" x="250" y="290"></rect><text class="lbl" style="font-size:12px" text-anchor="middle" x="310" y="309">fragment</text><text style="font-size:10px" text-anchor="middle" x="310" y="325">8-byte boundary</text></g>
+<rect class="sh-hdr" height="44" rx="5" width="120" x="250" y="290"></rect><text class="lbl" style="font-size:12px" text-anchor="middle" x="310" y="309"><tspan data-l="fr">fragmentation</tspan><tspan data-l="en">fragment</tspan><tspan data-l="nl">fragmenteren</tspan><tspan data-l="de">fragmentieren</tspan></text><text style="font-size:10px" text-anchor="middle" x="310" y="325"><tspan data-l="fr">frontière de 8 octets</tspan><tspan data-l="en">8-byte boundary</tspan><tspan data-l="nl">grens van 8 bytes</tspan><tspan data-l="de">8-Byte-Grenze</tspan></text></g>
 <g data-s="8"><path class="ln-ok" d="M500 220H232" marker-end="url(#aAg)"></path><text class="muted" style="font-size:10px" x="430" y="212">≤ MTU</text>
 <path class="ln-ok" d="M290 290L200 250" marker-end="url(#aAg)"></path>
-<rect class="sh-ok" height="60" rx="5" width="190" x="40" y="200"></rect><text class="lbl" style="font-size:13px" text-anchor="middle" x="135" y="223">8. ✓ Transmit</text><text class="mono" style="font-size:10px" text-anchor="middle" x="135" y="242">csum updated (RFC 1624)</text><text class="mono" style="font-size:10px" text-anchor="middle" x="135" y="255">new L2 header</text></g>
+<rect class="sh-ok" height="60" rx="5" width="190" x="40" y="200"></rect><text class="lbl" style="font-size:13px" text-anchor="middle" x="135" y="223"><tspan data-l="fr">8. ✓ Émission</tspan><tspan data-l="en">8. ✓ Transmit</tspan><tspan data-l="nl">8. ✓ Verzenden</tspan><tspan data-l="de">8. ✓ Senden</tspan></text><text class="mono" style="font-size:10px" text-anchor="middle" x="135" y="242"><tspan data-l="fr">checksum mis à jour (RFC 1624)</tspan><tspan data-l="en">checksum updated (RFC 1624)</tspan><tspan data-l="nl">checksum bijgewerkt (RFC 1624)</tspan><tspan data-l="de">Checksum angepasst (RFC 1624)</tspan></text><text class="mono" style="font-size:10px" text-anchor="middle" x="135" y="255"><tspan data-l="fr">nouvel en-tête L2</tspan><tspan data-l="en">new L2 header</tspan><tspan data-l="nl">nieuwe L2-header</tspan><tspan data-l="de">neuer L2-Header</tspan></text></g>
 </svg>
       </div>
       <div class="anim-controls">
@@ -1900,29 +1909,29 @@ window.NPE = (function () {
 <marker id="aBr" markerheight="7" markerwidth="7" orient="auto-start-reverse" refx="9" refy="5" viewbox="0 0 10 10"><path class="mk-err" d="M0,0L10,5L0,10z"></path></marker></defs>
 
 <rect class="sh-box" height="50" rx="6" width="110" x="20" y="40"></rect><text class="lbl" style="font-size:13px" text-anchor="middle" x="75" y="62">Host A</text><text class="mono" style="font-size:10px" text-anchor="middle" x="75" y="80">192.0.2.10</text>
-<rect class="sh-box" height="50" rx="6" width="110" x="395" y="40"></rect><text class="lbl" style="font-size:13px" text-anchor="middle" x="450" y="62">R1</text><text class="mono" style="font-size:10px" text-anchor="middle" x="450" y="80">egress MTU 1500</text>
+<rect class="sh-box" height="50" rx="6" width="110" x="395" y="40"></rect><text class="lbl" style="font-size:13px" text-anchor="middle" x="450" y="62">R1</text><text class="mono" style="font-size:10px" text-anchor="middle" x="450" y="80"><tspan data-l="fr">MTU de sortie 1500</tspan><tspan data-l="en">egress MTU 1500</tspan><tspan data-l="nl">uitgaande MTU 1500</tspan><tspan data-l="de">Ausgangs-MTU 1500</tspan></text>
 <rect class="sh-box" height="50" rx="6" width="110" x="770" y="40"></rect><text class="lbl" style="font-size:13px" text-anchor="middle" x="825" y="62">Host B</text><text class="mono" style="font-size:10px" text-anchor="middle" x="825" y="80">198.51.100.20</text>
-<line class="ln-span" x1="130" x2="395" y1="65" y2="65"></line><text class="muted halo" style="font-size:10px" text-anchor="middle" x="262" y="58">link MTU 9000</text>
-<line class="ln-span" x1="505" x2="770" y1="65" y2="65"></line><text class="muted halo" style="font-size:10px" text-anchor="middle" x="637" y="58">link MTU 1500</text>
+<line class="ln-span" x1="130" x2="395" y1="65" y2="65"></line><text class="muted halo" style="font-size:10px" text-anchor="middle" x="262" y="58"><tspan data-l="fr">MTU du lien 9000</tspan><tspan data-l="en">link MTU 9000</tspan><tspan data-l="nl">link-MTU 9000</tspan><tspan data-l="de">Link-MTU 9000</tspan></text>
+<line class="ln-span" x1="505" x2="770" y1="65" y2="65"></line><text class="muted halo" style="font-size:10px" text-anchor="middle" x="637" y="58"><tspan data-l="fr">MTU du lien 1500</tspan><tspan data-l="en">link MTU 1500</tspan><tspan data-l="nl">link-MTU 1500</tspan><tspan data-l="de">Link-MTU 1500</tspan></text>
 
 <g data-s="1" data-until="2"><path class="ln-flow" d="M140 115H385" marker-end="url(#aB)"></path><rect class="sh-hdr" height="40" rx="4" width="230" x="150" y="122"></rect><text class="mono" style="font-size:11px" text-anchor="middle" x="265" y="139">ID 0x7a3c, TL 4000, DF=0</text><text class="mono" style="font-size:10px" text-anchor="middle" x="265" y="154">UDP 49152: 5001</text></g>
-<g data-s="2" data-until="2"><rect class="sh-hdr" height="40" rx="4" width="110" x="395" y="122"></rect><text class="mono" style="font-size:11px" text-anchor="middle" x="450" y="140">4000 &gt; 1500</text><text class="mono" style="font-size:10px" text-anchor="middle" x="450" y="155">DF=0: split</text></g>
+<g data-s="2" data-until="2"><rect class="sh-hdr" height="40" rx="4" width="110" x="395" y="122"></rect><text class="mono" style="font-size:11px" text-anchor="middle" x="450" y="140">4000 &gt; 1500</text><text class="mono" style="font-size:10px" text-anchor="middle" x="450" y="155"><tspan data-l="fr">DF=0 : découpe</tspan><tspan data-l="en">DF=0: split</tspan><tspan data-l="nl">DF=0: splitsen</tspan><tspan data-l="de">DF=0: teilen</tspan></text></g>
 
 <g data-s="3"><path class="ln-flow" d="M515 115H760" marker-end="url(#aB)"></path>
 <rect class="sh-hdr" height="30" rx="4" width="230" x="520" y="122"></rect><text class="mono" style="font-size:9.5px" text-anchor="middle" x="635" y="141">F1, off 0, MF=1, TL 1500</text>
 <rect class="sh-hdr" height="30" rx="4" width="230" x="520" y="158"></rect><text class="mono" style="font-size:9.5px" text-anchor="middle" x="635" y="177">F2, off 185, MF=1, TL 1500</text>
 <rect class="sh-hdr" height="30" rx="4" width="230" x="520" y="194"></rect><text class="mono" style="font-size:9.5px" text-anchor="middle" x="635" y="213">F3, off 370, MF=0, TL 1040</text></g>
 
-<g data-s="4"><text class="lbl" style="font-size:12px" x="40" y="262">Host B reassembly buffer, key = (192.0.2.10, 198.51.100.20, 17, 0x7a3c)</text>
+<g data-s="4"><text class="lbl" style="font-size:12px" x="40" y="262"><tspan data-l="fr">Tampon de réassemblage de Host B, clé = (192.0.2.10, 198.51.100.20, 17, 0x7a3c)</tspan><tspan data-l="en">Host B reassembly buffer, key = (192.0.2.10, 198.51.100.20, 17, 0x7a3c)</tspan><tspan data-l="nl">Herassemblagebuffer van Host B, sleutel = (192.0.2.10, 198.51.100.20, 17, 0x7a3c)</tspan><tspan data-l="de">Reassemblierungspuffer von Host B, Schlüssel = (192.0.2.10, 198.51.100.20, 17, 0x7a3c)</tspan></text>
 <rect class="sh-box" height="34" rx="3" width="820" x="40" y="272"></rect>
-<text class="mono muted" style="font-size:10px" x="40" y="324">byte 0</text><text class="mono muted" style="font-size:10px" x="345" y="324">1480</text><text class="mono muted" style="font-size:10px" x="650" y="324">2960</text><text class="mono muted" style="font-size:10px" text-anchor="end" x="860" y="324">3980</text></g>
-<g data-s="4"><rect class="sh-body" height="34" width="210" x="650" y="272"></rect><text class="mono" style="font-size:11px" text-anchor="middle" x="755" y="293">F3 ✓ (last: size known)</text></g>
-<g data-s="5"><rect class="sh-body" height="34" width="305" x="40" y="272"></rect><text class="mono" style="font-size:11px" text-anchor="middle" x="192" y="293">F1 ✓ (UDP header)</text></g>
-<g data-s="6" data-until="6"><rect class="sh-body" height="34" width="305" x="345" y="272"></rect><text class="mono" style="font-size:11px" text-anchor="middle" x="497" y="293">F2 ✓: complete</text>
-<rect class="sh-ok" height="32" rx="4" width="820" x="40" y="338"></rect><text class="lbl" style="font-size:12px" text-anchor="middle" x="450" y="359">✓ 4000-byte datagram delivered to UDP (Protocol 17)</text></g>
-<g data-s="7" data-until="7"><rect class="sh-err" height="34" stroke-dasharray="5 4" width="305" x="345" y="272"></rect><text class="mono" style="font-size:11px" text-anchor="middle" x="497" y="293">F2 ✗ lost</text>
-<rect class="sh-err" height="32" rx="4" width="820" x="40" y="338"></rect><text class="lbl" style="font-size:12px" text-anchor="middle" x="450" y="359">✗ reassembly timeout (60-120 s): buffer freed, ICMP 11/1 to A (fragment 0 was received)</text></g>
-<text class="muted" data-s="4" style="font-size:11px" x="40" y="240">⏱ timer started on first fragment</text>
+<text class="mono muted" style="font-size:10px" x="40" y="324"><tspan data-l="fr">octet 0</tspan><tspan data-l="en">byte 0</tspan><tspan data-l="nl">byte 0</tspan><tspan data-l="de">Byte 0</tspan></text><text class="mono muted" style="font-size:10px" x="345" y="324">1480</text><text class="mono muted" style="font-size:10px" x="650" y="324">2960</text><text class="mono muted" style="font-size:10px" text-anchor="end" x="860" y="324">3980</text></g>
+<g data-s="4"><rect class="sh-body" height="34" width="210" x="650" y="272"></rect><text class="mono" style="font-size:11px" text-anchor="middle" x="755" y="293"><tspan data-l="fr">F3 ✓ (dernier : taille connue)</tspan><tspan data-l="en">F3 ✓ (last: size known)</tspan><tspan data-l="nl">F3 ✓ (laatste: grootte bekend)</tspan><tspan data-l="de">F3 ✓ (letztes: Größe bekannt)</tspan></text></g>
+<g data-s="5"><rect class="sh-body" height="34" width="305" x="40" y="272"></rect><text class="mono" style="font-size:11px" text-anchor="middle" x="192" y="293"><tspan data-l="fr">F1 ✓ (en-tête UDP)</tspan><tspan data-l="en">F1 ✓ (UDP header)</tspan><tspan data-l="nl">F1 ✓ (UDP-header)</tspan><tspan data-l="de">F1 ✓ (UDP-Header)</tspan></text></g>
+<g data-s="6" data-until="6"><rect class="sh-body" height="34" width="305" x="345" y="272"></rect><text class="mono" style="font-size:11px" text-anchor="middle" x="497" y="293"><tspan data-l="fr">F2 ✓ : complet</tspan><tspan data-l="en">F2 ✓: complete</tspan><tspan data-l="nl">F2 ✓: compleet</tspan><tspan data-l="de">F2 ✓: vollständig</tspan></text>
+<rect class="sh-ok" height="32" rx="4" width="820" x="40" y="338"></rect><text class="lbl" style="font-size:12px" text-anchor="middle" x="450" y="359"><tspan data-l="fr">✓ datagramme de 4000 octets remis à UDP (Protocol 17)</tspan><tspan data-l="en">✓ 4000-byte datagram delivered to UDP (Protocol 17)</tspan><tspan data-l="nl">✓ datagram van 4000 bytes afgeleverd aan UDP (Protocol 17)</tspan><tspan data-l="de">✓ Datagramm mit 4000 Byte an UDP zugestellt (Protocol 17)</tspan></text></g>
+<g data-s="7" data-until="7"><rect class="sh-err" height="34" stroke-dasharray="5 4" width="305" x="345" y="272"></rect><text class="mono" style="font-size:11px" text-anchor="middle" x="497" y="293"><tspan data-l="fr">F2 ✗ perdu</tspan><tspan data-l="en">F2 ✗ lost</tspan><tspan data-l="nl">F2 ✗ verloren</tspan><tspan data-l="de">F2 ✗ verloren</tspan></text>
+<rect class="sh-err" height="32" rx="4" width="820" x="40" y="338"></rect><text class="lbl" style="font-size:12px" text-anchor="middle" x="450" y="359"><tspan data-l="fr">✗ délai de réassemblage (60-120 s) : tampon libéré, ICMP 11/1 vers A (fragment 0 reçu)</tspan><tspan data-l="en">✗ reassembly timeout (60-120 s): buffer freed, ICMP 11/1 to A (fragment 0 was received)</tspan><tspan data-l="nl">✗ herassemblagetimeout (60-120 s): buffer vrij, ICMP 11/1 naar A (fragment 0 ontvangen)</tspan><tspan data-l="de">✗ Reassemblierungs-Timeout (60-120 s): Puffer frei, ICMP 11/1 an A (Fragment 0 empfangen)</tspan></text></g>
+<text class="muted" data-s="4" style="font-size:11px" x="40" y="240"><tspan data-l="fr">⏱ minuterie lancée au premier fragment</tspan><tspan data-l="en">⏱ timer started on first fragment</tspan><tspan data-l="nl">⏱ timer start bij het eerste fragment</tspan><tspan data-l="de">⏱ Timer startet beim ersten Fragment</tspan></text>
 </svg>
       </div>
       <div class="anim-controls">
@@ -1947,26 +1956,26 @@ window.NPE = (function () {
 <marker id="aCr" markerheight="7" markerwidth="7" orient="auto-start-reverse" refx="9" refy="5" viewbox="0 0 10 10"><path class="mk-err" d="M0,0L10,5L0,10z"></path></marker>
 <marker id="aCg" markerheight="7" markerwidth="7" orient="auto-start-reverse" refx="9" refy="5" viewbox="0 0 10 10"><path class="mk-ok" d="M0,0L10,5L0,10z"></path></marker></defs>
 <rect class="sh-box" height="46" rx="6" width="110" x="10" y="20"></rect><text class="lbl" style="font-size:13px" text-anchor="middle" x="65" y="40">Host A</text><text class="mono" style="font-size:10px" text-anchor="middle" x="65" y="57">MTU 1500</text>
-<rect class="sh-vend" height="46" rx="6" width="110" x="200" y="20"></rect><text class="lbl" style="font-size:13px" text-anchor="middle" x="255" y="40">FW-A</text><text class="mono" style="font-size:10px" text-anchor="middle" x="255" y="57">ICMP policy</text>
-<rect class="sh-box" height="46" rx="6" width="110" x="390" y="20"></rect><text class="lbl" style="font-size:13px" text-anchor="middle" x="445" y="40">R1</text><text class="mono" style="font-size:10px" text-anchor="middle" x="445" y="57">tunnel MTU 1400</text>
-<rect class="sh-box" height="46" rx="6" width="110" x="580" y="20"></rect><text class="lbl" style="font-size:13px" text-anchor="middle" x="635" y="40">R2</text><text class="mono" style="font-size:10px" text-anchor="middle" x="635" y="57">tunnel end</text>
+<rect class="sh-vend" height="46" rx="6" width="110" x="200" y="20"></rect><text class="lbl" style="font-size:13px" text-anchor="middle" x="255" y="40">FW-A</text><text class="mono" style="font-size:10px" text-anchor="middle" x="255" y="57"><tspan data-l="fr">politique ICMP</tspan><tspan data-l="en">ICMP policy</tspan><tspan data-l="nl">ICMP-beleid</tspan><tspan data-l="de">ICMP-Regel</tspan></text>
+<rect class="sh-box" height="46" rx="6" width="110" x="390" y="20"></rect><text class="lbl" style="font-size:13px" text-anchor="middle" x="445" y="40">R1</text><text class="mono" style="font-size:10px" text-anchor="middle" x="445" y="57"><tspan data-l="fr">MTU du tunnel 1400</tspan><tspan data-l="en">tunnel MTU 1400</tspan><tspan data-l="nl">tunnel-MTU 1400</tspan><tspan data-l="de">Tunnel-MTU 1400</tspan></text>
+<rect class="sh-box" height="46" rx="6" width="110" x="580" y="20"></rect><text class="lbl" style="font-size:13px" text-anchor="middle" x="635" y="40">R2</text><text class="mono" style="font-size:10px" text-anchor="middle" x="635" y="57"><tspan data-l="fr">fin du tunnel</tspan><tspan data-l="en">tunnel end</tspan><tspan data-l="nl">tunneleinde</tspan><tspan data-l="de">Tunnelende</tspan></text>
 <rect class="sh-box" height="46" rx="6" width="110" x="780" y="20"></rect><text class="lbl" style="font-size:13px" text-anchor="middle" x="835" y="40">Host B</text><text class="mono" style="font-size:10px" text-anchor="middle" x="835" y="57">MTU 1500</text>
 <g class="ln-span"><line x1="65" x2="65" y1="66" y2="372"></line><line x1="255" x2="255" y1="66" y2="372"></line><line x1="445" x2="445" y1="66" y2="372"></line><line x1="635" x2="635" y1="66" y2="372"></line><line x1="835" x2="835" y1="66" y2="372"></line></g>
-<g data-s="1"><path class="ln-ok" d="M65 92H833" marker-end="url(#aCg)"></path><text class="mono halo" style="font-size:11px" text-anchor="middle" x="450" y="86">1. SYN / SYN-ACK, MSS 1460, DF=1 (small packets pass)</text></g>
-<g data-s="2"><path class="ln-flow" d="M65 128H443" marker-end="url(#aC)"></path><text class="mono halo" style="font-size:11px" text-anchor="middle" x="250" y="122">2. TCP data, TL 1500, DF=1</text>
+<g data-s="1"><path class="ln-ok" d="M65 92H833" marker-end="url(#aCg)"></path><text class="mono halo" style="font-size:11px" text-anchor="middle" x="450" y="86"><tspan data-l="fr">1. SYN / SYN-ACK, MSS 1460, DF=1 (les petits paquets passent)</tspan><tspan data-l="en">1. SYN / SYN-ACK, MSS 1460, DF=1 (small packets pass)</tspan><tspan data-l="nl">1. SYN / SYN-ACK, MSS 1460, DF=1 (kleine pakketten komen door)</tspan><tspan data-l="de">1. SYN / SYN-ACK, MSS 1460, DF=1 (kleine Pakete kommen durch)</tspan></text></g>
+<g data-s="2"><path class="ln-flow" d="M65 128H443" marker-end="url(#aC)"></path><text class="mono halo" style="font-size:11px" text-anchor="middle" x="250" y="122"><tspan data-l="fr">2. données TCP, TL 1500, DF=1</tspan><tspan data-l="en">2. TCP data, TL 1500, DF=1</tspan><tspan data-l="nl">2. TCP-data, TL 1500, DF=1</tspan><tspan data-l="de">2. TCP-Daten, TL 1500, DF=1</tspan></text>
 <text class="mono halo" fill="var(--err-bd)" style="font-size:11px" x="452" y="133">✗ 1500 &gt; 1400</text></g>
 <g data-s="3" data-until="5"><path class="ln-flow" d="M445 160H67" marker-end="url(#aC)"></path><text class="mono halo" style="font-size:11px" text-anchor="middle" x="250" y="154">3. ICMP 3/4, Next-Hop MTU 1400</text></g>
-<g data-s="4" data-until="5"><rect class="sh-hdr" height="40" rx="4" width="200" x="10" y="176"></rect><text class="mono" style="font-size:10.5px" text-anchor="middle" x="110" y="193">PMTU(B) = 1400</text><text class="mono" style="font-size:10.5px" text-anchor="middle" x="110" y="208">MSS: 1360, aging 10 min</text></g>
-<g data-s="5" data-until="5"><path class="ln-ok" d="M65 240H833" marker-end="url(#aCg)"></path><text class="mono halo" style="font-size:11px" text-anchor="middle" x="450" y="234">5. ✓ TCP data, TL 1400, DF=1: delivered</text></g>
+<g data-s="4" data-until="5"><rect class="sh-hdr" height="40" rx="4" width="200" x="10" y="176"></rect><text class="mono" style="font-size:10.5px" text-anchor="middle" x="110" y="193">PMTU(B) = 1400</text><text class="mono" style="font-size:10.5px" text-anchor="middle" x="110" y="208"><tspan data-l="fr">MSS : 1360, expiration 10 min</tspan><tspan data-l="en">MSS: 1360, aging 10 min</tspan><tspan data-l="nl">MSS: 1360, veroudering 10 min</tspan><tspan data-l="de">MSS: 1360, Alterung 10 min</tspan></text></g>
+<g data-s="5" data-until="5"><path class="ln-ok" d="M65 240H833" marker-end="url(#aCg)"></path><text class="mono halo" style="font-size:11px" text-anchor="middle" x="450" y="234"><tspan data-l="fr">5. ✓ données TCP, TL 1400, DF=1 : remises</tspan><tspan data-l="en">5. ✓ TCP data, TL 1400, DF=1: delivered</tspan><tspan data-l="nl">5. ✓ TCP-data, TL 1400, DF=1: afgeleverd</tspan><tspan data-l="de">5. ✓ TCP-Daten, TL 1400, DF=1: zugestellt</tspan></text></g>
 <g data-s="6"><path class="ln-err" d="M445 175H262" marker-end="url(#aCr)"></path><text class="mono halo" style="font-size:11px" text-anchor="middle" x="350" y="191">ICMP 3/4</text>
-<text class="mono halo" fill="var(--err-bd)" style="font-size:11px" x="262" y="210">✗ dropped by FW-A (all ICMP denied)</text>
-<path class="ln-flow" d="M65 250H443" marker-end="url(#aC)"></path><text class="mono halo" style="font-size:11px" text-anchor="middle" x="250" y="244">retransmit TL 1500 DF=1 ...</text>
-<path class="ln-flow" d="M65 280H443" marker-end="url(#aC)"></path><text class="mono halo" style="font-size:11px" text-anchor="middle" x="250" y="274">retransmit TL 1500 DF=1 ...</text>
-<text class="halo lbl" fill="var(--err-bd)" style="font-size:12px" x="470" y="270">✗ black hole: session up, transfer stalls</text></g>
+<text class="mono halo" fill="var(--err-bd)" style="font-size:11px" x="262" y="210"><tspan data-l="fr">✗ rejeté par FW-A (tout ICMP refusé)</tspan><tspan data-l="en">✗ dropped by FW-A (all ICMP denied)</tspan><tspan data-l="nl">✗ gedropt door FW-A (alle ICMP geweigerd)</tspan><tspan data-l="de">✗ von FW-A verworfen (alles ICMP gesperrt)</tspan></text>
+<path class="ln-flow" d="M65 250H443" marker-end="url(#aC)"></path><text class="mono halo" style="font-size:11px" text-anchor="middle" x="250" y="244"><tspan data-l="fr">retransmission TL 1500 DF=1 ...</tspan><tspan data-l="en">retransmit TL 1500 DF=1 ...</tspan><tspan data-l="nl">hertransmissie TL 1500 DF=1 ...</tspan><tspan data-l="de">Neuübertragung TL 1500 DF=1 ...</tspan></text>
+<path class="ln-flow" d="M65 280H443" marker-end="url(#aC)"></path><text class="mono halo" style="font-size:11px" text-anchor="middle" x="250" y="274"><tspan data-l="fr">retransmission TL 1500 DF=1 ...</tspan><tspan data-l="en">retransmit TL 1500 DF=1 ...</tspan><tspan data-l="nl">hertransmissie TL 1500 DF=1 ...</tspan><tspan data-l="de">Neuübertragung TL 1500 DF=1 ...</tspan></text>
+<text class="halo lbl" fill="var(--err-bd)" style="font-size:12px" x="470" y="270"><tspan data-l="fr">✗ trou noir : session établie, transfert bloqué</tspan><tspan data-l="en">✗ black hole: session up, transfer stalls</tspan><tspan data-l="nl">✗ zwart gat: sessie staat, overdracht stokt</tspan><tspan data-l="de">✗ Black Hole: Sitzung steht, Übertragung hängt</tspan></text></g>
 <g data-s="7" data-until="7"><rect class="sh-ok" height="66" rx="5" width="690" x="200" y="300"></rect>
-<text class="lbl" style="font-size:11.5px" text-anchor="middle" x="545" y="320">✓ fixes: permit ICMP type 3 code 4, TCP MSS clamp 1360 on R1</text>
-<text style="font-size:11.5px" text-anchor="middle" x="545" y="338">PLPMTUD (RFC 4821 / 8899) on hosts, lower host MTU</text>
-<text fill="var(--err-bd)" style="font-size:11px" text-anchor="middle" x="545" y="356">clearing DF = non-compliant workaround (RFC 6864 §4.3)</text></g>
+<text class="lbl" style="font-size:11.5px" text-anchor="middle" x="545" y="320"><tspan data-l="fr">✓ remèdes : autoriser ICMP type 3 code 4, MSS TCP limité à 1360 sur R1</tspan><tspan data-l="en">✓ fixes: permit ICMP type 3 code 4, TCP MSS clamp 1360 on R1</tspan><tspan data-l="nl">✓ oplossingen: ICMP type 3 code 4 toelaten, TCP-MSS op R1 begrenzen tot 1360</tspan><tspan data-l="de">✓ Abhilfe: ICMP Typ 3 Code 4 erlauben, TCP-MSS auf R1 auf 1360 begrenzen</tspan></text>
+<text style="font-size:11.5px" text-anchor="middle" x="545" y="338"><tspan data-l="fr">PLPMTUD (RFC 4821 / 8899) sur les hôtes, MTU d'hôte réduite</tspan><tspan data-l="en">PLPMTUD (RFC 4821 / 8899) on hosts, lower host MTU</tspan><tspan data-l="nl">PLPMTUD (RFC 4821 / 8899) op de hosts, lagere host-MTU</tspan><tspan data-l="de">PLPMTUD (RFC 4821 / 8899) auf den Hosts, kleinere Host-MTU</tspan></text>
+<text fill="var(--err-bd)" style="font-size:11px" text-anchor="middle" x="545" y="356"><tspan data-l="fr">effacer DF = contournement non conforme (RFC 6864 §4.3)</tspan><tspan data-l="en">clearing DF = non-compliant workaround (RFC 6864 §4.3)</tspan><tspan data-l="nl">DF wissen = niet-conforme noodoplossing (RFC 6864 §4.3)</tspan><tspan data-l="de">DF löschen = nicht konformer Notbehelf (RFC 6864 §4.3)</tspan></text></g>
 </svg>
       </div>
       <div class="anim-controls">

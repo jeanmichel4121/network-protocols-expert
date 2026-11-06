@@ -11,6 +11,17 @@ Versioning rules for this library:
 
 ## [Unreleased]
 
+### Changed
+- Animations: the explanatory labels inside the eight step-by-step diagrams (Ethernet, IPv4, OSI)
+  are translated in the four languages; field, state and message names stay in English. A badge
+  that shows an explanation ("idle") is translated through the figure's `data-anim-i18n`
+  dictionary and follows the language switch.
+
+### Fixed
+- Packet views: the bit diagram reserves its height before the page script draws it
+  (`tools/packet-builder.py --update` writes the number of rows), so the panel below it no longer
+  moves over a slow link (layout shift 0.110 on the English OSI packets chapter).
+
 ## [0.5.0] - 2026-11-06
 
 ### Added
