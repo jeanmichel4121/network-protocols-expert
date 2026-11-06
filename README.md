@@ -85,6 +85,7 @@ links; the switch in the header changes language without reloading the page.
 |---|---|---|
 | [Ethernet](https://learning.cuvelier.tech/en/ethernet/) | Ethernet II, IEEE 802.3 LLC/SNAP, IEEE 802.1Q and Q-in-Q, MAC Control (PAUSE, PFC) | Published |
 | [IPv4](https://learning.cuvelier.tech/en/ipv4/) | Full header, DS field (DSCP, ECN), fragmentation and PMTUD, every IP option | Published |
+| [OSI and TCP/IP models](https://learning.cuvelier.tech/en/osi-tcpip-model/) | Seven OSI layers, four TCP/IP layers, encapsulation on real frames, per-layer verification | Published |
 
 The list on the [home page](https://learning.cuvelier.tech) is always current.
 

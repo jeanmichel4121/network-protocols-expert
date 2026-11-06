@@ -768,7 +768,7 @@ IP_GROUP = "233.252.0.1"  # RFC 6676 MCAST-TEST-NET
 MAC_HOST, MAC_GW = "00:00:5e:00:53:0a", "00:00:5e:00:53:01"
 MAC_GROUP = "01:00:5e:7c:00:01"  # RFC 1112 §6.4: 01-00-5E + the low 23 bits of 233.252.0.1
 ICMP_DATA = bytes((0x20 + i) % 256 for i in range(56))
-PROTO_NAMES = {1: "ICMP", 2: "IGMP", 17: "UDP"}
+PROTO_NAMES = {1: "ICMP", 2: "IGMP", 6: "TCP", 17: "UDP"}
 DSCP_NAMES = {0: ("CS0", "Default"), 46: ("EF", "Expedited Forwarding"), 48: ("CS6", "Class Selector 6")}
 ECN_NAMES = {
     0: ("Not-ECT", "Not ECN-Capable Transport"),
@@ -1621,8 +1621,424 @@ IPV4_SAMPLES = {
     "ipv4-ce": ipv4_ce,
 }
 
+# ----------------------------------------------------------------------------- OSI and TCP/IP models
+# One frame per transport: the same bytes read layer by layer. RFC 9293 §3.1 (TCP header, MSS
+# option §3.7.1), RFC 9768 (AE flag), RFC 768 (UDP), RFC 1035 §4.1 (DNS message). Tree labels:
+# Wireshark packet-tcp.c and packet-dns.c. Documentation values only (RFC 5737, RFC 2606, RFC 9542).
+IP_DNS, IP_WEB = "198.51.100.53", "203.0.113.80"
+DNS_NAME = "example.com"
+TCP_REF, DNS_REF = "RFC 9293 §3.1", "RFC 1035 §4.1.1"
+TCP_FLAGS = (
+    ("cwr", "CWR", "Congestion Window Reduced"),
+    ("ece", "ECE", "ECN-Echo"),
+    ("urg", "URG", "Urgent"),
+    ("ack", "ACK", "Acknowledgment"),
+    ("push", "PSH", "Push"),
+    ("reset", "RST", "Reset"),
+    ("syn", "SYN", "Syn"),
+    ("fin", "FIN", "Fin"),
+)
 
-SAMPLES = {"ospf-hello": ospf_hello, **ETH_SAMPLES, **IPV4_SAMPLES}
+
+def tcp_segment(src, dst, sport, dport, seq, ack, flags, window, options=b"", data=b""):  # noqa: PLR0917 (header fields in wire order)
+    """RFC 9293 §3.1: Data Offset and the checksum over the pseudo-header are computed."""
+    options += bytes(-len(options) % 4)
+    offset = 5 + len(options) // 4
+    hdr = struct.pack("!HHIIHHHH", sport, dport, seq, ack, offset << 12 | flags, window, 0, 0) + options
+    pseudo = ip4(src) + ip4(dst) + struct.pack("!BBH", 0, 6, len(hdr) + len(data))
+    csum = inet_checksum(pseudo + hdr + data)
+    return hdr[:16] + struct.pack("!H", csum) + hdr[18:] + data
+
+
+def dns_query(ident: int, name: str, qtype: int = 1) -> bytes:
+    """RFC 1035 §4.1: header with RD set, one question (QCLASS IN), no compression."""
+    qname = b"".join(bytes([len(part)]) + part.encode("ascii") for part in name.split(".")) + b"\x00"
+    return struct.pack("!HHHHHH", ident, 0x0100, 1, 0, 0, 0) + qname + struct.pack("!HH", qtype, 1)
+
+
+class LayerFrame(IPv4Frame):
+    """A whole frame drawn from its first bit, one colour per layer of the stack."""
+
+    LAYER = {"eth": "encap", "ip": "header", "udp": "tlv", "tcp": "tlv", "dns": "body"}
+
+    def udp_header(self, msg):
+        sport, dport, length, csum = struct.unpack("!HHHH", msg[:8])
+        t = "udp"
+        self.add(
+            "sport",
+            "Source Port",
+            "tlv",
+            msg[:2],
+            str(sport),
+            "udp.srcport",
+            "Source Port",
+            "RFC 768",
+            tree=t,
+        )
+        self.add(
+            "dport",
+            "Destination Port",
+            "tlv",
+            msg[2:4],
+            str(dport),
+            "udp.dstport",
+            "Destination Port",
+            "RFC 768",
+            tree=t,
+        )
+        self.add("ulen", "Length", "tlv", msg[4:6], str(length), "udp.length", "Length", "RFC 768", tree=t)
+        self.add(
+            "ucsum",
+            "Checksum",
+            "tlv",
+            msg[6:8],
+            f"0x{csum:04x}",
+            "udp.checksum",
+            "Checksum",
+            "RFC 768",
+            tree=t,
+            ws_value=f"0x{csum:04x} [unverified]",
+            ws_more=[{"label": "[Checksum Status: Unverified]", "ws": "udp.checksum.status"}],
+        )
+        return msg[8:]
+
+    def tcp(self, msg):
+        sport, dport, seq, ack, off_flags, window, csum, urg = struct.unpack("!HHIIHHHH", msg[:20])
+        offset, flags = off_flags >> 12, off_flags & 0x0FFF
+        t = "tcp"
+        self.add(
+            "tsport", "Source Port", "tlv", msg[:2], str(sport), "tcp.srcport", "Source Port", TCP_REF, tree=t
+        )
+        self.add(
+            "tdport",
+            "Destination Port",
+            "tlv",
+            msg[2:4],
+            str(dport),
+            "tcp.dstport",
+            "Destination Port",
+            TCP_REF,
+            tree=t,
+        )
+        self.add(
+            "tseq",
+            "Sequence Number",
+            "tlv",
+            msg[4:8],
+            str(seq),
+            "tcp.seq_raw",
+            "Sequence Number (raw)",
+            TCP_REF,
+            tree=t,
+            ws_pre=[{"label": "Sequence Number: 0    (relative sequence number)", "ws": "tcp.seq"}],
+        )
+        self.add(
+            "tack",
+            "Acknowledgment Number",
+            "tlv",
+            msg[8:12],
+            str(ack),
+            "tcp.ack_raw",
+            "Acknowledgment number (raw)",
+            TCP_REF,
+            tree=t,
+            ws_pre=[{"label": "Acknowledgment Number: 0", "ws": "tcp.ack"}],
+        )
+        self.data += msg[12:14]
+        self.bitfield(
+            "toff",
+            "Data Offset",
+            "tlv",
+            4,
+            str(offset),
+            "tcp.hdr_len",
+            "Header Length",
+            TCP_REF,
+            tree=t,
+            ws_bits=wsbits(offset, 4, 0, 8),
+            ws_value=f"{offset * 4} bytes ({offset})",
+        )
+        names = [n for (_, n, _), k in zip(TCP_FLAGS, range(7, -1, -1), strict=True) if flags >> k & 1]
+        fl = self.group("tflags", f"Flags: 0x{flags:03x} ({', '.join(names)})", "tcp.flags")
+        self.bitfield(
+            "tres",
+            "Rsrvd",
+            "tlv",
+            3,
+            str(flags >> 9),
+            "tcp.flags.res",
+            "Reserved",
+            TCP_REF,
+            tree=t,
+            ws_group=fl,
+            ws_bits=wsbits(flags >> 9, 3, 0, 12),
+            ws_value="Not set",
+        )
+        self.bitfield(
+            "tae",
+            "AE",
+            "tlv",
+            1,
+            str(flags >> 8 & 1),
+            "tcp.flags.ae",
+            "Accurate ECN",
+            "RFC 9768 §3.1",
+            tree=t,
+            ws_group=fl,
+            ws_bits=wsbits(flags >> 8 & 1, 1, 3, 12),
+            ws_value="Not set",
+        )
+        for k, (fid, name, label) in enumerate(TCP_FLAGS):
+            val = flags >> (7 - k) & 1
+            self.bitfield(
+                "tf" + fid,
+                name,
+                "tlv",
+                1,
+                str(val),
+                f"tcp.flags.{fid}",
+                label,
+                TCP_REF,
+                tree=t,
+                ws_group=fl,
+                ws_bits=wsbits(val, 1, 4 + k, 12),
+                ws_value="Set" if val else "Not set",
+            )
+        self.add(
+            "twin",
+            "Window",
+            "tlv",
+            msg[14:16],
+            str(window),
+            "tcp.window_size_value",
+            "Window",
+            TCP_REF,
+            tree=t,
+        )
+        self.add(
+            "tcsum",
+            "Checksum",
+            "tlv",
+            msg[16:18],
+            f"0x{csum:04x}",
+            "tcp.checksum",
+            "Checksum",
+            TCP_REF,
+            tree=t,
+            ws_value=f"0x{csum:04x} [unverified]",
+            ws_more=[{"label": "[Checksum Status: Unverified]", "ws": "tcp.checksum.status"}],
+        )
+        self.add(
+            "turg",
+            "Urgent Pointer",
+            "tlv",
+            msg[18:20],
+            str(urg),
+            "tcp.urgent_pointer",
+            "Urgent Pointer",
+            TCP_REF,
+            tree=t,
+        )
+        kind, length, mss = struct.unpack("!BBH", msg[20:24])
+        ref = "RFC 9293 §3.7.1"
+        go = self.group("topts", f"Options: ({offset * 4 - 20} bytes), Maximum segment size", "tcp.options")
+        gm = self.group("tmss", f"TCP Option - Maximum segment size: {mss} bytes", "tcp.options.mss", go)
+        self.add(
+            "tokind",
+            "Kind",
+            "tlv",
+            msg[20:21],
+            str(kind),
+            "tcp.option_kind",
+            "Kind",
+            ref,
+            tree=t,
+            ws_group=gm,
+            ws_value=f"Maximum Segment Size ({kind})",
+        )
+        self.add(
+            "tolen",
+            "Length",
+            "tlv",
+            msg[21:22],
+            str(length),
+            "tcp.option_len",
+            "Length",
+            ref,
+            tree=t,
+            ws_group=gm,
+        )
+        self.add(
+            "tomss",
+            "MSS Value",
+            "tlv",
+            msg[22:24],
+            str(mss),
+            "tcp.options.mss_val",
+            "MSS Value",
+            ref,
+            tree=t,
+            ws_group=gm,
+        )
+
+    def dns(self, msg):
+        ident, flags, qd, an, ns, ar = struct.unpack("!HHHHHH", msg[:12])
+        t = "dns"
+        self.add(
+            "did",
+            "ID",
+            "body",
+            msg[:2],
+            f"0x{ident:04x}",
+            "dns.id",
+            "Transaction ID",
+            DNS_REF,
+            tree=t,
+        )
+        fl = self.group("dflags", f"Flags: 0x{flags:04x} Standard query", "dns.flags")
+        self.data += msg[2:4]
+        # name, width, Wireshark filter, label, what Wireshark prints for the value of this query
+        bits = (
+            ("QR", 1, "dns.flags.response", "Response", "Message is a query"),
+            ("Opcode", 4, "dns.flags.opcode", "Opcode", "Standard query (0)"),
+            ("AA", 1, "dns.flags.authoritative", "Authoritative", "Not set"),
+            ("TC", 1, "dns.flags.truncated", "Truncated", "Message is not truncated"),
+            ("RD", 1, "dns.flags.recdesired", "Recursion desired", "Do query recursively"),
+            ("RA", 1, "dns.flags.recavail", "Recursion available", "Not set"),
+            ("Z", 1, "dns.flags.z", "Z", "reserved (0)"),
+            ("AD", 1, "dns.flags.authenticated", "Answer authenticated", "Not set"),
+            ("CD", 1, "dns.flags.checkdisable", "Non-authenticated data", "Unacceptable"),
+            ("RCODE", 4, "dns.flags.rcode", "Reply code", "No error (0)"),
+        )
+        pos = 0
+        for name, width, ws, label, text in bits:
+            val = flags >> (16 - pos - width) & ((1 << width) - 1)
+            self.bitfield(
+                "d" + name.lower(),
+                name,
+                "body",
+                width,
+                str(val),
+                ws,
+                label,
+                DNS_REF,
+                tree=t,
+                ws_group=fl,
+                ws_bits=wsbits(val, width, pos, 16),
+                ws_value=text,
+            )
+            pos += width
+        for k, (fid, name, ws, label, val) in enumerate(
+            (
+                ("dqd", "QDCOUNT", "dns.count.queries", "Questions", qd),
+                ("dan", "ANCOUNT", "dns.count.answers", "Answer RRs", an),
+                ("dns", "NSCOUNT", "dns.count.auth_rr", "Authority RRs", ns),
+                ("dar", "ARCOUNT", "dns.count.add_rr", "Additional RRs", ar),
+            )
+        ):
+            self.add(fid, name, "body", msg[4 + 2 * k : 6 + 2 * k], str(val), ws, label, DNS_REF, tree=t)
+        qname, (qtype, qclass) = msg[12:-4], struct.unpack("!HH", msg[-4:])
+        ref = "RFC 1035 §4.1.2"
+        gq = self.group("dqueries", "Queries")
+        g1 = self.group("dquery", f"{DNS_NAME}: type A, class IN", "", gq)
+        self.add(
+            "dqname",
+            "QNAME",
+            "body",
+            qname,
+            DNS_NAME,
+            "dns.qry.name",
+            "Name",
+            ref,
+            tree=t,
+            ws_group=g1,
+            ws_more=[
+                {"label": f"[Name Length: {len(DNS_NAME)}]", "ws": "dns.qry.name.len"},
+                {"label": f"[Label Count: {DNS_NAME.count('.') + 1}]", "ws": "dns.count.labels"},
+            ],
+        )
+        self.add(
+            "dqtype",
+            "QTYPE",
+            "body",
+            msg[-4:-2],
+            str(qtype),
+            "dns.qry.type",
+            "Type",
+            ref,
+            tree=t,
+            ws_group=g1,
+            ws_value=f"A ({qtype}) (Host Address)",
+        )
+        self.add(
+            "dqclass",
+            "QCLASS",
+            "body",
+            msg[-2:],
+            str(qclass),
+            "dns.qry.class",
+            "Class",
+            ref,
+            tree=t,
+            ws_group=g1,
+            ws_value=f"IN (0x{qclass:04x})",
+        )
+
+    def out(self, sid, message, encapsulation, layers):
+        d = super().out(sid, message, encapsulation, layers)
+        for f in d["fields"]:
+            f["layer"] = self.LAYER[f["tree"]]
+        d["protocol"] = "OSI and TCP/IP models"
+        d["grid_from"] = 0
+        return d
+
+
+def layer_sample(sid, message, pkt, upper):
+    fr = LayerFrame()
+    fr.eth(MAC_GW)
+    payload = fr.ip_header(pkt)
+    src, dst = (str(ipaddress.IPv4Address(pkt[k : k + 4])) for k in (12, 16))
+    layers = {
+        "eth": f"Ethernet II, Src: {MAC_HOST}, Dst: {MAC_GW}",
+        "ip": f"Internet Protocol Version 4, Src: {src}, Dst: {dst}",
+    }
+    upper(fr, payload, layers)
+    return fr.out(sid, message, "Ethernet II, IPv4", layers)
+
+
+def osi_dns() -> dict:
+    """A DNS query: Ethernet II, IPv4, UDP and DNS headers in one 71-byte frame."""
+    query = dns_query(0x1A2B, DNS_NAME)
+    pkt = ipv4_packet(
+        IP_HOST, IP_DNS, 17, udp_datagram(IP_HOST, IP_DNS, 53124, 53, query), ident=0x3C4D, df=1
+    )
+
+    def upper(fr, payload, layers):
+        layers["udp"] = "User Datagram Protocol, Src Port: 53124, Dst Port: 53"
+        layers["dns"] = "Domain Name System (query)"
+        fr.dns(fr.udp_header(payload))
+
+    return layer_sample("osi-dns", "DNS query (UDP)", pkt, upper)
+
+
+def osi_syn() -> dict:
+    """A TCP SYN with an MSS option: Ethernet II, IPv4 and TCP, no application data yet."""
+    seg = tcp_segment(
+        IP_HOST, IP_WEB, 49152, 443, 0x2F5A1C00, 0, 0x002, 64240, struct.pack("!BBH", 2, 4, 1460)
+    )
+    pkt = ipv4_packet(IP_HOST, IP_WEB, 6, seg, ident=0x3C4E, df=1)
+
+    def upper(fr, payload, layers):
+        layers["tcp"] = "Transmission Control Protocol, Src Port: 49152, Dst Port: 443, Seq: 0, Len: 0"
+        fr.tcp(payload)
+
+    return layer_sample("osi-syn", "TCP SYN", pkt, upper)
+
+
+OSI_SAMPLES = {"osi-dns": osi_dns, "osi-syn": osi_syn}
+
+
+SAMPLES = {"ospf-hello": ospf_hello, **ETH_SAMPLES, **IPV4_SAMPLES, **OSI_SAMPLES}
 
 
 def ipv4_self_test() -> int:
@@ -1679,6 +2095,14 @@ def self_test() -> int:
             print(f"FAIL {name} size or FCS")
             errors += 1
     errors += ipv4_self_test()
+    # OSI samples: IPv4, UDP and TCP checksums verify (the last two over the pseudo-header).
+    for name, proto in (("osi-dns", 17), ("osi-syn", 6)):
+        ip = bytes.fromhex(SAMPLES[name]()["hex"].replace(" ", ""))[14:]
+        l4 = ip[20:]
+        pseudo = ip[12:20] + struct.pack("!BBH", 0, proto, len(l4))
+        if inet_checksum(ip[:20]) != 0 or ip[9] != proto or inet_checksum(pseudo + l4) != 0:
+            print(f"FAIL {name} IPv4 or transport checksum")
+            errors += 1
     # The field map must tile the packet exactly: contiguous, no gap, no overlap. A field
     # narrower than a byte (802.1Q PCP, DEI, VID) carries the hex of the bytes it sits in.
     for name, build in SAMPLES.items():

@@ -11,6 +11,13 @@ Versioning rules for this library:
 
 ## [Unreleased]
 
+### Added
+- OSI and TCP/IP models page (`protocols/osi-tcpip-model/`): the seven OSI layers and the four
+  TCP/IP layers, encapsulation read on two generated frames (DNS query over UDP, TCP SYN), two
+  animations, per-layer verification commands on the six platforms, a bottom-up troubleshooting
+  tree and a 16-question quiz. `tools/packet-builder.py` builds the two frames (`osi-dns`,
+  `osi-syn`) and checks their IPv4, UDP and TCP checksums.
+
 ### Changed
 - Ethernet, Concepts: three diagrams for the terminology (sizes, MAC address, VLAN tag) and one
   for the frame variants; the two reference tables are collapsible; the sizes table states its
