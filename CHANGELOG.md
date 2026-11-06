@@ -11,7 +11,17 @@ Versioning rules for this library:
 
 ## [Unreleased]
 
+### Added
+- IPv4 and OSI: same learning path as the Ethernet page. Every chapter states its goals; Concepts,
+  Operation and Advanced are cut into numbered lessons that end with key points and, where it
+  helps, a self-check; every sample packet lists its fields in order under the diagram.
+- Every diagram of the three pages now has, under its colour legend, a list that explains what the
+  drawing contains: the eleven IP option layouts, the IPv4 header structure, the checksum
+  computation, the eight animations, the layer and encapsulation diagrams, the physical-layer name.
+
 ### Changed
+- IPv4: the note on the Wireshark preferences used for the trees is folded, so the chapter opens on
+  the first packet; the labels of the encapsulation diagram are translated.
 - Animations: the explanatory labels inside the eight step-by-step diagrams (Ethernet, IPv4, OSI)
   are translated in the four languages; field, state and message names stay in English. A badge
   that shows an explanation ("idle") is translated through the figure's `data-anim-i18n`
