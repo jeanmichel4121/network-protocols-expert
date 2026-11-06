@@ -11,6 +11,8 @@ Versioning rules for this library:
 
 ## [Unreleased]
 
+## [0.3.0] - 2026-11-06
+
 ### Added
 - OSI and TCP/IP models page (`protocols/osi-tcpip-model/`): the seven OSI layers and the four
   TCP/IP layers, encapsulation read on two generated frames (DNS query over UDP, TCP SYN), two
@@ -208,6 +210,7 @@ tooling, the CI pipeline and the public site.
   as Cisco's terms require), laid out left to right under the headline; CI checks the embedded
   scene matches the generator.
 
-[Unreleased]: https://github.com/jeanmichel4121/network-protocols-expert/compare/v0.2.0...main
+[Unreleased]: https://github.com/jeanmichel4121/network-protocols-expert/compare/v0.3.0...main
+[0.3.0]: https://github.com/jeanmichel4121/network-protocols-expert/compare/v0.2.0...v0.3.0
 [0.2.0]: https://github.com/jeanmichel4121/network-protocols-expert/compare/v0.1.0...v0.2.0
 [0.1.0]: https://github.com/jeanmichel4121/network-protocols-expert/tree/v0.1.0
