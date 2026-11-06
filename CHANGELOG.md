@@ -15,6 +15,9 @@ Versioning rules for this library:
 - IPv4 and OSI: same learning path as the Ethernet page. Every chapter states its goals; Concepts,
   Operation and Advanced are cut into numbered lessons that end with key points and, where it
   helps, a self-check; every sample packet lists its fields in order under the diagram.
+- IPv4: four addressing lessons in Concepts (address and prefix, subnetting and aggregation,
+  local or remote decision, private and special addresses) with three diagrams, a table of common
+  prefixes and a self-check each; sources RFC 4632, RFC 950, RFC 3021 and RFC 1918 added.
 - Every diagram of the three pages now has, under its colour legend, a list that explains what the
   drawing contains: the eleven IP option layouts, the IPv4 header structure, the checksum
   computation, the eight animations, the layer and encapsulation diagrams, the physical-layer name.

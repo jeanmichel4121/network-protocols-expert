@@ -6,8 +6,8 @@ Accessed 25 October and 5 November 2026. Same list and numbering as the Sources 
 ## Standards and registries
 
 1. **RFC 791, Internet Protocol (STD 5)**: §1.4, §2.3, §3.1, §3.2; errata. Updated by RFC 1349, 2474, 6864. https://www.rfc-editor.org/rfc/rfc791
-2. **RFC 1122, Requirements for Internet Hosts**: §3.2.1.1-3.2.1.8, §3.3.2, §3.3.3. https://www.rfc-editor.org/rfc/rfc1122
-3. **RFC 1812, Requirements for IP Version 4 Routers**: §4.2.2.9, §5.2.2, §5.3.1, §5.3.7, §5.3.13. https://www.rfc-editor.org/rfc/rfc1812
+2. **RFC 1122, Requirements for Internet Hosts**: §3.2.1.1-3.2.1.8, §3.3.1.1 (local or remote decision), §3.3.2, §3.3.3. https://www.rfc-editor.org/rfc/rfc1122
+3. **RFC 1812, Requirements for IP Version 4 Routers**: §4.2.2.9, §4.2.2.11 (addressing), §5.2.2, §5.2.4.3 (longest match), §5.3.1, §5.3.7, §5.3.13. https://www.rfc-editor.org/rfc/rfc1812
 4. **RFC 2474, Definition of the DS Field**: §3, §4.2.2, §6 (updated by RFC 3168, 8436). https://www.rfc-editor.org/rfc/rfc2474
 5. **RFC 3168, Explicit Congestion Notification**: §5, §6.1, §17. https://www.rfc-editor.org/rfc/rfc3168
 6. **RFC 8311, Relaxing Restrictions on ECN Experimentation**. https://www.rfc-editor.org/rfc/rfc8311
@@ -120,6 +120,13 @@ Accessed 25 October and 5 November 2026. Same list and numbering as the Sources 
 107. Fortinet: **FortiOS 7.4.6 Administration Guide, Performing a sniffer trace or packet capture** (7.4.6, sniffer). https://docs.fortinet.com/document/fortigate/7.4.6/administration-guide/680228/performing-a-sniffer-trace-or-packet-capture
 108. Fortinet: **FortiOS 7.4.4 Administration Guide, Debugging the packet flow** (7.4.4, debug flow). https://docs.fortinet.com/document/fortigate/7.4.4/administration-guide/54688/debugging-the-packet-flow
 109. Fortinet: **FortiOS 7.4.4 CLI Reference, config firewall DoS-policy (anomaly names not listed)** (7.4.4, DoS-policy). https://docs.fortinet.com/document/fortigate/7.4.4/cli-reference/561707922
+
+## Addressing
+
+110. **RFC 4632 (BCP 122), Classless Inter-domain Routing (CIDR): The Internet Address Assignment and Aggregation Plan**: §3.1 (prefix notation), §4.1 (aggregation); obsoletes RFC 1519. https://www.rfc-editor.org/rfc/rfc4632
+111. **RFC 950 (STD 5), Internet Standard Subnetting Procedure**: §2 (address mask, subnet field). https://www.rfc-editor.org/rfc/rfc950
+112. **RFC 3021, Using 31-Bit Prefixes on IPv4 Point-to-Point Links**: §2.1, §2.2. https://www.rfc-editor.org/rfc/rfc3021
+113. **RFC 1918 (BCP 5), Address Allocation for Private Internets**: §3 (private address space). https://www.rfc-editor.org/rfc/rfc1918
 
 ## Wireshark preferences used for the trees
 
