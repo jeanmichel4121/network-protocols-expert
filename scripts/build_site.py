@@ -171,6 +171,13 @@ def localise(text: str, meta: dict, lang: str, path: str, home_href: str) -> str
     body = re.sub(
         r'href="[^"#]*((?:#[^"]*)?)" data-home', lambda m: f'href="{home_href}{m.group(1)}" data-home', body
     )
+    # A link to another protocol page (../<slug>/index.html in the source) goes to that page's
+    # overview in the same language, whatever the depth of the page being built.
+    body = re.sub(
+        r'href="\.\./([a-z0-9-]+)/index\.html((?:#[^"]*)?)"',
+        lambda m: f'href="{home_href}{m.group(1)}/{m.group(2)}"',
+        body,
+    )
     sha = os.environ.get("CI_COMMIT_SHA", "local")[:8]
     body = body.replace("<code data-version>local</code>", f"<code data-version>{esc(sha)}</code>")
     return pre + sep + head + sep2 + body
@@ -765,7 +772,7 @@ def chooser(blocks: dict) -> str:
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="color-scheme" content="light dark">
+<meta name="color-scheme" content="dark">
 <title>{BRAND}</title>
 <meta name="description" content="Expert-level network protocols in French, English, Dutch and German.">
 <link rel="canonical" href="{SITE}/">
@@ -824,7 +831,7 @@ def not_found(blocks: dict) -> str:
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="color-scheme" content="light dark">
+<meta name="color-scheme" content="dark">
 <meta name="robots" content="noindex">
 <title>404 | {BRAND}</title>
 {blocks["icon"]}

@@ -123,8 +123,9 @@ Component patterns:
 
 ## 7. Colour and theming
 
-- Light and dark themes from one set of tokens (`light-dark()`), default = system
-  preference, manual toggle remembered in `localStorage` (wrapped in try/catch).
+- Light and dark themes from one set of tokens (`light-dark()`). Dark is the default (owner's
+  choice, 2026-11-06), also without JavaScript; the manual toggle to light is remembered in
+  `localStorage` (wrapped in try/catch).
 - Library colour code (CLAUDE.md): grey = encapsulation, blue = protocol header,
   teal = message body, purple = TLV/options, orange = vendor-specific, green = expected,
   red = error. Fields also differ by border style (solid / dashed / dotted) so the

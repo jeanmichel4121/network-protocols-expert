@@ -11,6 +11,20 @@ Versioning rules for this library:
 
 ## [Unreleased]
 
+### Added
+- Template: learning-path blocks (`.goals`, `h3.lesson`, `.callout.recap`, `details.check`): chapter
+  goals with time and prerequisites, numbered lessons, key points, and a self-check whose answer
+  stays hidden until opened.
+- Ethernet: every chapter states its goals and ends with key points; Concepts, Operation and
+  Advanced are cut into numbered lessons with a self-check each; every frame of the Packet formats
+  chapter lists its fields in order, with size and role, under the diagram.
+- Build: a link to another protocol page (`../<slug>/index.html`) is rewritten to that page's
+  overview in the same language.
+
+### Changed
+- Theme: dark by default on every page, also without JavaScript; the toggle to light is remembered.
+  The smoke test checks the default and the stored light choice.
+
 ## [0.4.0] - 2026-11-06
 
 ### Added

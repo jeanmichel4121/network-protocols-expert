@@ -111,7 +111,7 @@ page from `templates/protocol-template.html`; its shared blocks are copied verba
 - **One self-contained file per page**: CSS, JS and SVG inline. No CDN, no external
   font, no external image, no network call. The page must open offline by double-click.
 - Vanilla HTML/CSS/JS only (no framework, no build step).
-- Light and dark mode (`prefers-color-scheme` + manual toggle).
+- Light and dark mode: dark by default, manual toggle to light, choice remembered.
 - Responsive down to 360 px wide, no horizontal page scroll (wide tables/grids scroll
   inside their own container).
 - `localStorage` only for per-viewer conveniences (chosen language, theme), always wrapped

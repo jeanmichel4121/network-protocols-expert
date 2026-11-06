@@ -157,14 +157,24 @@ def check_slow_link(browser, base: str, rel: str) -> list:
     return errors
 
 
+def theme_errors(page, built, want: str) -> list:
+    """Dark is the default theme; light is the reader's stored choice."""
+    if built and page.evaluate("document.documentElement.dataset.theme") != want:
+        return [f"theme is not '{want}'"]
+    return []
+
+
 def check_page(browser, base: str, rel: str, axe: str) -> list:
     errors = []
     built = re.match(r"^(fr|en|nl|de)/", rel)
 
     # Desktop, light theme: axe, CLS, language switching, alternates.
     ctx, page = new_page(browser, base, errors, viewport={"width": 1280, "height": 900}, color_scheme="light")
+    # The site is dark by default: the light theme is the reader's stored choice.
+    page.add_init_script("try { localStorage.setItem('theme', 'light'); } catch (e) {}")
     page.goto(f"{base}/{rel}", wait_until="load")
     page.wait_for_timeout(400)
+    errors += theme_errors(page, built, "light")
     cls = page.evaluate("window.__cls")
     if cls > CLS_BUDGET:
         errors.append(f"cumulative layout shift {cls:.3f} > {CLS_BUDGET}")
@@ -184,9 +194,11 @@ def check_page(browser, base: str, rel: str, axe: str) -> list:
                 errors.append(f"button '{lang}' does not move the URL to /{lang}/")
     ctx.close()
 
-    # Dark theme: colour contrast must hold in both themes.
-    ctx, page = new_page(browser, base, errors, viewport={"width": 1280, "height": 900}, color_scheme="dark")
+    # Dark theme: colour contrast must hold in both themes. Dark is the default, even when the
+    # system asks for light.
+    ctx, page = new_page(browser, base, errors, viewport={"width": 1280, "height": 900}, color_scheme="light")
     page.goto(f"{base}/{rel}", wait_until="load")
+    errors += theme_errors(page, built, "dark")
     errors += run_axe(page, axe, "dark")
     ctx.close()
 
