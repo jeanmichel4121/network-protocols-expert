@@ -34,12 +34,12 @@ Accessed 24-25 October 2026. Same list as section 8 (Sources) of `index.html`.
 - Network Management CG 17.9, Configuring Packet Capture: https://www.cisco.com/c/en/us/td/docs/switches/lan/catalyst9300/software/release/17-9/configuration_guide/nmgmt/b_179_nmgmt_9300_cg/configuring_packet_capture.html
 - TAC 217233 (MTU on Catalyst 9000): https://www.cisco.com/c/en/us/support/docs/switches/catalyst-9500-series-switches/217233-troubleshoot-mtu-on-catalyst-9000-series.html
 - TAC 217726 (QinQ and L2PT on Catalyst 9000): https://www.cisco.com/c/en/us/support/docs/switches/catalyst-9300-switch/217726-configure-and-verify-and-troubleshoot-qi.html
-- TAC 218397 (port flaps on Catalyst 9000): https://www.cisco.com/c/zh_cn/support/docs/switches/catalyst-9500-series-switches/218397-troubleshoot-port-flaps-on-catalyst-9000.html
+- TAC 218397 (port flaps on Catalyst 9000): https://www.cisco.com/c/en/us/support/docs/switches/catalyst-9500-series-switches/218397-troubleshoot-port-flaps-on-catalyst-9000.html
 - NX-OS 10.4 Interfaces CG, Basic Interface Parameters: https://www.cisco.com/c/en/us/td/docs/dcn/nx-os/nexus9000/104x/configuration/interfaces/cisco-nexus-9000-series-nx-os-interfaces-configuration-guide-release-104x/m_configuring_basic_interface_parameters_93x.html
 - NX-OS 10.4 Interfaces CG, Q-in-Q VLAN Tunnels: https://www.cisco.com/c/en/us/td/docs/dcn/nx-os/nexus9000/104x/configuration/interfaces/cisco-nexus-9000-series-nx-os-interfaces-configuration-guide-release-104x/m_configuring_q-in-q_vlan_tunnels_9x.html
 - NX-OS 10.3 QoS CG, Link Level Flow Control: https://www.cisco.com/c/en/us/td/docs/dcn/nx-os/nexus9000/103x/configuration/qos/cisco-nexus-9000-nx-os-quality-of-service-configuration-guide-103x/m-configuring-llfc.html
-- TAC 220133 (Nexus 9000 CRC): https://bxin.cisco.com/c/en/us/support/docs/ios-nx-os-software/nx-os-software/220133-troubleshoot-nexus-9000-interface-crc-er.pdf
-- TAC 218096 (Nexus cheat sheet, ethanalyzer): https://cisco.com/c/en/us/support/docs/switches/nexus-9000-series-switches/218096-troubleshoot-nexus-cheat-sheet-for-begin.pdf
+- TAC 220133 (Nexus 9000 CRC): https://www.cisco.com/c/en/us/support/docs/ios-nx-os-software/nx-os-software/220133-troubleshoot-nexus-9000-interface-crc-er.html
+- TAC 218096 (Nexus cheat sheet, ethanalyzer): https://www.cisco.com/c/en/us/support/docs/switches/nexus-9000-series-switches/218096-troubleshoot-nexus-cheat-sheet-for-begin.html
 - IOS XR 7.9 (ASR 9000), Configuring 802.1Q VLAN Interfaces: https://www.cisco.com/c/en/us/td/docs/routers/asr9000/software/asr9k-r7-9/configuration/guide/b-interfaces-hardware-component-cg-asr9000-79x/configuring-802-1q-vlan-interfaces.html
 
 ### Check Point
@@ -64,15 +64,18 @@ Accessed 24-25 October 2026. Same list as section 8 (Sources) of `index.html`.
 - PAN-OS 11.1, Protocol Protection: https://docs.paloaltonetworks.com/pan-os/11-1/pan-os-admin/zone-protection-and-dos-protection/zone-defense/zone-protection-profiles/protocol-protection
 - KB Jumbo Frame: https://knowledgebase.paloaltonetworks.com/KCSArticleDetail?id=kA10g000000ClVaCAK
 - KB MTU and MSS from CLI: https://knowledgebase.paloaltonetworks.com/kcsArticleDetail?id=kA10g000000ClLI
+- KB Identify configured Interface MTU (show interface): https://knowledgebase.paloaltonetworks.com/KCSArticleDetail?id=kA10g000000CljICAS
 - KB CRC errors: https://knowledgebase.paloaltonetworks.com/KCSArticleDetail?id=kA10g000000ClJVCA0
 - KB hardware counters: https://knowledgebase.paloaltonetworks.com/KCSArticleDetail?id=kA10g000000ClV7CAK
 - KB global counters: https://knowledgebase.paloaltonetworks.com/articles/en_US/Knowledge/How-to-check-global-counters-f-65794
 - KB Getting Started: Packet Capture: https://knowledgebase.paloaltonetworks.com/KCSArticleDetail?id=kA10g000000ClTJCA0
+- Web Interface Help 11.1, Building Blocks for a Custom Packet Capture (capture stages): https://docs.paloaltonetworks.com/ngfw/help/11-1/monitor/monitor-packet-capture/building-blocks-for-a-custom-packet-capture
+- GlobalProtect Administrator's Guide, Troubleshoot Clientless VPN (set capture stage ... file ...): https://docs.paloaltonetworks.com/globalprotect/administration/globalprotect-clientless-vpn/troubleshoot-clientless-vpn
 - Not documented officially: Q-in-Q, 802.3x flow control, CLI `layer3 units ... tag` syntax.
 
 ### NetScaler
-- ADC CLI Commands 14.1, interface / vlan / nstrace: https://developer-docs.netscaler.com/en-us/adc-command-reference-int/current-release/network/interface.html, https://developer-docs.netscaler.com/en-us/adc-command-reference-int/current-release/network/vlan.html, https://developer-docs.netscaler.com/en-us/adc-command-reference-int/current-release/basic/nstrace.html
-- ADC CLI Commands 13.0, arp / bridgetable: https://developer-docs.netscaler.com/en-us/adc-command-reference-int/13/network/arp.html, https://developer-docs.netscaler.com/en-us/adc-command-reference-int/13/network/bridgetable.html
+- ADC CLI Commands 14.1, interface / vlan / nstrace (archived copies; the vendor site no longer serves the command reference): https://web.archive.org/web/20240813193338/https://developer-docs.netscaler.com/en-us/adc-command-reference-int/current-release/network/interface, https://web.archive.org/web/20241108044106/https://developer-docs.netscaler.com/en-us/adc-command-reference-int/current-release/network/vlan, https://web.archive.org/web/20241207122657/https://developer-docs.netscaler.com/en-us/adc-command-reference-int/current-release/basic/nstrace
+- ADC CLI Commands 13.0, arp / bridgetable (archived copies): https://web.archive.org/web/20250429151900/https://developer-docs.netscaler.com/en-us/adc-command-reference-int/13/network/arp, https://web.archive.org/web/20250619222805/https://developer-docs.netscaler.com/en-us/adc-command-reference-int/13/network/bridgetable
 - Understanding VLANs (14.1): https://docs.netscaler.com/us/en/citrix-adc/current-release/networking/interfaces/understanding-vlans.html
 - Not documented officially: Q-in-Q / 802.1ad, separate runt/giant/PAUSE counters.
 

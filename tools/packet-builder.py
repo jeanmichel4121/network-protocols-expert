@@ -1628,6 +1628,8 @@ IPV4_SAMPLES = {
 IP_DNS, IP_WEB = "198.51.100.53", "203.0.113.80"
 DNS_NAME = "example.com"
 TCP_REF, DNS_REF = "RFC 9293 §3.1", "RFC 1035 §4.1.1"
+# RFC 1035 has a 3-bit Z field; DNSSEC took two of its bits (RFC 2535 §6.1, now RFC 4035).
+DNSSEC_REF = {"AD": "RFC 4035 §3.2.3", "CD": "RFC 4035 §3.2.2"}
 TCP_FLAGS = (
     ("cwr", "CWR", "Congestion Window Reduced"),
     ("ece", "ECE", "ECN-Echo"),
@@ -1768,7 +1770,7 @@ class LayerFrame(IPv4Frame):
             str(flags >> 9),
             "tcp.flags.res",
             "Reserved",
-            TCP_REF,
+            "RFC 9293 §3.1, RFC 9768 §3.1",
             tree=t,
             ws_group=fl,
             ws_bits=wsbits(flags >> 9, 3, 0, 12),
@@ -1921,7 +1923,7 @@ class LayerFrame(IPv4Frame):
                 str(val),
                 ws,
                 label,
-                DNS_REF,
+                DNSSEC_REF.get(name, DNS_REF),
                 tree=t,
                 ws_group=fl,
                 ws_bits=wsbits(val, width, pos, 16),

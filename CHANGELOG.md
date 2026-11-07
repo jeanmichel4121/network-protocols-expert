@@ -36,6 +36,12 @@ Versioning rules for this library:
   dictionary and follows the language switch.
 
 ### Fixed
+- OSI, Ethernet, IPv4: corrections from a review. Citations (DNS AD and CD bits to RFC 4035, default
+  TTL 64 to the IANA registry, EtherType and DNS registries, HTTP/3 on UDP 443, MPLS shim to RFC 3032,
+  TCP reserved bits and the ACK flag in a RST, X.200 editions), wording (tunnels, RFC 1122 and the
+  upper layers, ARP cache timeout, TLS on layers 5-6), dead NetScaler links replaced by archived
+  copies, three Cisco URLs, Palo Alto capture stages, IOS XR TCP MSS adjustment and Q-in-Any
+  examples, and the Ethernet menu entry "Frame formats".
 - Packet views: the bit diagram reserves its height before the page script draws it
   (`tools/packet-builder.py --update` writes the number of rows), so the panel below it no longer
   moves over a slow link (layout shift 0.110 on the English OSI packets chapter).

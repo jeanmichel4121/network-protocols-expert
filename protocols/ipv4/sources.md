@@ -76,7 +76,7 @@ Accessed 25 October and 5 November 2026. Same list and numbering as the Sources 
 63. Cisco: **Configure and Verify Maximum Transmission Unit on Nexus Platforms (TAC 118994)** (NX-OS 9.x/10.x, Nexus 9000). https://www.cisco.com/c/en/us/support/docs/switches/nexus-9000-series-switches/118994-config-nexus-00.html
 64. Cisco: **NX-API REST SDK, Configuring IP TCP MSS** (NX-OS, ip tcp mss). https://developer.cisco.com/docs/cisco-nexus-3000-and-9000-series-nx-api-rest-sdk-user-guide-and-api-reference/latest/configuring-ip-tcp-mss
 65. Cisco: **Troubleshoot Nexus Cheat Sheet for Beginners (TAC 218096)** (NX-OS, ping / ethanalyzer). https://www.cisco.com/c/en/us/support/docs/switches/nexus-9000-series-switches/218096-troubleshoot-nexus-cheat-sheet-for-begin.html
-66. Cisco: **IP Addresses and Services Command Reference for ASR 9000 (Network Stack IPv4)** (IOS XR 7.x, ipv4 mtu / ipv4 source-route). https://www.cisco.com/c/en/us/td/docs/routers/asr9000/software/ip-addresses/command/reference/b-ip-addresses-cr-asr9000/b-ipaddr-cr-asr9k_chapter_01000.html
+66. Cisco: **IP Addresses and Services Command Reference for ASR 9000 (Network Stack IPv4)** (IOS XR 7.x, ipv4 mtu / ipv4 source-route / ipv4 tcp-mss-adjust). https://www.cisco.com/c/en/us/td/docs/routers/asr9000/software/ip-addresses/command/reference/b-ip-addresses-cr-asr9000/b-ipaddr-cr-asr9k_chapter_01000.html
 67. Cisco: **MTU Behavior on Cisco IOS XR and Cisco IOS Routers (TAC 116350)** (IOS XR, MTU). https://www.cisco.com/c/en/us/support/docs/ios-nx-os-software/ios-xr-software/116350-trouble-ios-xr-mtu-00.html
 68. Cisco: **IP Addresses and Services CR for NCS 5500, Host Services (ping)** (IOS XR 7.x, ping donnotfrag). https://www.cisco.com/c/en/us/td/docs/iosxr/ncs5500/ip-addresses/b-ip-addresses-cr-ncs5500/b-ncs5500-ip-addresses-cli-reference_chapter_0100.html
 69. Check Point: **Gaia Administration Guide, Physical Interfaces** (R81.20, Physical Interfaces). https://sc1.checkpoint.com/documents/R81.20/WebAdminGuides/EN/CP_R81.20_Gaia_AdminGuide/Content/Topics-GAG/Physical-Interfaces.htm
@@ -103,12 +103,12 @@ Accessed 25 October and 5 November 2026. Same list and numbering as the Sources 
 90. Palo Alto Networks: **KB, How to Verify MTU Size Exceeded** (PAN-OS, counters). https://knowledgebase.paloaltonetworks.com/KCSArticleDetail?id=kA10g000000ClLPCA0
 91. Palo Alto Networks: **KB, Firewall unable to connect to Panorama due to fragmentation** (PAN-OS 7.1+, ping do-not-fragment). https://knowledgebase.paloaltonetworks.com/KCSArticleDetail?id=kA10g000000PNC8CAO
 92. Palo Alto Networks: **KB, Getting Started: Packet Capture** (PAN-OS, packet-diag). https://knowledgebase.paloaltonetworks.com/KCSArticleDetail?id=kA10g000000ClTJCA0
-93. NetScaler: **ADC CLI Command Reference, interface** (14.1, set interface -mtu). https://developer-docs.netscaler.com/en-us/adc-command-reference-int/current-release/network/interface
-94. NetScaler: **ADC CLI Command Reference, ns tcpProfile** (14.1, -mss). https://developer-docs.netscaler.com/en-us/adc-command-reference-int/current-release/ns/ns-tcpprofile
-95. NetScaler: **ADC CLI Command Reference, ns param** (14.1, -ipTtl / -pmtuMin / -pmtuTimeout). https://developer-docs.netscaler.com/en-us/adc-command-reference-int/current-release/ns/ns-param
-96. NetScaler: **ADC CLI Command Reference, ns mode** (14.1, PMTUD). https://developer-docs.netscaler.com/en-us/adc-command-reference-int/current-release/ns/ns-mode
-97. NetScaler: **ADC CLI Command Reference, protocol ip** (14.1, stat protocol ip). https://developer-docs.netscaler.com/en-us/adc-command-reference-int/current-release/protocol/protocol-ip
-98. NetScaler: **ADC CLI Command Reference, ping** (14.1, ping). https://developer-docs.netscaler.com/en-us/adc-command-reference-int/current-release/utility/ping
+93. NetScaler: **ADC CLI Command Reference, interface** (14.1, archived copy, set interface -mtu). https://web.archive.org/web/20240813193338/https://developer-docs.netscaler.com/en-us/adc-command-reference-int/current-release/network/interface
+94. NetScaler: **ADC CLI Command Reference, ns tcpProfile** (14.1, archived copy, -mss). https://web.archive.org/web/20241105191801/https://developer-docs.netscaler.com/en-us/adc-command-reference-int/current-release/ns/ns-tcpprofile
+95. NetScaler: **ADC CLI Command Reference, ns param** (14.1, archived copy, -ipTtl / -pmtuMin / -pmtuTimeout). https://web.archive.org/web/20260610182508/https://developer-docs.netscaler.com/en-us/adc-command-reference-int/current-release/ns/ns-param
+96. NetScaler: **ADC CLI Command Reference, ns mode** (14.1, archived copy, PMTUD). https://web.archive.org/web/20260608045959/https://developer-docs.netscaler.com/en-us/adc-command-reference-int/current-release/ns/ns-mode
+97. NetScaler: **ADC CLI Command Reference, protocol ip** (14.1, archived copy, stat protocol ip). https://web.archive.org/web/20260314122054/https://developer-docs.netscaler.com/en-us/adc-command-reference-int/current-release/protocol/protocol-ip
+98. NetScaler: **ADC CLI Command Reference, ping** (14.1, archived copy, ping). https://web.archive.org/web/20260308071932/https://developer-docs.netscaler.com/en-us/adc-command-reference-int/current-release/utility/ping
 99. NetScaler: **CTX131805, Citrix ADC IP Counters** (-, nsconmsg names). https://support.citrix.com/external/article/CTX131805/citrix-adc-internet-protocol-ip-counters.html
 100. NetScaler: **How to record a packet trace on NetScaler** (14.1, nstrace). https://docs.netscaler.com/en-us/citrix-adc/current-release/system/troubleshooting-citrix-adc/how-to-record-a-packet-trace-on-citrix-adc.html
 101. Fortinet: **FortiOS 7.4.4 Administration Guide, Interface MTU packet size** (7.4.4, Interface MTU). https://docs.fortinet.com/document/fortigate/7.4.4/administration-guide/596096/interface-mtu-packet-size
@@ -120,13 +120,17 @@ Accessed 25 October and 5 November 2026. Same list and numbering as the Sources 
 107. Fortinet: **FortiOS 7.4.6 Administration Guide, Performing a sniffer trace or packet capture** (7.4.6, sniffer). https://docs.fortinet.com/document/fortigate/7.4.6/administration-guide/680228/performing-a-sniffer-trace-or-packet-capture
 108. Fortinet: **FortiOS 7.4.4 Administration Guide, Debugging the packet flow** (7.4.4, debug flow). https://docs.fortinet.com/document/fortigate/7.4.4/administration-guide/54688/debugging-the-packet-flow
 109. Fortinet: **FortiOS 7.4.4 CLI Reference, config firewall DoS-policy (anomaly names not listed)** (7.4.4, DoS-policy). https://docs.fortinet.com/document/fortigate/7.4.4/cli-reference/561707922
+110. Palo Alto Networks: **Web Interface Help, Building Blocks for a Custom Packet Capture** (PAN-OS 11.1, capture stages). https://docs.paloaltonetworks.com/ngfw/help/11-1/monitor/monitor-packet-capture/building-blocks-for-a-custom-packet-capture
+111. Palo Alto Networks: **GlobalProtect Administrator's Guide, Troubleshoot Clientless VPN** (set capture stage ... file ...). https://docs.paloaltonetworks.com/globalprotect/administration/globalprotect-clientless-vpn/troubleshoot-clientless-vpn
+112. Cisco: **IP Addresses and Services Configuration Guide for ASR 9000, Implementing Network Stack IPv4 and IPv6** (IOS XR 25.1.x to 25.4.x, TCP MSS Adjustment). https://www.cisco.com/c/en/us/td/docs/routers/asr9000/software/25xx/ip-addresses/configuration/guide/b-ip-addresses-cg-asr9000-25xx/implementing-network-stack-ipv4-and-ipv6.html
+113. Cisco: **IP Addresses and Services Command Reference for NCS 5500, NCS 540 and NCS 560, Network Stack IPv4 and IPv6 Commands** (IOS XR, ipv6 tcp-mss-adjust). https://www.cisco.com/c/en/us/td/docs/iosxr/ncs5500/ip-addresses/b-ip-addresses-cr-ncs5500/b-ncs5500-ip-addresses-cli-reference_chapter_0110.html
 
 ## Addressing
 
-110. **RFC 4632 (BCP 122), Classless Inter-domain Routing (CIDR): The Internet Address Assignment and Aggregation Plan**: §3.1 (prefix notation), §4.1 (aggregation); obsoletes RFC 1519. https://www.rfc-editor.org/rfc/rfc4632
-111. **RFC 950 (STD 5), Internet Standard Subnetting Procedure**: §2 (address mask, subnet field). https://www.rfc-editor.org/rfc/rfc950
-112. **RFC 3021, Using 31-Bit Prefixes on IPv4 Point-to-Point Links**: §2.1, §2.2. https://www.rfc-editor.org/rfc/rfc3021
-113. **RFC 1918 (BCP 5), Address Allocation for Private Internets**: §3 (private address space). https://www.rfc-editor.org/rfc/rfc1918
+114. **RFC 4632 (BCP 122), Classless Inter-domain Routing (CIDR): The Internet Address Assignment and Aggregation Plan**: §3.1 (prefix notation), §4.1 (aggregation); obsoletes RFC 1519. https://www.rfc-editor.org/rfc/rfc4632
+115. **RFC 950 (STD 5), Internet Standard Subnetting Procedure**: §2 (address mask, subnet field). https://www.rfc-editor.org/rfc/rfc950
+116. **RFC 3021, Using 31-Bit Prefixes on IPv4 Point-to-Point Links**: §2.1, §2.2. https://www.rfc-editor.org/rfc/rfc3021
+117. **RFC 1918 (BCP 5), Address Allocation for Private Internets**: §3 (private address space). https://www.rfc-editor.org/rfc/rfc1918
 
 ## Wireshark preferences used for the trees
 
@@ -137,7 +141,7 @@ Accessed 25 October and 5 November 2026. Same list and numbering as the Sources 
 
 ## Known gaps (no readable official source; nothing invented)
 
-- Cisco IOS XE: formal `ip mtu` reference entry, one-line `ping ... df-bit`, `debug ip packet`; IOS XR `show ipv4 traffic` counter names and TCP MSS adjust syntax; NX-OS `show ip traffic` sample output.
+- Cisco IOS XE: formal `ip mtu` reference entry, one-line `ping ... df-bit`, `debug ip packet`; IOS XR `show ipv4 traffic` counter names; NX-OS `show ip traffic` sample output.
 - Check Point: `fw ctl zdebug` (sk171943), default drop of IP options (sk93809, community-sourced only).
 - F5: K411/K13637 tcpdump KBs, K13948 PMTUD; `show sys ip-stat` sample output.
 - Palo Alto: CLI leaf names for Zone Protection IP-option drops and the MSS adjustment size.

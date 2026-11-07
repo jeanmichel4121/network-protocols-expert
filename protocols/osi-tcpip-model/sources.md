@@ -3,28 +3,28 @@
 Hierarchy: standards (ITU-T, ISO/IEC, RFC, IEEE, IANA) > vendor documentation > references.
 Accessed 6 November 2026. Same list and numbering as the Sources chapter of `index.html`.
 
-1. **ITU-T Recommendation X.200 (07/1994) | ISO/IEC 7498-1:1994, Open Systems Interconnection, Basic Reference Model: The basic model**: clause 5 (layered architecture: entities, services, (N)-PDU, (N)-SDU, (N)-SAP), clause 6 (the seven layers), clause 7 (each layer in detail). https://www.itu.int/rec/T-REC-X.200-199407-I
-2. **RFC 1122, Requirements for Internet Hosts: Communication Layers (STD 3)**: §1.1.3 (Internet protocol suite: application, transport, internet and link layers), §2.3.2 (ARP, in the link layer chapter), §2.3.2.1 (ARP cache), §3.2.1.7 (Time to Live), §3.3.1 (local or remote destination). https://www.rfc-editor.org/rfc/rfc1122
+1. **ITU-T Recommendation X.200 (07/1994) | ISO/IEC 7498-1:1994, Open Systems Interconnection, Basic Reference Model: The basic model**: clause 5 (layered architecture: entities, services, (N)-PDU, (N)-SDU, (N)-SAP), clause 6 (the seven layers), clause 7 (each layer in detail). Earlier editions: ISO 7498:1984, CCITT X.200 (10/1984) and X.200 (11/1988), both superseded. https://www.itu.int/rec/T-REC-X.200-199407-I
+2. **RFC 1122, Requirements for Internet Hosts: Communication Layers (STD 3)**: §1.1.3 (Internet protocol suite: application, transport, internet and link layers), §2.3.2 (ARP, in the link layer chapter), §2.3.2.1 (ARP cache validation: mechanisms, timeout on the order of a minute), §3.2.1.7 (Time to Live: configurable, no value), §3.3.1 (local or remote destination). https://www.rfc-editor.org/rfc/rfc1122
 3. **RFC 1123, Requirements for Internet Hosts: Application and Support (STD 3)**: §1 (application layer of the Internet suite). https://www.rfc-editor.org/rfc/rfc1123
 4. **RFC 3439, Some Internet Architectural Guidelines and Philosophy**: §3 (Layering Considered Harmful). https://www.rfc-editor.org/rfc/rfc3439
 5. **RFC 791, Internet Protocol (STD 5)**: §1.4, §2.2, §3.1 (Protocol field, Time to Live). https://www.rfc-editor.org/rfc/rfc791
 6. **RFC 894, A Standard for the Transmission of IP Datagrams over Ethernet Networks (STD 41)**: EtherType 0x0800. https://www.rfc-editor.org/rfc/rfc894
 7. **RFC 826, An Ethernet Address Resolution Protocol (STD 37)**: whole document. https://www.rfc-editor.org/rfc/rfc826
 8. **RFC 768, User Datagram Protocol (STD 6)**: whole document. https://www.rfc-editor.org/rfc/rfc768
-9. **RFC 9293, Transmission Control Protocol (STD 7)**: §3.1 (header format), §3.5 (three-way handshake), §3.7.1 (Maximum Segment Size option). https://www.rfc-editor.org/rfc/rfc9293
-10. **RFC 9768, More Accurate Explicit Congestion Notification (AccECN) Feedback in TCP**: §3.1 (AE flag). https://www.rfc-editor.org/rfc/rfc9768
-11. **RFC 1035, Domain Names: Implementation and Specification (STD 13)**: §4.1.1 (header), §4.1.2 (question section), §4.2.1 (UDP usage). https://www.rfc-editor.org/rfc/rfc1035
+9. **RFC 9293, Transmission Control Protocol (STD 7)**: §3.1 (header format), §3.1 (4 reserved bits), §3.5 (three-way handshake), §3.5.2 (reset generation), §3.7.1 (Maximum Segment Size option). https://www.rfc-editor.org/rfc/rfc9293
+10. **RFC 9768, More Accurate Explicit Congestion Notification (AccECN) Feedback in TCP**: §3.1 (AE flag, taken from the reserved bits of RFC 9293). https://www.rfc-editor.org/rfc/rfc9768
+11. **RFC 1035, Domain Names: Implementation and Specification (STD 13)**: §4.1.1 (header, without the AD and CD bits), §4.1.2 (question section), §4.2.1 (UDP usage). https://www.rfc-editor.org/rfc/rfc1035
 12. **RFC 1812, Requirements for IP Version 4 Routers**: §5.2.1 (forwarding algorithm), §5.3.1 (Time to Live). https://www.rfc-editor.org/rfc/rfc1812
 13. **RFC 3022, Traditional IP Network Address Translator (Traditional NAT)**: §2.2 (NAPT), §4.1 (header and checksum adjustment). https://www.rfc-editor.org/rfc/rfc3022
-14. **RFC 3031, Multiprotocol Label Switching Architecture**: §3.9 (label stack), §3.10 (NHLFE). https://www.rfc-editor.org/rfc/rfc3031
+14. **RFC 3031, Multiprotocol Label Switching Architecture**: §3.9 (label stack), §3.10 (NHLFE); encoding in RFC 3032. https://www.rfc-editor.org/rfc/rfc3031
 15. **RFC 7348, Virtual eXtensible Local Area Network (VXLAN)**: §5 (frame format). https://www.rfc-editor.org/rfc/rfc7348
 16. **RFC 8446, The Transport Layer Security (TLS) Protocol Version 1.3**: §1, §5 (record protocol). https://www.rfc-editor.org/rfc/rfc8446
-17. **RFC 9000, QUIC: A UDP-Based Multiplexed and Secure Transport**: §1 (overview). https://www.rfc-editor.org/rfc/rfc9000
-18. **RFC 9110, HTTP Semantics (STD 97)**: §3.7 (intermediaries). https://www.rfc-editor.org/rfc/rfc9110
+17. **RFC 9000, QUIC: A UDP-Based Multiplexed and Secure Transport**: §1 (overview); assigns no UDP port. https://www.rfc-editor.org/rfc/rfc9000
+18. **RFC 9110, HTTP Semantics (STD 97)**: §3.7 (intermediaries), §4.2.2 (https scheme, default port 443). https://www.rfc-editor.org/rfc/rfc9110
 19. **RFC 1191, Path MTU Discovery**: §3, §4. https://www.rfc-editor.org/rfc/rfc1191
 20. **IEEE Std 802-2014, IEEE Standard for Local and Metropolitan Area Networks: Overview and Architecture**: reference model: LLC and MAC sublayers, physical layer. https://standards.ieee.org/ieee/802/4158/
 21. **IANA, Assigned Internet Protocol Numbers**: values 1, 6, 17. https://www.iana.org/assignments/protocol-numbers/protocol-numbers.xhtml
-22. **IANA, Service Name and Transport Protocol Port Number Registry**: ports 53, 443. https://www.iana.org/assignments/service-names-port-numbers/service-names-port-numbers.xhtml
+22. **IANA, Service Name and Transport Protocol Port Number Registry**: ports 53, 443 (https: 443/tcp and 443/udp). https://www.iana.org/assignments/service-names-port-numbers/service-names-port-numbers.xhtml
 23. **Wireshark Display Filter Reference**: eth, ip, udp, tcp, dns. https://www.wireshark.org/docs/dfref/
 24. **tools/packet-builder.py**: samples osi-dns and osi-syn (computed lengths and checksums, cross-decoded with scapy).
 25. **Cisco: Command Reference, Cisco IOS XE Cupertino 17.9.x (Catalyst 9300 Switches)**: Interface and Hardware Commands: show interfaces, show interfaces transceiver. https://www.cisco.com/c/en/us/td/docs/switches/lan/catalyst9300/software/release/17-9/command_reference/b_179_9300_cr/interface_and_hardware_commands.html
@@ -68,7 +68,7 @@ Accessed 6 November 2026. Same list and numbering as the Sources chapter of `ind
 63. **NetScaler: NetScaler 14.1 documentation**: Configuring Static Routes: show route. https://docs.netscaler.com/en-us/citrix-adc/current-release/networking/ip-routing/configuring-static-routes.html
 64. **NetScaler: ADC CLI Commands 14.1**: ping (archived copy, 8 March 2026). https://web.archive.org/web/20260308071932/https://developer-docs.netscaler.com/en-us/adc-command-reference-int/current-release/utility/ping
 65. **NetScaler: ADC CLI Commands 14.1**: traceroute (archived copy, 12 August 2024). https://web.archive.org/web/20240812042534/https://developer-docs.netscaler.com/en-us/adc-command-reference-int/current-release/utility/traceroute
-66. **NetScaler: ADC CLI Commands 14.1**: ns connectiontable (archived copy, 8 August 2024). https://web.archive.org/web/20240808132006/https://developer-docs.netscaler.com/en-us/adc-command-reference-int/current-release/ns/ns-connectiontable
+66. **NetScaler: ADC CLI Commands 13.0**: ns connectiontable (archived copy, 18 June 2025; no copy of the 14.1 page is available). https://web.archive.org/web/20250618052400/https://developer-docs.netscaler.com/en-us/adc-command-reference-int/13/ns/ns-connectiontable
 67. **NetScaler: ADC CLI Commands 14.1**: lb vserver (archived copy, 12 May 2026). https://web.archive.org/web/20260512215958/https://developer-docs.netscaler.com/en-us/adc-command-reference-int/current-release/lb/lb-vserver
 68. **NetScaler: ADC CLI Commands 14.1**: service (archived copy, 4 January 2026). https://web.archive.org/web/20260104073929/https://developer-docs.netscaler.com/en-us/adc-command-reference-int/current-release/basic/service
 69. **NetScaler: NetScaler 14.1 documentation**: How to record a packet trace on NetScaler. https://docs.netscaler.com/en-us/citrix-adc/current-release/system/troubleshooting-citrix-adc/how-to-record-a-packet-trace-on-citrix-adc.html
@@ -80,3 +80,10 @@ Accessed 6 November 2026. Same list and numbering as the Sources chapter of `ind
 75. **Fortinet: FortiOS 7.4.9 CLI Reference**: execute ping-options, execute traceroute-options. https://docs.fortinet.com/document/fortigate/7.4.9/cli-reference/221756471/execute-ping-options
 76. **Fortinet: FortiOS 7.4.4 and 7.4.7 Administration Guide**: Using a session table (filters; app= and url_cat= fields on the 7.4.7 page). https://docs.fortinet.com/document/fortigate/7.4.7/administration-guide/562859/using-a-session-table
 77. **Fortinet: FortiOS 7.4.0 Administration Guide**: Performing a sniffer trace or packet capture. https://docs.fortinet.com/document/fortigate/7.4.0/administration-guide/680228/performing-a-sniffer-trace-or-packet-capture
+78. **RFC 4035, Protocol Modifications for the DNS Security Extensions**: §3.2.2 (CD bit), §3.2.3 (AD bit); the two bits were first allocated by RFC 2535 §6.1, now obsolete. https://www.rfc-editor.org/rfc/rfc4035
+79. **IANA, Internet Protocol Version 4 (IPv4) Parameters**: IP Time to Live Parameter: recommended default TTL 64 (the value published in the Assigned Numbers series, RFC 1700). https://www.iana.org/assignments/ip-parameters/ip-parameters.xhtml
+80. **IEEE Registration Authority, EtherType public listing**: 0800: IPv4. https://standards-oui.ieee.org/ethertype/eth.txt
+81. **IANA, Domain Name System (DNS) Parameters**: Resource Record (RR) TYPEs: A = 1; DNS header flags. https://www.iana.org/assignments/dns-parameters/dns-parameters.xhtml
+82. **RFC 9114, HTTP/3**: §3.1 (discovering an HTTP/3 endpoint: QUIC connection to the port of the https URI, any UDP port allowed). https://www.rfc-editor.org/rfc/rfc9114
+83. **RFC 3032, MPLS Label Stack Encoding**: §2.1 (label stack entry of 4 octets, the shim header). https://www.rfc-editor.org/rfc/rfc3032
+84. **IEEE Std 802.1Q-2022, IEEE Standard for Local and Metropolitan Area Networks: Bridges and Bridged Networks**: §8.6 (forwarding process), §8.8 (filtering database: MAC address and VID). https://standards.ieee.org/ieee/802.1Q/10323/
