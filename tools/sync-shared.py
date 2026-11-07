@@ -3,7 +3,7 @@
 
 CLAUDE.md: layout changes go into templates/protocol-template.html first, then are
 propagated to every existing page. This copies, verbatim, from the template into
-index.html and protocols/*/index.html:
+index.html, protocols/*/index.html and pages/*/index.html:
   - the pre-paint script (theme + language before first paint),
   - the shared style block (first <style>),
   - the page library (window.NPE),
@@ -37,7 +37,11 @@ def split_head(text: str):
 
 def main() -> int:
     _, tpl = split_head(TEMPLATE.read_text(encoding="utf-8"))
-    pages = [ROOT / "index.html", *sorted((ROOT / "protocols").glob("*/index.html"))]
+    pages = [
+        ROOT / "index.html",
+        *sorted((ROOT / "protocols").glob("*/index.html")),
+        *sorted((ROOT / "pages").glob("*/index.html")),
+    ]
     for page in pages:
         pre, text = split_head(page.read_text(encoding="utf-8"))
         old = text

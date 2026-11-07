@@ -11,6 +11,28 @@ Versioning rules for this library:
 
 ## [Unreleased]
 
+### Added
+- Legal pages, in four languages, linked from every page: legal notice, terms of use, privacy
+  (GDPR, browser storage, rights, Belgian Data Protection Authority) and a voluntary
+  accessibility statement (`pages/`, published at `/<lang>/legal/`, `/terms/`, `/privacy/`,
+  `/accessibility/`).
+- Privacy: a "remember my choices and progress on this device" switch (footer and privacy
+  page, unticked by default) and a "delete this site's data" button. The smoke test fails if a
+  page writes `localStorage` without the reader's consent.
+- Text and data mining reservation (Directive (EU) 2019/790 art. 4(3), Belgian Code of economic
+  law art. XI.190, 20°) in machine-readable form: `tdm-reservation` meta tag on every page,
+  `/.well-known/tdmrep.json` (TDMRep), and `robots.txt` rules for the AI training crawlers.
+- ADR 0010 (content licence) and ADR 0011 (privacy by design, text and data mining reservation).
+
+### Changed
+- Content licence: CC BY-NC-SA 4.0 instead of CC BY-SA 4.0 (ADR 0010). Commercial use needs
+  written permission. Releases up to v0.6.0 stay available under CC BY-SA 4.0.
+- Browser storage: language, theme and the chapter menu stay in the tab by default
+  (`sessionStorage`); reading progress (chapters opened, "Resume" link, quiz scores) is kept
+  only with the reader's consent.
+- Footer: a "Legal" column, the new licence, copyright holder Jean-Michel Cuvelier; JSON-LD
+  `license` and `copyrightHolder`.
+
 ## [0.6.0] - 2026-11-07
 
 ### Added

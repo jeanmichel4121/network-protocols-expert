@@ -1,6 +1,6 @@
 # ADR 0006: MIT for code, CC BY-SA 4.0 for content, REUSE
 
-- Status: accepted
+- Status: accepted; content licence superseded by [ADR 0010](0010-content-licence-noncommercial.md) (2026-11-07)
 - Date: 2026-10-26
 
 ## Context

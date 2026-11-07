@@ -108,7 +108,7 @@ environment) and update that file in the same MR. Significant decisions get an A
 
 ## Licensing
 
-Code is MIT, content CC BY-SA 4.0 (see [`REUSE.toml`](REUSE.toml)). By contributing you
+Code is MIT, content CC BY-NC-SA 4.0 (see [`REUSE.toml`](REUSE.toml) and ADR 0010). By contributing you
 agree that your contribution is published under the licence of the files you change.
 
 ## Secrets

@@ -10,6 +10,8 @@ Serves the site directory (default: public/) on a local port and, in headless Ch
 - language pages (/xx/...): the FR/EN/NL/DE buttons switch <html lang> in place and move
   the URL to the matching language; canonical + hreflang (4 + x-default) are consistent;
 - mobile: no horizontal page scroll at 360 px;
+- privacy: no page writes localStorage without the reader's consent; on the privacy page the
+  "remember on this device" switch stores the choice and the delete button removes everything;
 - the root page sends the visitor to a language.
 Pages are checked in parallel (SMOKE_WORKERS, default 4): one Playwright instance and one
 browser per worker thread, as Playwright requires (its API is not thread-safe).
@@ -164,14 +166,54 @@ def theme_errors(page, built, want: str) -> list:
     return []
 
 
+def check_remember(page) -> list:
+    """The privacy page's switch keeps choices on the device; its button deletes them."""
+    errors = []
+    switch = page.locator("main input[data-remember]")
+    if switch.count() != 1:
+        return ["privacy page: no 'remember on this device' switch in the page"]
+    switch.check()
+    if page.evaluate("localStorage.getItem('npe-remember')") != "1":
+        errors.append("privacy page: ticking 'remember' does not store the choice")
+    page.locator("button[data-forget]").click()
+    left = page.evaluate("Object.keys(localStorage).concat(Object.keys(sessionStorage))")
+    if left:
+        errors.append(f"privacy page: 'delete' leaves {', '.join(sorted(left))}")
+    if page.locator("input[data-remember]:checked").count():
+        errors.append("privacy page: the switch stays ticked after 'delete'")
+    return errors
+
+
+def check_dark(browser, base: str, rel: str, axe: str, errors: list) -> list:
+    """Dark theme: colour contrast must hold in both themes; dark is the default, even when the
+    system asks for light. A fresh reader also gets nothing written on the device (privacy page)."""
+    found = []
+    built = re.match(r"^(fr|en|nl|de)/", rel)
+    ctx, page = new_page(browser, base, errors, viewport={"width": 1280, "height": 900}, color_scheme="light")
+    page.goto(f"{base}/{rel}", wait_until="load")
+    found += theme_errors(page, built, "dark")
+    found += run_axe(page, axe, "dark")
+    kept = page.evaluate("(() => { try { return Object.keys(localStorage); } catch (e) { return []; } })()")
+    if kept:
+        found.append(f"localStorage written without the reader's consent: {', '.join(sorted(kept))}")
+    if built and rel.endswith("/privacy/index.html"):
+        found += check_remember(page)
+    ctx.close()
+    return found
+
+
 def check_page(browser, base: str, rel: str, axe: str) -> list:
     errors = []
     built = re.match(r"^(fr|en|nl|de)/", rel)
 
     # Desktop, light theme: axe, CLS, language switching, alternates.
     ctx, page = new_page(browser, base, errors, viewport={"width": 1280, "height": 900}, color_scheme="light")
-    # The site is dark by default: the light theme is the reader's stored choice.
-    page.add_init_script("try { localStorage.setItem('theme', 'light'); } catch (e) {}")
+    # The site is dark by default: the light theme is the reader's stored choice, kept on the
+    # device because this reader ticked "remember on this device" (privacy page).
+    page.add_init_script(
+        "try { localStorage.setItem('npe-remember', '1'); localStorage.setItem('theme', 'light'); }"
+        " catch (e) {}"
+    )
     page.goto(f"{base}/{rel}", wait_until="load")
     page.wait_for_timeout(400)
     errors += theme_errors(page, built, "light")
@@ -194,13 +236,7 @@ def check_page(browser, base: str, rel: str, axe: str) -> list:
                 errors.append(f"button '{lang}' does not move the URL to /{lang}/")
     ctx.close()
 
-    # Dark theme: colour contrast must hold in both themes. Dark is the default, even when the
-    # system asks for light.
-    ctx, page = new_page(browser, base, errors, viewport={"width": 1280, "height": 900}, color_scheme="light")
-    page.goto(f"{base}/{rel}", wait_until="load")
-    errors += theme_errors(page, built, "dark")
-    errors += run_axe(page, axe, "dark")
-    ctx.close()
+    errors += check_dark(browser, base, rel, axe, errors)
 
     # Reduced motion: nothing animates on its own.
     ctx, page = new_page(

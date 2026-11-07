@@ -29,8 +29,9 @@ Last reviewed: 2026-10-25.
   Links to an anchor that moved to another chapter are rewritten to that chapter. A
   learner-paced segment at a time follows Mayer's segmenting principle [L4]. **[CI]**
   (`check_site.py`: links, anchors, every chapter linked from its overview)
-- The chapter list and the overview cards mark the chapters a reader has already opened
-  (`localStorage`, a per-viewer convenience: the page works without it).
+- The chapter list and the overview cards mark the chapters a reader has already opened, only
+  if the reader ticked "remember on this device" (privacy page, ADR 0011): a per-viewer
+  convenience, the page works without it.
 - A step-by-step diagram shows the steps not reached yet faintly, so the reader sees where
   the exchange goes before pressing Play.
 - The sample packets of a section are tabs (`NPE.pktset`): one packet shown at a time,
@@ -125,7 +126,7 @@ Component patterns:
 
 - Light and dark themes from one set of tokens (`light-dark()`). Dark is the default (owner's
   choice, 2026-11-06), also without JavaScript; the manual toggle to light is remembered in
-  `localStorage` (wrapped in try/catch).
+  the tab (`sessionStorage`), or on the device once the reader agreed (wrapped in try/catch).
 - Library colour code (CLAUDE.md): grey = encapsulation, blue = protocol header,
   teal = message body, purple = TLV/options, orange = vendor-specific, green = expected,
   red = error. Fields also differ by border style (solid / dashed / dotted) so the
@@ -165,6 +166,29 @@ explanations shown, source URLs printed after each source.
 | No `TEMPLATE` placeholder in a published page | `test:pages-static` |
 | Field map tiles the packet exactly; checksums verify | `test:packet-builder` |
 | axe WCAG 2.2 AA light + dark, CLS < 0.1, reduced motion, hreflang/canonical, URL switch, 360 px, no external request, no console error | `verify:browser`, `scripts/smoke_test.py` |
+| No `localStorage` write without the reader's consent; the privacy page's switch and delete button work | `verify:browser`, `scripts/smoke_test.py` |
+
+## 11. Privacy, licence and rights
+
+- Legal pages in `pages/<slug>/index.html` (legal notice, terms of use, privacy,
+  accessibility), built from the template and published at `/<lang>/<slug>/`; every page
+  links them from the footer. They state facts that live elsewhere: keep them true in the
+  same change (ADR 0010, ADR 0011).
+- No cookie, no tracker, no third-party resource (CSP `default-src 'self'`,
+  `connect-src 'none'`) [R1]. No visitor IP is written: Traefik writes no access log for the
+  `learning` router and nginx logs without the client address (homelab stack `learning`,
+  README "Privacy").
+- Browser storage [R2]: a choice (language, theme, chapter menu) stays in the tab
+  (`sessionStorage`), which the ePrivacy rule allows for an interface preference kept for
+  the session; reading progress and longer storage need consent, the "remember on this
+  device" switch (`npe-remember`, unticked by default). Unticking or "delete" removes every
+  key of the site.
+- Content under CC BY-NC-SA 4.0 [R3]; commercial use on written permission. Text and data
+  mining is reserved under Directive (EU) 2019/790 art. 4(3) and the Belgian Code of economic
+  law art. XI.190, 20° [R4], in machine-readable form: `<meta name="tdm-reservation"
+  content="1">` on every page and `/.well-known/tdmrep.json` (TDMRep [R5]), plus
+  `robots.txt` rules for the documented AI training crawlers (GPTBot, ClaudeBot,
+  Google-Extended, Applebot-Extended, CCBot, Meta-ExternalAgent).
 
 ## Sources
 
@@ -187,3 +211,8 @@ explanations shown, source URLs printed after each source.
 - [L4] Mayer: Applying the science of learning: evidence-based principles for the design of multimedia instruction (2008). https://pressbooks.pub/learningenvironmentsdesign/chapter/mayer-applying-the-science-of-learning-evidence-based-principles-for-the-design-of-multimedia-instruction/
 - [L5] UBC: Design principles for multimedia. https://wiki.ubc.ca/Documentation:Design_Principles_for_Multimedia
 - [L6] Red Blob Games: notes on interactive explanations. https://redblobgames.com/x/2306-educ432
+- [R1] Regulation (EU) 2016/679 (GDPR), art. 5, 6(1)(f), 13, 15-21. https://eur-lex.europa.eu/eli/reg/2016/679/oj
+- [R2] Directive 2002/58/EC art. 5(3); Article 29 Working Party, Opinion 04/2012 on cookie consent exemption (WP194), user-interface customisation; Belgian Data Protection Authority, cookies page. https://www.autoriteprotectiondonnees.be/citoyen/themes/internet/cookies
+- [R3] Creative Commons BY-NC-SA 4.0 legal code. https://creativecommons.org/licenses/by-nc-sa/4.0/legalcode.en
+- [R4] Directive (EU) 2019/790 art. 4(3) and recital 18; Belgian law of 19 June 2022, art. 13 (Code of economic law art. XI.190, 20°); Regulation (EU) 2024/1689 art. 53(1)(c). https://eur-lex.europa.eu/eli/dir/2019/790/oj
+- [R5] W3C TDM Reservation Protocol (TDMRep), community group final report, 2024-05-10. https://www.w3.org/community/reports/tdmrep/CG-FINAL-tdmrep-20240510/

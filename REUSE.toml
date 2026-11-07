@@ -13,19 +13,20 @@ precedence = "override"
 SPDX-FileCopyrightText = "2026 Jean-Michel Cuvelier"
 SPDX-License-Identifier = "MIT"
 
-# Learning content: protocol pages, their sources, the home page and the documentation.
+# Learning content: protocol pages, their sources, the information pages, the home page and
+# the documentation (CC BY-NC-SA 4.0 since 2026-11-07, ADR 0010).
 [[annotations]]
-path = ["protocols/**", "docs/**"]
+path = ["protocols/**", "pages/**", "docs/**"]
 precedence = "override"
 SPDX-FileCopyrightText = "2026 Jean-Michel Cuvelier"
-SPDX-License-Identifier = "CC-BY-SA-4.0"
+SPDX-License-Identifier = "CC-BY-NC-SA-4.0"
 
 # The home page and its screenshots embed the unaltered Cisco icons.
 [[annotations]]
 path = ["index.html", "docs/assets/**"]
 precedence = "override"
 SPDX-FileCopyrightText = ["2026 Jean-Michel Cuvelier", "Cisco Systems, Inc."]
-SPDX-License-Identifier = "CC-BY-SA-4.0 AND LicenseRef-Cisco-Network-Topology-Icons"
+SPDX-License-Identifier = "CC-BY-NC-SA-4.0 AND LicenseRef-Cisco-Network-Topology-Icons"
 
 [[annotations]]
 path = "tools/icons/cisco/*.svg"

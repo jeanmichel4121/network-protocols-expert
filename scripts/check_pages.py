@@ -12,6 +12,7 @@
   tools/packet-builder.py output (written in the markup, so the first paint does not shift).
 - Landing topology: the embedded scene equals tools/landing-topology.py output (icons unaltered).
 - Published protocol pages contain no TEMPLATE placeholder.
+- Information pages (pages/: legal notice, terms, privacy, accessibility) get the same checks.
 Exit code 1 if any page fails.
 """
 
@@ -78,6 +79,7 @@ def builder():
 def pages():
     yield ROOT / "index.html"
     yield from sorted((ROOT / "protocols").glob("*/index.html"))
+    yield from sorted((ROOT / "pages").glob("*/index.html"))
     yield TEMPLATE
 
 

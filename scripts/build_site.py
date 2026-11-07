@@ -9,14 +9,18 @@ chapters, one URL each (ADR 0009), so a reader gets one chapter at a time:
     public/<lang>/index.html                  home, <html lang> = <lang>
     public/<lang>/<slug>/index.html           overview: header, chapter cards
     public/<lang>/<slug>/<chapter>/index.html one section (concepts, packets, ...)
+    public/<lang>/<page>/index.html           an information page of pages/ (legal notice,
+                                              terms of use, privacy, accessibility), whole
 
 Chapter pages keep the page's shared CSS/JS (they stay self-contained), get the chapter
 list and previous/next links, and every #anchor that moved to another chapter is
 rewritten to that chapter's URL. Each copy gets <html lang>, <title>, description,
 canonical, hreflang alternates (+ x-default), Open Graph and JSON-LD for its language,
 taken from the page's <script type="application/json" id="page-meta">. Also written: a
-root language chooser (/), 404.html, sitemap.xml, robots.txt, version.txt and
-security.txt (RFC 9116).
+root language chooser (/), 404.html, sitemap.xml, robots.txt, version.txt,
+security.txt (RFC 9116) and /.well-known/tdmrep.json. Every page carries the text and
+data mining reservation (TDMRep, W3C community report) stated in the terms of use, and
+robots.txt asks the AI training crawlers to stay away (ADR 0011).
 
 Usage: build_site.py [OUT_DIR]   (env SITE_URL, default https://learning.cuvelier.tech)
 Standard library only.
@@ -37,6 +41,19 @@ LANGS = ("fr", "en", "nl", "de")
 NATIVE = {"fr": "Français", "en": "English", "nl": "Nederlands", "de": "Deutsch"}
 OG_LOCALE = {"fr": "fr_BE", "en": "en_GB", "nl": "nl_BE", "de": "de_DE"}
 BRAND = "Network Protocols Expert"
+AUTHOR = "Jean-Michel Cuvelier"
+LICENSE_URL = "https://creativecommons.org/licenses/by-nc-sa/4.0/"
+# Training crawlers asked not to collect the site (terms of use, section "Text and data
+# mining"). Each token is the one its operator documents for AI training; search engines
+# (Googlebot, Bingbot, Applebot...) and user-requested fetches are not concerned.
+AI_TRAINING_BOTS = (
+    "GPTBot",
+    "ClaudeBot",
+    "Google-Extended",
+    "Applebot-Extended",
+    "CCBot",
+    "Meta-ExternalAgent",
+)
 META_RE = re.compile(r'<script type="application/json" id="page-meta">\s*(.*?)\s*</script>', re.S)
 
 
@@ -74,7 +91,19 @@ def head_tags(meta: dict, lang: str, path: str) -> str:
         f'<meta property="og:locale" content="{OG_LOCALE[lang]}">',
     ]
     tags += [f'<meta property="og:locale:alternate" content="{OG_LOCALE[o]}">' for o in LANGS if o != lang]
-    if meta.get("kind") == "home":
+    if meta.get("kind") == "info":
+        ld = {
+            "@context": "https://schema.org",
+            "@type": "WebPage",
+            "name": title,
+            "description": meta["description"][lang],
+            "url": url(lang, path),
+            "inLanguage": lang,
+            "isPartOf": {"@type": "WebSite", "name": BRAND, "url": f"{SITE}/"},
+        }
+        if meta.get("updated"):
+            ld["dateModified"] = meta["updated"]
+    elif meta.get("kind") == "home":
         ld = {
             "@context": "https://schema.org",
             "@type": "WebSite",
@@ -108,10 +137,30 @@ def head_tags(meta: dict, lang: str, path: str) -> str:
             ]
         if meta.get("updated"):
             ld["dateModified"] = meta["updated"]
-    ld["license"] = "https://creativecommons.org/licenses/by-sa/4.0/"
-    ld["author"] = {"@type": "Person", "name": "Jean-Michel Cuvelier", "url": "https://about.cuvelier.tech"}
+    ld["license"] = LICENSE_URL
+    ld["author"] = {"@type": "Person", "name": AUTHOR, "url": "https://about.cuvelier.tech"}
+    ld["copyrightHolder"] = ld["author"]
     tags.append('<script type="application/ld+json">' + json.dumps(ld, ensure_ascii=False) + "</script>")
+    tags.append(TDM_META)
     return "\n".join(tags)
+
+
+# Text and data mining reservation (Directive (EU) 2019/790 art. 4(3), Belgian Code of economic
+# law art. XI.190, 20°) in the TDMRep form: the same signal is in /.well-known/tdmrep.json.
+TDM_META = '<meta name="tdm-reservation" content="1">'
+
+
+def tdmrep() -> str:
+    return json.dumps([{"location": "/", "tdm-reservation": 1}], indent=2) + "\n"
+
+
+def robots() -> str:
+    blocked = "".join(f"User-agent: {bot}\nDisallow: /\n\n" for bot in AI_TRAINING_BOTS)
+    return (
+        "# Search engines are welcome. AI training crawlers are not: see the terms of use,\n"
+        f"# {SITE}/en/terms/ (text and data mining reservation, also in /.well-known/tdmrep.json).\n"
+        f"{blocked}User-agent: *\nAllow: /\n\nSitemap: {SITE}/sitemap.xml\n"
+    )
 
 
 def full_title(meta: dict, lang: str) -> str:
@@ -225,14 +274,19 @@ PIN_ICON = (
     'stroke-width="2" stroke-linecap="round" stroke-linejoin="round">'
     '<rect x="3" y="4" width="18" height="16" rx="2"/><path d="M9 4v16"/></svg>'
 )
-# Wide screens: the chapter list is open, and its button folds it away (choice kept in localStorage,
-# applied here, before the chapter is painted). Folded, pointing at the left edge shows the list;
-# right after the click it stays away until the pointer has left.
+# Wide screens: the chapter list is open, and its button folds it away (choice kept in this tab,
+# or on this device if the reader asked so: privacy page, ADR 0011; applied here, before the
+# chapter is painted). Folded, pointing at the left edge shows the list; right after the click
+# it stays away until the pointer has left.
 PIN_SCRIPT = """(function () {
   var root = document.documentElement, nav = document.currentScript.parentNode;
   var pin = document.getElementById("toc-pin"), off = false;
   if (matchMedia("(min-width: 64rem)").matches) document.getElementById("toc").open = true;
-  try { off = localStorage.getItem("npe-nav") === "off"; } catch (e) {}
+  function box() {
+    try { return localStorage.getItem("npe-remember") === "1" ? localStorage : sessionStorage; }
+    catch (e) { return null; }
+  }
+  try { off = box().getItem("npe-nav") === "off"; } catch (e) {}
   function set() {
     root.classList.toggle("nav-off", off);
     pin.setAttribute("aria-expanded", String(!off));
@@ -242,7 +296,7 @@ PIN_SCRIPT = """(function () {
     off = !off;
     root.classList.toggle("nav-quiet", off);
     set();
-    try { localStorage.setItem("npe-nav", off ? "off" : "on"); } catch (e) {}
+    try { box().setItem("npe-nav", off ? "off" : "on"); } catch (e) {}
   });
   nav.addEventListener("mouseleave", function () { root.classList.remove("nav-quiet"); });
 })();"""
@@ -571,9 +625,10 @@ def overview_cards(parts: dict) -> str:
 
 
 def seen_marks(slug: str, here: str, name: str, labels: dict) -> str:
-    """Per-reader conveniences of a protocol's pages, kept in localStorage (the pages work without):
-    marks the chapters already opened (chapter list and overview cards), remembers the chapter
-    being read (the home page offers to resume it) and the last quiz score (shown on the quiz card)."""
+    """Per-reader conveniences of a protocol's pages, kept in localStorage only when the reader
+    ticked "remember on this device" (npe-remember, privacy page; the pages work without): marks
+    the chapters already opened (chapter list and overview cards), remembers the chapter being
+    read (the home page offers to resume it) and the last quiz score (shown on the quiz card)."""
     word = json.dumps(f'<span class="sr-only"> {spans(WORDS["seen"])}</span>')
     last = json.dumps({"slug": slug, "ch": here, "name": name, "labels": labels}, ensure_ascii=False)
     score = json.dumps(f'<span class="cc score">{spans(WORDS["score"])} </span>')
@@ -581,6 +636,7 @@ def seen_marks(slug: str, here: str, name: str, labels: dict) -> str:
         "<script>(function () {\n"
         "  try {\n"
         f'    var key = "npe-seen:{slug}", here = "{here}", store = localStorage;\n'
+        '    if (store.getItem("npe-remember") !== "1") return;\n'
         '    var seen = JSON.parse(store.getItem(key) || "[]");\n'
         "    if (here) {\n"
         "      if (seen.indexOf(here) < 0) { seen.push(here); store.setItem(key, JSON.stringify(seen)); }\n"
@@ -610,6 +666,7 @@ def resume_link() -> str:
         f'<p class="resume" id="resume" hidden>{spans(WORDS["resume"])} <a></a></p>\n'
         "<script>(function () {\n"
         "  try {\n"
+        '    if (localStorage.getItem("npe-remember") !== "1") return;\n'
         '    var last = JSON.parse(localStorage.getItem("npe-last") || "null");\n'
         '    var box = document.getElementById("resume");\n'
         "    if (!last || !/^[a-z0-9-]+$/.test(last.slug) || !/^[a-z0-9-]+$/.test(last.ch)) return;\n"
@@ -776,13 +833,17 @@ def chooser(blocks: dict) -> str:
 <title>{BRAND}</title>
 <meta name="description" content="Expert-level network protocols in French, English, Dutch and German.">
 <link rel="canonical" href="{SITE}/">
+{TDM_META}
 {alts}
 <link rel="alternate" hreflang="x-default" href="{SITE}/">
 {blocks["icon"]}
 <script>
 (function () {{
   var l = null;
-  try {{ l = localStorage.getItem("lang"); }} catch (e) {{}}
+  try {{
+    var keep = localStorage.getItem("npe-remember") === "1";
+    l = (keep ? localStorage : sessionStorage).getItem("lang");
+  }} catch (e) {{}}
   if (!l) l = (navigator.language || "en").slice(0, 2).toLowerCase();
   if (["fr", "en", "nl", "de"].indexOf(l) < 0) l = "en";
   location.replace(l + "/");
@@ -833,6 +894,7 @@ def not_found(blocks: dict) -> str:
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="color-scheme" content="dark">
 <meta name="robots" content="noindex">
+{TDM_META}
 <title>404 | {BRAND}</title>
 {blocks["icon"]}
 {blocks["early"]}
@@ -877,6 +939,23 @@ def sitemap(pages: list) -> str:
     return "\n".join(out) + "\n"
 
 
+def info_pages(out: pathlib.Path) -> list:
+    """pages/<slug>/index.html (legal notice, terms, privacy, accessibility): one whole page per
+    language at /<lang>/<slug>/. Returns their (path, meta) for the sitemap."""
+    done = []
+    for src in sorted((ROOT / "pages").glob("*/index.html")):
+        slug, text = src.parent.name, src.read_text(encoding="utf-8")
+        meta = meta_of(text, src)
+        if meta.get("kind") != "info":
+            sys.exit(f"{src}: page-meta kind must be 'info'")
+        done.append((f"{slug}/", meta))
+        for lang in LANGS:
+            target = out / lang / slug / "index.html"
+            target.parent.mkdir(parents=True, exist_ok=True)
+            target.write_text(french_spaces(localise(text, meta, lang, f"{slug}/", "../")), encoding="utf-8")
+    return done
+
+
 def main() -> int:
     out = pathlib.Path(sys.argv[1] if len(sys.argv) > 1 else ROOT / "public").resolve()
     if out.exists():
@@ -919,19 +998,20 @@ def main() -> int:
                     encoding="utf-8",
                 )
 
+    pages += info_pages(out)
+
     blocks = shared_blocks(home)
     (out / "index.html").write_text(chooser(blocks), encoding="utf-8")
     (out / "404.html").write_text(not_found(blocks), encoding="utf-8")
     (out / "sitemap.xml").write_text(sitemap(pages), encoding="utf-8")
-    (out / "robots.txt").write_text(
-        f"User-agent: *\nAllow: /\n\nSitemap: {SITE}/sitemap.xml\n", encoding="utf-8"
-    )
+    (out / "robots.txt").write_text(robots(), encoding="utf-8")
     (out / "version.txt").write_text(os.environ.get("CI_COMMIT_SHA", "local") + "\n", encoding="utf-8")
     # RFC 9116, also at the top level for clients that do not look in /.well-known/.
     sec = security_txt()
     (out / ".well-known").mkdir()
     (out / ".well-known" / "security.txt").write_text(sec, encoding="utf-8")
     (out / "security.txt").write_text(sec, encoding="utf-8")
+    (out / ".well-known" / "tdmrep.json").write_text(tdmrep(), encoding="utf-8")
 
     for f in sorted(out.rglob("*")):
         if f.is_file():

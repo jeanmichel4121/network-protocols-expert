@@ -4,7 +4,7 @@
 [![WCAG 2.2 AA](https://img.shields.io/badge/WCAG-2.2%20AA-1f75cb)](https://www.w3.org/TR/WCAG22/)
 [![Languages](https://img.shields.io/badge/languages-FR%20%7C%20EN%20%7C%20NL%20%7C%20DE-1f75cb)](#languages)
 [![Code: MIT](https://img.shields.io/badge/code-MIT-blue)](LICENSE)
-[![Content: CC BY-SA 4.0](https://img.shields.io/badge/content-CC%20BY--SA%204.0-lightgrey)](https://creativecommons.org/licenses/by-sa/4.0/)
+[![Content: CC BY-NC-SA 4.0](https://img.shields.io/badge/content-CC%20BY--NC--SA%204.0-lightgrey)](https://creativecommons.org/licenses/by-nc-sa/4.0/)
 [![REUSE](https://img.shields.io/badge/REUSE-compliant-green)](https://reuse.software/)
 
 An expert-level learning library for network protocols, written to master each protocol
@@ -30,6 +30,7 @@ One self-contained HTML page per protocol, in French, English, Dutch and German.
 - [Local preview](#local-preview)
 - [Contributing and feedback](#contributing-and-feedback)
 - [Security](#security)
+- [Privacy](#privacy)
 - [License](#license)
 - [Acknowledgements](#acknowledgements)
 
@@ -116,6 +117,7 @@ security features) is documented with its reason in
 ├── index.html                    home page (protocol list, 4 languages)
 ├── templates/protocol-template.html   reference page copied by every protocol page
 ├── protocols/<slug>/             one folder per protocol: index.html + sources.md
+├── pages/<slug>/                 legal notice, terms of use, privacy, accessibility (4 languages)
 ├── tools/                        packet builder, shared-block sync, home-page topology, icons
 ├── scripts/                      site build, page checks, browser tests, labels, releases
 ├── docs/                         standards, repository settings, decision records (adr/), screenshots
@@ -159,11 +161,24 @@ pre-commit run --all-files
 Please report vulnerabilities privately, not in a public issue: see [`SECURITY.md`](SECURITY.md).
 The site also publishes [`/.well-known/security.txt`](https://learning.cuvelier.tech/.well-known/security.txt) (RFC 9116).
 
+## Privacy
+
+No cookie, no tracker, no analytics, no third-party resource, and no visitor IP address kept
+(the server setup is in the homelab stack `learning`). Language, theme and the chapter menu
+stay in the browser tab; reading progress is kept on the device only when the reader ticks
+"remember on this device". Details: the [privacy page](https://learning.cuvelier.tech/en/privacy/)
+and [ADR 0011](docs/adr/0011-privacy-by-design-and-tdm-reservation.md). Legal notice, terms of
+use and accessibility statement are published next to it.
+
 ## License
 
 - **Code** (scripts, tools, template, configuration): [MIT](LICENSE).
-- **Content** (protocol pages, home page, documentation): [CC BY-SA 4.0](LICENSES/CC-BY-SA-4.0.txt).
-  You may reuse and adapt it, with attribution, under the same licence.
+- **Content** (protocol pages, information pages, home page, documentation):
+  [CC BY-NC-SA 4.0](LICENSES/CC-BY-NC-SA-4.0.txt) since 2026-11-07 ([ADR 0010](docs/adr/0010-content-licence-noncommercial.md)).
+  You may reuse and adapt it for non-commercial purposes, with attribution, under the same
+  licence; commercial use needs written permission. Text and data mining, AI training
+  included, is reserved ([terms of use](https://learning.cuvelier.tech/en/terms/)).
+  Releases up to v0.6.0 were published under CC BY-SA 4.0 and stay available under it.
 - **Cisco network topology icons** (`tools/icons/cisco/`, embedded in the home page): property of
   Cisco Systems, Inc., used unaltered under [Cisco's terms](LICENSES/LicenseRef-Cisco-Network-Topology-Icons.txt).
 

@@ -21,7 +21,7 @@ Fortinet NSE 8, F5 Certified Solution Expert, NetScaler Expert; see README.md).
 /
 ├── CLAUDE.md
 ├── README.md  CONTRIBUTING.md  SECURITY.md  CODE_OF_CONDUCT.md  CHANGELOG.md  CITATION.cff
-├── LICENSE  LICENSES/  REUSE.toml  # MIT (code), CC BY-SA 4.0 (content), Cisco icons terms
+├── LICENSE  LICENSES/  REUSE.toml  # MIT (code), CC BY-NC-SA 4.0 (content), Cisco icons terms
 ├── .gitlab-ci.yml                  # CI pipeline, runs on the self-hosted runners (NAS)
 ├── .gitlab/                        # MR and issue templates, CODEOWNERS
 ├── .github/                        # issue forms, SUPPORT.md, labels.yml (both forges)
@@ -32,6 +32,8 @@ Fortinet NSE 8, F5 Certified Solution Expert, NetScaler Expert; see README.md).
 │   └── <protocol-slug>/            # lowercase, e.g. ospf, bgp, tcp, ipsec-ikev2
 │       ├── index.html              # the page (self-contained)
 │       └── sources.md              # every source used, with section numbers and links
+├── pages/
+│   └── <slug>/index.html           # information pages: legal, terms, privacy, accessibility
 ├── tools/
 │   ├── packet-builder.py           # builds sample packets, computes checksums/lengths
 │   ├── sync-shared.py              # copies the template's shared blocks into every page
@@ -114,8 +116,11 @@ page from `templates/protocol-template.html`; its shared blocks are copied verba
 - Light and dark mode: dark by default, manual toggle to light, choice remembered.
 - Responsive down to 360 px wide, no horizontal page scroll (wide tables/grids scroll
   inside their own container).
-- `localStorage` only for per-viewer conveniences (chosen language, theme), always wrapped
-  in try/catch; the page must work without it.
+- Browser storage only for per-viewer conveniences (language, theme, reading progress),
+  always wrapped in try/catch; the page must work without it. By default a choice stays in
+  the tab (`sessionStorage`) and reading progress is not kept; `localStorage` is used only
+  after the reader ticks "remember on this device" (`npe-remember`, privacy page, ADR 0011).
+  CI fails if a page writes `localStorage` without that consent.
 - Accessible, **WCAG 2.2 AA** (axe-core in CI): semantic headings, `alt`/`aria-label`,
   keyboard-usable interactive elements (roving tabindex + arrow keys), visible focus not
   hidden by the sticky header, targets at least 24x24 px, accessible name = visible text,
@@ -130,7 +135,7 @@ page from `templates/protocol-template.html`; its shared blocks are copied verba
   versions are all inside the page (`data-l="fr|en|nl|de"` blocks plus the template's
   inline JS dictionary); switching language never reloads the page.
 - Default language: the browser language if it is fr/en/nl/de, else EN.
-  Remember the choice in `localStorage`. Set `<html lang>` on switch.
+  Remember the choice (tab, or device with consent: see the storage rule). Set `<html lang>` on switch.
   On the published site each language also has its own URL (`/fr/<slug>/`...) with
   `hreflang`, canonical, Open Graph and JSON-LD; there the URL's language wins and the
   switch rewrites the URL. Title and description per language live in `#page-meta`.
@@ -272,8 +277,10 @@ Rules:
   (The public site name learning.cuvelier.tech is the one exception.)
 
 ## Licensing
-- Code, tooling and the template: MIT. Learning content (pages, docs): CC BY-SA 4.0.
-  Cisco topology icons: Cisco's own terms, used unaltered. Declared per file in
+- Code, tooling and the template: MIT. Learning content (pages, docs): CC BY-NC-SA 4.0
+  since 2026-11-07 (ADR 0010; earlier releases stay CC BY-SA 4.0). Commercial use needs the
+  owner's written permission; text and data mining (AI training) is reserved and signalled
+  by machine-readable means (terms of use, ADR 0011). Cisco topology icons: Cisco's own terms, used unaltered. Declared per file in
   `REUSE.toml`; `reuse lint` runs in pre-commit and CI. New file types or folders may
   need a `REUSE.toml` annotation.
 
