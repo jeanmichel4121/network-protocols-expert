@@ -2040,7 +2040,294 @@ def osi_syn() -> dict:
 OSI_SAMPLES = {"osi-dns": osi_dns, "osi-syn": osi_syn}
 
 
-SAMPLES = {"ospf-hello": ospf_hello, **ETH_SAMPLES, **IPV4_SAMPLES, **OSI_SAMPLES}
+# ----------------------------------------------------------------------------- ARP
+# RFC 826 (packet format: ar$hrd, ar$pro, ar$hln, ar$pln, ar$op, ar$sha, ar$spa, ar$tha, ar$tpa),
+# RFC 5227 §1.1 (ARP Probe: sender IP 0.0.0.0; ARP Announcement: sender IP = target IP, request),
+# RFC 5944 §4.6 (gratuitous ARP in reply form: target hardware address = sender hardware address),
+# IANA ARP parameters (hardware type 1, opcodes 1 and 2), EtherType 0x0806. IEEE 802.3 §3.2.8:
+# the 28-byte ARP packet is padded to 46 bytes of MAC client data (42 behind a VLAN tag).
+# Tree labels: Wireshark epan/dissectors/packet-arp.c. Documentation values only (RFC 5737, RFC 9542).
+MAC_BCAST, MAC_ZERO = "ff:ff:ff:ff:ff:ff", "00:00:00:00:00:00"
+IP_GW, IP_SRV, MAC_SRV = "192.0.2.1", "192.0.2.20", "00:00:5e:00:53:14"
+IP_NEW, MAC_NEW = "192.0.2.30", "00:00:5e:00:53:1e"
+IP_VIP, MAC_LB = "192.0.2.100", "00:00:5e:00:53:65"
+ARP_OPS = {1: "request", 2: "reply"}  # IANA ARP parameters, Operation Codes
+ARP_REF = "RFC 826 (Definitions)"
+
+
+class ArpFrame(EthFrame):
+    """Ethernet II (optionally 802.1Q tagged) + ARP for IPv4 over Ethernet + padding + FCS."""
+
+    def eth(self, dst, src, vid=None):
+        self.mac_hdr(dst, src, prefix="eth", layer="encap")
+        if vid is None:
+            self.ethertype("ethtype", 0x0806, "ARP", layer="encap")
+        else:
+            self.tag("", 0x8100, 0, 0, vid, "vlan", "eth", "eth.type", "802.1Q Virtual LAN")
+            self.ethertype("ethtype", 0x0806, "ARP", tree="vlan", ws="vlan.etype", layer="encap")
+
+    def arp(self, op, sha, spa, tha, tpa):
+        """The nine fields of RFC 826, hardware type 1 (Ethernet), protocol type 0x0800 (IPv4).
+        Returns Wireshark's name for the packet (packet-arp.c: gratuitous, probe, announcement)."""
+        gratuitous = spa == tpa
+        announcement = gratuitous and op == 1 and tha == MAC_ZERO
+        probe = not gratuitous and op == 1 and spa == "0.0.0.0"
+        marks = [
+            {"label": f"[{label}: True]", "ws": ws}
+            for on, label, ws in (
+                (gratuitous, "Is gratuitous", "arp.isgratuitous"),
+                (probe, "Is probe", "arp.isprobe"),
+                (announcement, "Is announcement", "arp.isannouncement"),
+            )
+            if on
+        ]
+        t = "arp"
+        self.add(
+            "hrd",
+            "Hardware Type",
+            "header",
+            struct.pack("!H", 1),
+            "Ethernet (1)",
+            "arp.hw.type",
+            "Hardware type",
+            ARP_REF,
+            tree=t,
+        )
+        self.add(
+            "pro",
+            "Protocol Type",
+            "header",
+            struct.pack("!H", 0x0800),
+            "IPv4 (0x0800)",
+            "arp.proto.type",
+            "Protocol type",
+            ARP_REF,
+            tree=t,
+        )
+        self.add("hln", "HLEN", "header", bytes([6]), "6", "arp.hw.size", "Hardware size", ARP_REF, tree=t)
+        self.add("pln", "PLEN", "header", bytes([4]), "4", "arp.proto.size", "Protocol size", ARP_REF, tree=t)
+        self.add(
+            "op",
+            "Operation",
+            "header",
+            struct.pack("!H", op),
+            f"{ARP_OPS[op]} ({op})",
+            "arp.opcode",
+            "Opcode",
+            "RFC 826 (Definitions), IANA ARP parameters",
+            tree=t,
+            **({"ws_more": marks} if marks else {}),
+        )
+        self.add(
+            "sha",
+            "Sender Hardware Address",
+            "body",
+            mac(sha),
+            sha,
+            "arp.src.hw_mac",
+            "Sender MAC address",
+            ARP_REF,
+            tree=t,
+        )
+        self.add(
+            "spa",
+            "Sender Protocol Address",
+            "body",
+            ip4(spa),
+            spa,
+            "arp.src.proto_ipv4",
+            "Sender IP address",
+            ARP_REF,
+            tree=t,
+        )
+        self.add(
+            "tha",
+            "Target Hardware Address",
+            "body",
+            mac(tha),
+            tha,
+            "arp.dst.hw_mac",
+            "Target MAC address",
+            ARP_REF,
+            tree=t,
+        )
+        self.add(
+            "tpa",
+            "Target Protocol Address",
+            "body",
+            ip4(tpa),
+            tpa,
+            "arp.dst.proto_ipv4",
+            "Target IP address",
+            ARP_REF,
+            tree=t,
+        )
+        if announcement:
+            return "ARP Announcement"
+        if probe:
+            return "ARP Probe"
+        return f"{ARP_OPS[op]}/gratuitous ARP" if gratuitous else ARP_OPS[op]
+
+    def finish(self, tree="eth"):
+        super().finish(tree)
+        for f in self.fields:
+            if f["id"] in {"pad", "fcs"}:
+                f["layer"] = "encap"
+
+    def out(self, sid, message, encapsulation, layers):
+        d = super().out(sid, message, encapsulation, layers)
+        for f, src in zip(d["fields"], self.fields, strict=True):
+            if "ws_more" in src:
+                f["ws_more"] = src["ws_more"]
+        d["protocol"] = "ARP"
+        # The bit diagram starts at the ARP packet (28 bytes, seven 32-bit rows); a tagged frame
+        # is drawn from its first bit, so the tag shows in the diagram too.
+        d["grid_from"] = 0 if "vlan" in layers else 112
+        return d
+
+
+def arp_sample(sid, message, encapsulation, dst, src, op, spa, tha, tpa, *, vid=None):  # noqa: PLR0917 (ARP fields in wire order)
+    fr = ArpFrame()
+    fr.eth(dst, src, vid)
+    kind = fr.arp(op, src, spa, tha, tpa)
+    fr.finish()
+    layers = {"eth": f"Ethernet II, Src: {src}, Dst: {dst}"}
+    if vid is not None:
+        layers["vlan"] = f"802.1Q Virtual LAN, PRI: 0, DEI: 0, ID: {vid}"
+    layers["arp"] = f"Address Resolution Protocol ({kind})"
+    return fr.out(sid, message, encapsulation, layers)
+
+
+def arp_request() -> dict:
+    """PC-A (192.0.2.10) asks in broadcast who has 192.0.2.20: target hardware address all zero."""
+    return arp_sample(
+        "arp-request",
+        "ARP Request",
+        "Ethernet II, EtherType 0x0806, broadcast",
+        MAC_BCAST,
+        MAC_HOST,
+        1,
+        IP_HOST,
+        MAC_ZERO,
+        IP_SRV,
+    )
+
+
+def arp_reply() -> dict:
+    """SRV-B (192.0.2.20) answers PC-A in unicast: the request's sender becomes the target."""
+    return arp_sample(
+        "arp-reply",
+        "ARP Reply",
+        "Ethernet II, EtherType 0x0806, unicast",
+        MAC_HOST,
+        MAC_SRV,
+        2,
+        IP_SRV,
+        MAC_HOST,
+        IP_HOST,
+    )
+
+
+def arp_probe() -> dict:
+    """RFC 5227 §2.1.1: PC-C probes 192.0.2.30 before using it, sender IP address 0.0.0.0."""
+    return arp_sample(
+        "arp-probe",
+        "ARP Probe",
+        "Ethernet II, EtherType 0x0806, broadcast",
+        MAC_BCAST,
+        MAC_NEW,
+        1,
+        "0.0.0.0",
+        MAC_ZERO,
+        IP_NEW,
+    )
+
+
+def arp_announce() -> dict:
+    """RFC 5227 §2.3: PC-C announces 192.0.2.30 (gratuitous ARP in request form)."""
+    return arp_sample(
+        "arp-announce",
+        "ARP Announcement",
+        "Ethernet II, EtherType 0x0806, broadcast",
+        MAC_BCAST,
+        MAC_NEW,
+        1,
+        IP_NEW,
+        MAC_ZERO,
+        IP_NEW,
+    )
+
+
+def arp_garp_reply() -> dict:
+    """Gratuitous ARP in reply form (RFC 5944 §4.6): LB-01 takes over the virtual address 192.0.2.100."""
+    return arp_sample(
+        "arp-garp-reply",
+        "Gratuitous ARP (Reply)",
+        "Ethernet II, EtherType 0x0806, broadcast",
+        MAC_BCAST,
+        MAC_LB,
+        2,
+        IP_VIP,
+        MAC_LB,
+        IP_VIP,
+    )
+
+
+def arp_dot1q() -> dict:
+    """An ARP Request for the gateway 192.0.2.1 on a trunk: 802.1Q tag, VID 100, 14 bytes of padding."""
+    return arp_sample(
+        "arp-dot1q",
+        "ARP Request (802.1Q)",
+        "Ethernet II, TPID 0x8100, inner EtherType 0x0806, broadcast",
+        MAC_BCAST,
+        MAC_HOST,
+        1,
+        IP_HOST,
+        MAC_ZERO,
+        IP_GW,
+        vid=100,
+    )
+
+
+ARP_SAMPLES = {
+    "arp-request": arp_request,
+    "arp-reply": arp_reply,
+    "arp-probe": arp_probe,
+    "arp-announce": arp_announce,
+    "arp-garp-reply": arp_garp_reply,
+    "arp-dot1q": arp_dot1q,
+}
+
+
+def arp_self_test() -> int:
+    """Every ARP frame is 64 bytes with a valid FCS; the ARP packet is 28 bytes of hardware type 1,
+    protocol type 0x0800, lengths 6 and 4; the sender hardware address is the frame's source; the
+    probe has a zero sender IP address; announcement and gratuitous reply have sender = target IP."""
+    errors = 0
+    for name, build in ARP_SAMPLES.items():
+        raw = bytes.fromhex(build()["hex"].replace(" ", ""))
+        tagged = raw[12:14] == b"\x81\x00"
+        a = raw[18:46] if tagged else raw[14:42]
+        hrd, pro, hln, pln, op = struct.unpack("!HHBBH", a[:8])
+        ok = len(raw) == ETH_MIN and zlib.crc32(raw) & 0xFFFFFFFF == 0x2144DF1C
+        ok = (
+            ok
+            and raw[16 if tagged else 12 :][:2] == b"\x08\x06"
+            and (hrd, pro, hln, pln) == (1, 0x0800, 6, 4)
+        )
+        ok = ok and a[8:14] == raw[6:12] and not any(raw[(46 if tagged else 42) : -4])
+        ok = ok and (raw[:6] == b"\xff" * 6 or (op == 2 and a[18:24] == raw[:6]))
+        if name == "arp-probe":
+            ok = ok and a[14:18] == bytes(4) and op == 1
+        if name in {"arp-announce", "arp-garp-reply"}:
+            ok = ok and a[14:18] == a[24:28]
+        if not ok:
+            print(f"FAIL {name} ARP frame")
+            errors += 1
+    return errors
+
+
+SAMPLES = {"ospf-hello": ospf_hello, **ETH_SAMPLES, **IPV4_SAMPLES, **OSI_SAMPLES, **ARP_SAMPLES}
 
 
 def ipv4_self_test() -> int:
@@ -2105,6 +2392,7 @@ def self_test() -> int:
         if inet_checksum(ip[:20]) != 0 or ip[9] != proto or inet_checksum(pseudo + l4) != 0:
             print(f"FAIL {name} IPv4 or transport checksum")
             errors += 1
+    errors += arp_self_test()
     # The field map must tile the packet exactly: contiguous, no gap, no overlap. A field
     # narrower than a byte (802.1Q PCP, DEI, VID) carries the hex of the bytes it sits in.
     for name, build in SAMPLES.items():

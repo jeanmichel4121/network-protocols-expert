@@ -12,6 +12,11 @@ Versioning rules for this library:
 ## [Unreleased]
 
 ### Added
+- ARP page (`protocols/arp/`): resolution on and off the subnet, ARP cache, gratuitous ARP, address
+  conflict detection (RFC 5227), proxy ARP, ARP with NAT, spoofing and Dynamic ARP Inspection,
+  ARP and MAC timer mismatch, six sample packets built by `tools/packet-builder.py` (Request, Reply,
+  Probe, Announcement, gratuitous Reply, 802.1Q), three animations, commands on six platforms,
+  17 quiz questions; label `protocol::arp`.
 - IPv4 and OSI: same learning path as the Ethernet page. Every chapter states its goals; Concepts,
   Operation and Advanced are cut into numbered lessons that end with key points and, where it
   helps, a self-check; every sample packet lists its fields in order under the diagram.
