@@ -15,6 +15,11 @@ Versioning rules for this library:
 - IPv4 and OSI: same learning path as the Ethernet page. Every chapter states its goals; Concepts,
   Operation and Advanced are cut into numbered lessons that end with key points and, where it
   helps, a self-check; every sample packet lists its fields in order under the diagram.
+- Packet views: a guided tour under every sample packet (previous field, next field) walks the
+  fields in order, selects each one in the bit diagram and in the Wireshark tree and shows its
+  detail. The bar is written in the page by `tools/packet-builder.py --update`.
+- OSI: a step-by-step animation of encapsulation and decapsulation of the DNS query, next to the
+  static diagram.
 - IPv4: four addressing lessons in Concepts (address and prefix, subnetting and aggregation,
   local or remote decision, private and special addresses) with three diagrams, a table of common
   prefixes and a self-check each; sources RFC 4632, RFC 950, RFC 3021 and RFC 1918 added.

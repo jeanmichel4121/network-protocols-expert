@@ -2164,6 +2164,19 @@ CHIPS = re.compile(r'(<ul class="packet-meta"(?: data-ref="([^"]*)")?>).*?(</ul>
 PACKET_SET = re.compile(r'<div class="pkt-set" id="[a-z0-9-]+">')
 SET_TABS = re.compile(r'\s*<div role="tablist" data-aria="packets"[^>]*>.*?</div>', re.S)
 GRID = re.compile(r'<div class="bitgrid"(?: style="--rows:\d+")?')
+PANEL = re.compile(r'(?:<div class="tour">.*?</div>\s*)?(<div class="fpanel")', re.S)
+TOUR = (
+    '<div class="tour"><span class="tour-t">'
+    '<span data-l="fr">Visite guidée</span><span data-l="en">Guided tour</span>'
+    '<span data-l="nl">Rondleiding</span><span data-l="de">Geführte Tour</span></span>'
+    '<button type="button" data-tour="prev" disabled>'
+    '<span data-l="fr">Champ précédent</span><span data-l="en">Previous field</span>'
+    '<span data-l="nl">Vorig veld</span><span data-l="de">Vorheriges Feld</span></button>'
+    '<button type="button" data-tour="next">'
+    '<span data-l="fr">Champ suivant</span><span data-l="en">Next field</span>'
+    '<span data-l="nl">Volgend veld</span><span data-l="de">Nächstes Feld</span></button>'
+    '<p class="tour-now"></p></div>\n          '
+)
 BYTES = (("fr", "octets"), ("en", "bytes"), ("nl", "bytes"), ("de", "Byte"))  # the template's "bytes"
 
 
@@ -2215,7 +2228,8 @@ def with_chips(m: re.Match) -> str:
         return c.group(1) + "".join(f"<li>{item}</li>" for item in items if item) + c.group(3)
 
     article = CHIPS.sub(line, m.group(0), count=1)
-    return GRID.sub(f'<div class="bitgrid" style="--rows:{grid_rows(s)}"', article, count=1)
+    article = GRID.sub(f'<div class="bitgrid" style="--rows:{grid_rows(s)}"', article, count=1)
+    return PANEL.sub(lambda p: TOUR + p.group(1), article, count=1)
 
 
 def grid_rows(sample: dict) -> int:

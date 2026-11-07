@@ -305,6 +305,14 @@ details.check > div > p { margin: 0; }
 .body:has(> .views) { display: flex; flex-direction: column; gap: 1rem; }
 .body:has(> .views) > * { order: 4; margin-top: 0; }
 .body:has(> .views) > .fpanel { order: 2; }
+/* Guided tour of a packet: previous / next field. The bar is written in the page by
+   tools/packet-builder.py --update, so it is there from the first paint. */
+.body:has(> .views) > .tour { order: 2; }
+.tour { display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem; }
+.tour-t { font-weight: 600; font-size: 0.9375rem; margin-right: 0.25rem; }
+.tour button { min-height: 2.5rem; padding: 0 0.9rem; border-radius: 10px; border: 1px solid var(--line); background: var(--surface); color: var(--fg); font: inherit; font-size: 0.9375rem; cursor: pointer; }
+.tour button:disabled { opacity: 0.4; cursor: not-allowed; }
+.tour-now { margin: 0; font-size: 0.9375rem; flex: 1 1 12rem; min-height: 1.5rem; }
 .views > :first-child { order: 1; }
 .views > :last-child { order: 3; }
 @media (min-width: 110rem) {
@@ -558,7 +566,7 @@ svg.sch .halo { paint-order: stroke; stroke: var(--surface); stroke-width: 4px; 
 @media print {
   :root { color-scheme: light; }
   body { background: #fff; font-size: 10.5pt; }
-  .site-header, .toc, .pager, .skip, .anim-controls, .copy, .quiz-q .btn, .lang, .icon-btn, .tpl, .pkt-set > [role="tablist"] { display: none !important; }
+  .site-header, .toc, .pager, .skip, .anim-controls, .tour, .copy, .quiz-q .btn, .lang, .icon-btn, .tpl, .pkt-set > [role="tablist"] { display: none !important; }
   .layout { display: block; padding: 0; }
   [role="tabpanel"][hidden], .expl[hidden] { display: block !important; }
   .tabs [role="tablist"] { display: none; }
@@ -775,6 +783,28 @@ window.NPE = (function () {
     el.addEventListener("pointerover", pick);
     el.addEventListener("focusin", pick);
     el.addEventListener("click", pick);
+    /* Guided tour: walks the fields in packet order; each step selects the field in both views
+       (opening the tree groups that hold it) and shows its detail. */
+    var tour = el.querySelector(".tour");
+    if (tour) {
+      var order = data.fields.map(function (f) { return f.id; }), ti = -1, tb = {};
+      var tnow = tour.querySelector(".tour-now");
+      tour.querySelectorAll("[data-tour]").forEach(function (b) { tb[b.dataset.tour] = b; });
+      var tgo = function (k) {
+        ti = Math.max(0, Math.min(order.length - 1, k));
+        var fid = order[ti];
+        tree.querySelectorAll('[data-f="' + fid + '"]').forEach(function (n) {
+          for (var d = n.parentNode; d && d !== tree; d = d.parentNode) if (d.tagName === "DETAILS") d.open = true;
+        });
+        activate(fid);
+        var cell = grid.querySelector('[data-f="' + fid + '"]'), box = grid.parentNode;
+        if (cell && box.scrollWidth > box.clientWidth) box.scrollLeft = Math.max(0, cell.offsetLeft - 24);
+        tnow.textContent = (ti + 1) + " / " + order.length + ". " + byId[fid].name;
+        tb.prev.disabled = ti === 0; tb.next.disabled = ti === order.length - 1;
+      };
+      tb.next.addEventListener("click", function () { tgo(ti + 1); });
+      tb.prev.addEventListener("click", function () { tgo(ti - 1); });
+    }
     roving(grid, "button.bf");
     roving(tree, "summary, .tl");
     show(null); paintFlags();
@@ -1325,6 +1355,7 @@ window.NPE = (function () {
               <div class="wstree" role="group" data-aria="wstree" aria-label="Wireshark tree"></div>
             </div>
           </div>
+          <div class="tour"><span class="tour-t"><span data-l="fr">Visite guidée</span><span data-l="en">Guided tour</span><span data-l="nl">Rondleiding</span><span data-l="de">Geführte Tour</span></span><button type="button" data-tour="prev" disabled><span data-l="fr">Champ précédent</span><span data-l="en">Previous field</span><span data-l="nl">Vorig veld</span><span data-l="de">Vorheriges Feld</span></button><button type="button" data-tour="next"><span data-l="fr">Champ suivant</span><span data-l="en">Next field</span><span data-l="nl">Volgend veld</span><span data-l="de">Nächstes Feld</span></button><p class="tour-now"></p></div>
           <div class="fpanel" aria-live="polite"></div>
           <details class="hexwrap">
             <summary><span data-l="fr">Dump hexadécimal (couverture du checksum : tout sauf le champ Authentication)</span><span data-l="en">Hex dump (checksum coverage: everything except the Authentication field)</span><span data-l="nl">Hexdump (checksumdekking: alles behalve het Authentication-veld)</span><span data-l="de">Hexdump (Prüfsummenabdeckung: alles außer dem Feld Authentication)</span></summary>
