@@ -11,6 +11,8 @@ Versioning rules for this library:
 
 ## [Unreleased]
 
+## [0.7.0] - 2026-11-07
+
 ### Added
 - Legal pages, in four languages, linked from every page: legal notice, terms of use, privacy
   (GDPR, browser storage, rights, Belgian Data Protection Authority) and a voluntary
@@ -313,7 +315,8 @@ tooling, the CI pipeline and the public site.
   as Cisco's terms require), laid out left to right under the headline; CI checks the embedded
   scene matches the generator.
 
-[Unreleased]: https://github.com/jeanmichel4121/network-protocols-expert/compare/v0.6.0...main
+[Unreleased]: https://github.com/jeanmichel4121/network-protocols-expert/compare/v0.7.0...main
+[0.7.0]: https://github.com/jeanmichel4121/network-protocols-expert/compare/v0.6.0...v0.7.0
 [0.6.0]: https://github.com/jeanmichel4121/network-protocols-expert/compare/v0.5.0...v0.6.0
 [0.5.0]: https://github.com/jeanmichel4121/network-protocols-expert/compare/v0.4.0...v0.5.0
 [0.4.0]: https://github.com/jeanmichel4121/network-protocols-expert/compare/v0.3.0...v0.4.0
