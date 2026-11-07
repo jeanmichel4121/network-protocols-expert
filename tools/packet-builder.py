@@ -2327,7 +2327,717 @@ def arp_self_test() -> int:
     return errors
 
 
-SAMPLES = {"ospf-hello": ospf_hello, **ETH_SAMPLES, **IPV4_SAMPLES, **OSI_SAMPLES, **ARP_SAMPLES}
+# ----------------------------------------------------------------------------- ICMP (IPv4)
+# RFC 792 (formats), RFC 1191 §4 (Next-Hop MTU), RFC 4884 §4 and §7 (length attribute, extension
+# structure), RFC 4950 §2 (MPLS Label Stack object). Tree labels: Wireshark packet-icmp.c.
+# Every frame is seen on host A's link: A 192.0.2.10 behind R1 192.0.2.1; R1 to R2 203.0.113.2;
+# B 198.51.100.20 behind R2; R3 192.0.2.2 is a second router on A's LAN, towards 203.0.113.200.
+# Documentation values only (RFC 5737, RFC 9542).
+ICMP_R1, ICMP_R2, ICMP_R3, ICMP_SRV = "192.0.2.1", "203.0.113.2", "192.0.2.2", "203.0.113.200"
+MAC_R3 = "00:00:5e:00:53:03"
+ICMP_TYPES = {
+    0: "Echo (ping) reply",
+    3: "Destination unreachable",
+    5: "Redirect",
+    8: "Echo (ping) request",
+    11: "Time-to-live exceeded",
+    13: "Timestamp request",
+}
+ICMP_CODES = {
+    (3, 3): "Port unreachable",
+    (3, 4): "Fragmentation needed",
+    (5, 1): "Redirect for host",
+    (11, 0): "Time to live exceeded in transit",
+}
+ICMP_RESP_MS = "0.412"  # capture metadata of the Echo pair: frames 1 and 2, 0.412 ms apart
+
+
+def icmp_message(mtype: int, code: int, rest: bytes, body: bytes) -> bytes:
+    """RFC 792: type, code, checksum over the whole message, 4 bytes that depend on the type, body."""
+    msg = struct.pack("!BBH", mtype, code, 0) + rest + body
+    return msg[:2] + struct.pack("!H", inet_checksum(msg)) + msg[4:]
+
+
+def icmp_ext_mpls(label: int, exp: int, s: int, ttl: int) -> bytes:
+    """RFC 4884 §7 extension header (version 2) + RFC 4950 §2 MPLS Label Stack object (class 1,
+    C-Type 1) holding one label stack entry; the checksum covers the whole structure."""
+    obj = struct.pack("!HBBI", 8, 1, 1, label << 12 | exp << 9 | s << 8 | ttl)
+    ext = struct.pack("!HH", 2 << 12, 0) + obj
+    return ext[:2] + struct.pack("!H", inet_checksum(ext)) + ext[4:]
+
+
+class ICMPFrame(IPv4Frame):
+    """Ethernet II + IPv4 (grey, in the tree and the hex dump) + one ICMP message drawn from its
+    first bit: header in blue, data or quoted datagram in teal, extension structure in purple."""
+
+    def encap(self, src_mac, dst_mac, pkt):
+        self.mac_hdr(dst_mac, src_mac, prefix="eth", layer="encap")
+        self.ethertype("ethtype", 0x0800, "IPv4", layer="encap")
+        return self.ip_fields(pkt, "encap", "", "ip", None)
+
+    def ip_fields(self, pkt, layer, prefix, tree, parent):
+        """The IPv4 header of pkt, dissected as on the IPv4 page, with its own ids and groups."""
+        tmp = IPv4Frame()
+        rest = tmp.ip_header(pkt)
+        base = self.pos
+        for gid, g in tmp.groups.items():
+            self.groups[prefix + gid] = {**g, **({"parent": parent} if parent else {})}
+        for src in tmp.fields:
+            f = dict(src, id=prefix + src["id"], layer=layer, tree=tree, offset=base + src["offset"])
+            if "ws_group" in f:
+                f["ws_group"] = prefix + f["ws_group"]
+            elif parent:
+                f["ws_group"] = parent
+            self.fields.append(f)
+        self.data += tmp.data
+        self.pos += tmp.pos
+        return rest
+
+    def head(self, msg):
+        """Type, Code and Checksum, common to every ICMP message (RFC 792)."""
+        mtype, code, csum = struct.unpack("!BBH", msg[:4])
+        t, ok = "icmp", inet_checksum(msg) == 0
+        self.add(
+            "icmptype",
+            "Type",
+            "header",
+            msg[:1],
+            str(mtype),
+            "icmp.type",
+            "Type",
+            "RFC 792",
+            tree=t,
+            ws_value=f"{mtype} ({ICMP_TYPES[mtype]})",
+        )
+        name = ICMP_CODES.get((mtype, code))
+        self.add(
+            "icmpcode",
+            "Code",
+            "header",
+            msg[1:2],
+            str(code),
+            "icmp.code",
+            "Code",
+            "RFC 792",
+            tree=t,
+            **({"ws_value": f"{code} ({name})"} if name else {}),
+        )
+        self.add(
+            "icmpcsum",
+            "Checksum",
+            "header",
+            msg[2:4],
+            f"0x{csum:04x}",
+            "icmp.checksum",
+            "Checksum",
+            "RFC 792, RFC 1071",
+            tree=t,
+            ws_value=f"0x{csum:04x} [{'correct' if ok else 'incorrect'}]",
+            ws_more=[
+                {"label": f"[Checksum Status: {'Good' if ok else 'Bad'}]", "ws": "icmp.checksum.status"}
+            ],
+        )
+
+    def ident_seq(self, msg, more, layer="header", prefix="", group=None):
+        ident, seq = struct.unpack("!HH", msg[4:8])
+        swap = lambda v: struct.unpack("<H", struct.pack(">H", v))[0]  # noqa: E731
+        g = {"ws_group": group} if group else {}
+        self.add(
+            prefix + "icmpid",
+            "Identifier",
+            layer,
+            msg[4:6],
+            f"0x{ident:04x}",
+            "icmp.ident",
+            "Identifier (BE)",
+            "RFC 792",
+            tree="icmp",
+            ws_value=f"{ident} (0x{ident:04x})",
+            ws_more=[
+                {"label": f"Identifier (LE): {swap(ident)} (0x{swap(ident):04x})", "ws": "icmp.ident_le"}
+            ],
+            **g,
+        )
+        self.add(
+            prefix + "icmpseq",
+            "Sequence Number",
+            layer,
+            msg[6:8],
+            str(seq),
+            "icmp.seq",
+            "Sequence Number (BE)",
+            "RFC 792",
+            tree="icmp",
+            ws_value=f"{seq} (0x{seq:04x})",
+            ws_more=[
+                {"label": f"Sequence Number (LE): {swap(seq)} (0x{swap(seq):04x})", "ws": "icmp.seq_le"},
+                *more,
+            ],
+            **g,
+        )
+
+    def unused(self, raw, fid="icmpunused"):
+        self.add(
+            fid,
+            "unused",
+            "header",
+            raw,
+            "0",
+            "icmp.unused",
+            "Unused",
+            "RFC 792",
+            tree="icmp",
+            ws_value=raw.hex(),
+        )
+
+    def echo(self, msg, more):
+        self.head(msg)
+        self.ident_seq(msg, more)
+        self.data_field(msg[8:], "icmp", self.group("icmpdata", f"Data ({len(msg) - 8} bytes)"))
+        self.fields[-1]["ref"] = "RFC 792"
+
+    def timestamp(self, msg):
+        self.head(msg)
+        self.ident_seq(msg, [])
+        for k, (fid, name, ws) in enumerate(
+            (
+                ("icmpots", "Originate Timestamp", "icmp.originate_timestamp"),
+                ("icmprts", "Receive Timestamp", "icmp.receive_timestamp"),
+                ("icmptts", "Transmit Timestamp", "icmp.transmit_timestamp"),
+            )
+        ):
+            raw = msg[8 + 4 * k : 12 + 4 * k]
+            ms = struct.unpack("!I", raw)[0]
+            h, m, s = ms // 3_600_000, ms // 60_000 % 60, ms // 1000 % 60
+            parts = [
+                f"{v} {u}{'' if v == 1 else 's'}" for v, u in ((h, "hour"), (m, "minute"), (s, "second")) if v
+            ]
+            shown = ", ".join(parts) or "0 seconds"
+            self.add(
+                fid,
+                name,
+                "body",
+                raw,
+                str(ms),
+                ws,
+                name,
+                "RFC 792",
+                tree="icmp",
+                ws_value=f"{ms} ({shown} after midnight UTC)",
+            )
+
+    def quoted(self, orig: bytes, l4: str):
+        """The quoted datagram of an error message: its IPv4 header, then what follows of it."""
+        src, dst = (str(ipaddress.IPv4Address(orig[k : k + 4])) for k in (12, 16))
+        qip = self.group("qip", f"Internet Protocol Version 4, Src: {src}, Dst: {dst}")
+        rest = self.ip_fields(orig, "body", "q", "icmp", qip)
+        t = "icmp"
+        if l4 == "udp":
+            sport, dport, length, csum = struct.unpack("!HHHH", rest[:8])
+            g = self.group("qudp", f"User Datagram Protocol, Src Port: {sport}, Dst Port: {dport}")
+            for fid, name, raw, val, ws in (
+                ("qsport", "Source Port", rest[:2], str(sport), "udp.srcport"),
+                ("qdport", "Destination Port", rest[2:4], str(dport), "udp.dstport"),
+                ("qulen", "Length", rest[4:6], str(length), "udp.length"),
+            ):
+                self.add(fid, name, "body", raw, val, ws, name, "RFC 768", tree=t, ws_group=g)
+            self.add(
+                "qucsum",
+                "Checksum",
+                "body",
+                rest[6:8],
+                f"0x{csum:04x}",
+                "udp.checksum",
+                "Checksum",
+                "RFC 768",
+                tree=t,
+                ws_group=g,
+                ws_value=f"0x{csum:04x} [unverified]",
+                ws_more=[{"label": "[Checksum Status: Unverified]", "ws": "udp.checksum.status"}],
+            )
+            if len(rest) > 8:
+                self.data_field(rest[8:], t, self.group("qdata", f"Data ({len(rest) - 8} bytes)"))
+                self.fields[-1].update(id="qdata", ref="RFC 1812 §4.3.2.3")
+        elif l4 == "tcp":
+            sport, dport, seq = struct.unpack("!HHI", rest[:8])
+            g = self.group("qtcp", f"Transmission Control Protocol, Src Port: {sport}, Dst Port: {dport}")
+            self.add(
+                "qtsport",
+                "Source Port",
+                "body",
+                rest[:2],
+                str(sport),
+                "tcp.srcport",
+                "Source Port",
+                TCP_REF,
+                tree=t,
+                ws_group=g,
+            )
+            self.add(
+                "qtdport",
+                "Destination Port",
+                "body",
+                rest[2:4],
+                str(dport),
+                "tcp.dstport",
+                "Destination Port",
+                TCP_REF,
+                tree=t,
+                ws_group=g,
+            )
+            self.add(
+                "qtseq",
+                "Sequence Number",
+                "body",
+                rest[4:8],
+                str(seq),
+                "tcp.seq_raw",
+                "Sequence Number (raw)",
+                TCP_REF,
+                tree=t,
+                ws_group=g,
+            )
+        else:  # the first 8 bytes of an ICMP Echo
+            mtype, code, csum = struct.unpack("!BBH", rest[:4])
+            g = self.group("qicmp", "Internet Control Message Protocol")
+            self.add(
+                "qicmptype",
+                "Type",
+                "body",
+                rest[:1],
+                str(mtype),
+                "icmp.type",
+                "Type",
+                "RFC 792",
+                tree=t,
+                ws_group=g,
+                ws_value=f"{mtype} ({ICMP_TYPES[mtype]})",
+            )
+            self.add(
+                "qicmpcode",
+                "Code",
+                "body",
+                rest[1:2],
+                str(code),
+                "icmp.code",
+                "Code",
+                "RFC 792",
+                tree=t,
+                ws_group=g,
+            )
+            self.add(
+                "qicmpcsum",
+                "Checksum",
+                "body",
+                rest[2:4],
+                f"0x{csum:04x}",
+                "icmp.checksum",
+                "Checksum",
+                "RFC 792",
+                tree=t,
+                ws_group=g,
+                ws_value=f"0x{csum:04x} [unverified] [in ICMP error packet]",
+                ws_more=[{"label": "[Checksum Status: Unverified]", "ws": "icmp.checksum.status"}],
+            )
+            self.ident_seq(rest, [], "body", "q", g)
+
+    def extension(self, ext: bytes):
+        """RFC 4884 §7 header and one RFC 4950 MPLS Label Stack object with one entry."""
+        t = "icmp"
+        word, csum = struct.unpack("!HH", ext[:4])
+        length, cls, ctype, entry = struct.unpack("!HBBI", ext[4:12])
+        label, exp, s, ttl = entry >> 12, entry >> 9 & 7, entry >> 8 & 1, entry & 0xFF
+        ok = inet_checksum(ext) == 0
+        top = self.group("ext", "ICMP Multi-Part Extensions", "icmp.ext")
+        self.data += ext[:2]
+        self.bitfield(
+            "extver",
+            "Version",
+            "tlv",
+            4,
+            str(word >> 12),
+            "icmp.ext.version",
+            "Version",
+            "RFC 4884 §7",
+            tree=t,
+            ws_group=top,
+        )
+        self.bitfield(
+            "extres",
+            "Reserved",
+            "tlv",
+            12,
+            "0",
+            "icmp.ext.res",
+            "Reserved",
+            "RFC 4884 §7",
+            tree=t,
+            ws_group=top,
+            ws_bits=wsbits(word & 0xFFF, 12, 4, 16),
+            ws_value=f"0x{word & 0xFFF:03x}",
+        )
+        self.add(
+            "extcsum",
+            "Checksum",
+            "tlv",
+            ext[2:4],
+            f"0x{csum:04x}",
+            "icmp.ext.checksum",
+            "Checksum",
+            "RFC 4884 §7",
+            tree=t,
+            ws_group=top,
+            ws_value=f"0x{csum:04x} [{'correct' if ok else 'incorrect'}]",
+            ws_more=[
+                {"label": f"[Checksum Status: {'Good' if ok else 'Bad'}]", "ws": "icmp.ext.checksum.status"}
+            ],
+        )
+        obj = self.group("extobj", "MPLS Stack Entry", parent=top)
+        self.add(
+            "extlen",
+            "Length",
+            "tlv",
+            ext[4:6],
+            str(length),
+            "icmp.ext.length",
+            "Length",
+            "RFC 4884 §8",
+            tree=t,
+            ws_group=obj,
+        )
+        self.add(
+            "extclass",
+            "Class-Num",
+            "tlv",
+            ext[6:7],
+            str(cls),
+            "icmp.ext.class",
+            "Class",
+            "RFC 4950 §2",
+            tree=t,
+            ws_group=obj,
+            ws_value=f"MPLS Label Stack Class ({cls})",
+        )
+        self.add(
+            "extctype",
+            "C-Type",
+            "tlv",
+            ext[7:8],
+            str(ctype),
+            "icmp.ext.ctype",
+            "C-Type",
+            "RFC 4950 §2",
+            tree=t,
+            ws_group=obj,
+        )
+        lse = self.group("extlse", f"Label: {label}, Exp: {exp}, S: {s}, TTL: {ttl}", parent=obj)
+        self.data += ext[8:11]
+        ref = "RFC 4950 §2, RFC 3032 §2.1"
+        self.bitfield(
+            "mplslabel",
+            "Label",
+            "tlv",
+            20,
+            str(label),
+            "icmp.mpls.label",
+            "Label",
+            ref,
+            tree=t,
+            ws_group=lse,
+            ws_bits=wsbits(label, 20, 0, 24),
+        )
+        self.bitfield(
+            "mplsexp",
+            "TC",
+            "tlv",
+            3,
+            str(exp),
+            "icmp.mpls.exp",
+            "Experimental",
+            ref + ", RFC 5462",
+            tree=t,
+            ws_group=lse,
+            ws_bits=wsbits(exp, 3, 20, 24),
+        )
+        self.bitfield(
+            "mplss",
+            "S",
+            "tlv",
+            1,
+            str(s),
+            "icmp.mpls.s",
+            "Stack bit",
+            ref,
+            tree=t,
+            ws_group=lse,
+            ws_bits=wsbits(s, 1, 23, 24),
+            ws_value="Set" if s else "Not set",
+        )
+        self.add(
+            "mplsttl",
+            "TTL",
+            "tlv",
+            ext[11:12],
+            str(ttl),
+            "icmp.mpls.ttl",
+            "Time to live",
+            ref,
+            tree=t,
+            ws_group=lse,
+        )
+
+    def out(self, sid, message, encapsulation, layers):
+        s = super().out(sid, message, encapsulation, layers)
+        s["protocol"] = "ICMP"
+        s["grid_from"] = 272  # the bit diagram starts at the ICMP message: 14 bytes of Ethernet + 20 of IPv4
+        return s
+
+
+def icmp_sample(sid, message, pkt, body, *, src_mac=MAC_GW, dst_mac=MAC_HOST):
+    """One Ethernet II frame on A's link carrying the ICMP message pkt; body(fr, msg) maps it."""
+    fr = ICMPFrame()
+    msg = fr.encap(src_mac, dst_mac, pkt)
+    src, dst = (str(ipaddress.IPv4Address(pkt[k : k + 4])) for k in (12, 16))
+    body(fr, msg)
+    layers = {
+        "eth": f"Ethernet II, Src: {src_mac}, Dst: {dst_mac}",
+        "ip": f"Internet Protocol Version 4, Src: {src}, Dst: {dst}",
+        "icmp": "Internet Control Message Protocol",
+    }
+    return fr.out(sid, message, "IPv4, protocol 1", layers)
+
+
+def icmp_probe(ttl: int, dport: int, ident: int, size: int = 60) -> bytes:
+    """A UDP traceroute probe from A to B: `size` bytes of IP datagram, ports as traceroute picks them."""
+    data = bytes(0x40 + k % 32 for k in range(size - 28))
+    return ipv4_packet(
+        IP_HOST, IP_DST, 17, udp_datagram(IP_HOST, IP_DST, 49153, dport, data), ident=ident, ttl=ttl
+    )
+
+
+def icmp_echo_req() -> dict:
+    """The Echo of the IPv4 page (ipv4-base), read here from the ICMP header."""
+    pkt = ipv4_packet(IP_HOST, IP_DST, 1, icmp_echo(0x0B1E, 1, ICMP_DATA), ident=0x4D2A, df=1)
+    more = [{"label": "[Response frame: 2]", "ws": "icmp.resp_in"}]
+    return icmp_sample(
+        "icmp-echo-req", "Echo Request", pkt, lambda fr, m: fr.echo(m, more), src_mac=MAC_HOST, dst_mac=MAC_GW
+    )
+
+
+def icmp_echo_rep() -> dict:
+    """B's answer after two routers: same Identifier, Sequence Number and data, type 0."""
+    msg = icmp_message(0, 0, struct.pack("!HH", 0x0B1E, 1), ICMP_DATA)
+    pkt = ipv4_packet(IP_DST, IP_HOST, 1, msg, ident=0x8F13, ttl=62)
+    more = [
+        {"label": "[Request frame: 1]", "ws": "icmp.resp_to"},
+        {"label": f"[Response time: {ICMP_RESP_MS} ms]", "ws": "icmp.resptime"},
+    ]
+    return icmp_sample("icmp-echo-rep", "Echo Reply", pkt, lambda fr, m: fr.echo(m, more))
+
+
+def icmp_error(sid, message, src, mtype, code, rest, orig, l4, *, ttl=255, dscp=0, ident=0, ext=b""):  # noqa: PLR0917 (the message in wire order)
+    msg = icmp_message(mtype, code, rest, orig + ext)
+    pkt = ipv4_packet(src, IP_HOST, 1, msg, ident=ident, ttl=ttl, dscp=dscp)
+
+    def body(fr, m):
+        fr.head(m)
+        if mtype == 5:
+            fr.add(
+                "icmpgw",
+                "Gateway Internet Address",
+                "header",
+                m[4:8],
+                str(ipaddress.IPv4Address(m[4:8])),
+                "icmp.redir_gw",
+                "Gateway Address",
+                "RFC 792",
+                tree="icmp",
+            )
+        elif m[5]:
+            fr.unused(m[4:5])
+            fr.add(
+                "icmplen",
+                "Length",
+                "header",
+                m[5:6],
+                str(m[5]),
+                "icmp.length",
+                "Length",
+                "RFC 4884 §4.2",
+                tree="icmp",
+                ws_more=[
+                    {
+                        "label": f"[Length of original datagram: {m[5] * 4}]",
+                        "ws": "icmp.length.original_datagram",
+                    }
+                ],
+            )
+            fr.unused(m[6:8], "icmpunusedb")
+        elif (mtype, code) == (3, 4):
+            fr.unused(m[4:6])
+            mtu = struct.unpack("!H", m[6:8])[0]
+            fr.add(
+                "icmpmtu",
+                "Next-Hop MTU",
+                "header",
+                m[6:8],
+                str(mtu),
+                "icmp.mtu",
+                "MTU of next hop",
+                "RFC 1191 §4",
+                tree="icmp",
+            )
+        else:
+            fr.unused(m[4:8])
+        fr.quoted(m[8 : 8 + len(orig)], l4)
+        if ext:
+            fr.extension(m[8 + len(orig) :])
+
+    return icmp_sample(sid, message, pkt, body)
+
+
+def icmp_big_segment() -> bytes:
+    """A full-size TCP segment from A to B: Total Length 1500, DF set (as on the IPv4 page, animation C)."""
+    seg = tcp_segment(IP_HOST, IP_DST, 49152, 443, 0x2F5A1C01, 0x6B3D9A11, 0x010, 64240, data=bytes(1460))
+    return ipv4_packet(IP_HOST, IP_DST, 6, seg, ident=0x4D2E, df=1)
+
+
+def icmp_frag_needed() -> dict:
+    """R1 cannot forward 1500 bytes into its 1400-byte tunnel: type 3 code 4, header + 8 bytes quoted."""
+    return icmp_error(
+        "icmp-frag-needed",
+        "Fragmentation Needed",
+        ICMP_R1,
+        3,
+        4,
+        struct.pack("!HH", 0, 1400),
+        icmp_big_segment()[:28],
+        "tcp",
+        ident=0x0A31,
+    )
+
+
+def icmp_port_unreach() -> dict:
+    """B has no listener on UDP 33440 (first probe with TTL 3, seen with TTL 1): type 3 code 3.
+    B quotes the whole 60-byte probe and marks the error CS6, as RFC 1812 recommends."""
+    return icmp_error(
+        "icmp-port-unreach",
+        "Port Unreachable",
+        IP_DST,
+        3,
+        3,
+        bytes(4),
+        icmp_probe(1, 33440, 0x5C17),
+        "udp",
+        ttl=62,
+        dscp=48,
+        ident=0xC2A4,
+    )
+
+
+def icmp_time_exceeded() -> dict:
+    """R1 drops the first probe (TTL 1, UDP 33434): type 11 code 0, header + 8 bytes quoted."""
+    return icmp_error(
+        "icmp-time-exceeded",
+        "Time Exceeded",
+        ICMP_R1,
+        11,
+        0,
+        bytes(4),
+        icmp_probe(1, 33434, 0x5C11)[:28],
+        "udp",
+        ident=0x0A2F,
+    )
+
+
+def icmp_redirect() -> dict:
+    """R1 forwards A's Echo for 203.0.113.200 back out of the same LAN to R3: type 5 code 1."""
+    echo = ipv4_packet(IP_HOST, ICMP_SRV, 1, icmp_echo(0x0B1F, 1, ICMP_DATA), ident=0x4D30, df=1)
+    return icmp_error(
+        "icmp-redirect", "Redirect", ICMP_R1, 5, 1, ip4(ICMP_R3), echo[:28], "icmp", ident=0x0A33
+    )
+
+
+def icmp_ts_req() -> dict:
+    """Timestamp request sent by A at 10:00:00.000 UT (36,000,000 ms after midnight)."""
+    body = struct.pack("!III", 36_000_000, 0, 0)
+    pkt = ipv4_packet(
+        IP_HOST, IP_DST, 1, icmp_message(13, 0, struct.pack("!HH", 0x0B20, 1), body), ident=0x4D31
+    )
+    return icmp_sample(
+        "icmp-ts-req",
+        "Timestamp Request",
+        pkt,
+        lambda fr, m: fr.timestamp(m),
+        src_mac=MAC_HOST,
+        dst_mac=MAC_GW,
+    )
+
+
+def icmp_te_mpls() -> dict:
+    """R2 as a label switching router: Time Exceeded for a 128-byte probe that arrived with label
+    24001 and MPLS TTL 1. Length = 32 words (128 bytes quoted), then the RFC 4950 extension."""
+    probe = icmp_probe(1, 33437, 0x5C14, size=128)
+    return icmp_error(
+        "icmp-te-mpls",
+        "Time Exceeded + MPLS",
+        ICMP_R2,
+        11,
+        0,
+        struct.pack("!BBH", 0, len(probe) // 4, 0),
+        probe,
+        "udp",
+        ttl=254,
+        ident=0x1B52,
+        ext=icmp_ext_mpls(24001, 0, 1, 1),
+    )
+
+
+ICMP_SAMPLES = {
+    "icmp-echo-req": icmp_echo_req,
+    "icmp-echo-rep": icmp_echo_rep,
+    "icmp-frag-needed": icmp_frag_needed,
+    "icmp-port-unreach": icmp_port_unreach,
+    "icmp-time-exceeded": icmp_time_exceeded,
+    "icmp-redirect": icmp_redirect,
+    "icmp-ts-req": icmp_ts_req,
+    "icmp-te-mpls": icmp_te_mpls,
+}
+
+
+def icmp_self_test() -> int:
+    """Outer IPv4 and ICMP checksums verify; every quoted IPv4 header verifies too; the reply
+    echoes the request's Identifier, Sequence Number and data; the extension checksum verifies
+    and the RFC 4884 length attribute counts the quoted bytes in 32-bit words."""
+    errors, raw = 0, {}
+    for name, build in ICMP_SAMPLES.items():
+        ip = raw[name] = bytes.fromhex(build()["hex"].replace(" ", ""))[14:]
+        msg = ip[20:]
+        bad = inet_checksum(ip[:20]) or inet_checksum(msg) or struct.unpack("!H", ip[2:4])[0] != len(ip)
+        if msg[0] in (3, 5, 11) and inet_checksum(msg[8:28]):
+            bad = True
+        if bad:
+            print(f"FAIL {name} IPv4 or ICMP checksum")
+            errors += 1
+    req, rep = raw["icmp-echo-req"][20:], raw["icmp-echo-rep"][20:]
+    if (req[0], rep[0]) != (8, 0) or req[4:] != rep[4:]:
+        print("FAIL icmp echo reply does not echo the request")
+        errors += 1
+    te = raw["icmp-te-mpls"][20:]
+    if te[5] * 4 != 128 or inet_checksum(te[8 + 128 :]) or len(te) != 8 + 128 + 12:
+        print("FAIL icmp-te-mpls length attribute or extension checksum")
+        errors += 1
+    return errors
+
+
+SAMPLES = {
+    "ospf-hello": ospf_hello,
+    **ETH_SAMPLES,
+    **IPV4_SAMPLES,
+    **OSI_SAMPLES,
+    **ARP_SAMPLES,
+    **ICMP_SAMPLES,
+}
 
 
 def ipv4_self_test() -> int:
@@ -2393,6 +3103,7 @@ def self_test() -> int:
             print(f"FAIL {name} IPv4 or transport checksum")
             errors += 1
     errors += arp_self_test()
+    errors += icmp_self_test()
     # The field map must tile the packet exactly: contiguous, no gap, no overlap. A field
     # narrower than a byte (802.1Q PCP, DEI, VID) carries the hex of the bytes it sits in.
     for name, build in SAMPLES.items():

@@ -12,6 +12,12 @@ Versioning rules for this library:
 ## [Unreleased]
 
 ### Added
+- ICMP page (`protocols/icmp/`): ICMP for IPv4, every message type read bit by bit (eight sample
+  packets built by `tools/packet-builder.py`: Echo Request and Reply, Fragmentation Needed, Port
+  Unreachable, Time Exceeded, Redirect, extended Time Exceeded with an MPLS object, Timestamp),
+  ping, traceroute and Path MTU Discovery as step-by-step animations, when an error must not be
+  sent, rate limits, PMTUD black holes, NAT, redirects, security, commands on six platforms, 17 quiz
+  questions; label `protocol::icmp`.
 - ARP page (`protocols/arp/`): resolution on and off the subnet, ARP cache, gratuitous ARP, address
   conflict detection (RFC 5227), proxy ARP, ARP with NAT, spoofing and Dynamic ARP Inspection,
   ARP and MAC timer mismatch, six sample packets built by `tools/packet-builder.py` (Request, Reply,
