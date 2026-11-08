@@ -166,15 +166,33 @@ def theme_errors(page, built, want: str) -> list:
     return []
 
 
+CONSENT_DAYS = 183  # six months: the consent to keep data on the device then expires (ADR 0011)
+
+
 def check_remember(page) -> list:
-    """The privacy page's switch keeps choices on the device; its button deletes them."""
+    """The privacy page's switch keeps choices on the device and dates the consent; the undated
+    consent of v0.7.0 gets a date; an expired consent forgets what it kept; the button deletes
+    everything."""
     errors = []
     switch = page.locator("main input[data-remember]")
     if switch.count() != 1:
         return ["privacy page: no 'remember on this device' switch in the page"]
     switch.check()
-    if page.evaluate("localStorage.getItem('npe-remember')") != "1":
-        errors.append("privacy page: ticking 'remember' does not store the choice")
+    age = "Date.now() - Number(localStorage.getItem('npe-remember'))"
+    if not 0 <= page.evaluate(age) < 60_000:
+        errors.append("privacy page: ticking 'remember' does not store the date of the consent")
+    page.evaluate("localStorage.setItem('npe-remember', '1'); localStorage.setItem('npe-seen:x', '[]')")
+    page.reload(wait_until="load")
+    if not 0 <= page.evaluate(age) < 60_000 or page.evaluate("localStorage.getItem('npe-seen:x')") != "[]":
+        errors.append("privacy page: the undated consent of v0.7.0 is not dated, or its data is lost")
+    page.evaluate(f"localStorage.setItem('npe-remember', String(Date.now() - {CONSENT_DAYS + 1} * 86400000))")
+    page.reload(wait_until="load")
+    left = page.evaluate("Object.keys(localStorage)")
+    if left:
+        errors.append(f"privacy page: an expired consent leaves {', '.join(sorted(left))}")
+    if page.locator("input[data-remember]:checked").count():
+        errors.append("privacy page: the switch stays ticked after the consent expired")
+    page.locator("main input[data-remember]").check()
     page.locator("button[data-forget]").click()
     left = page.evaluate("Object.keys(localStorage).concat(Object.keys(sessionStorage))")
     if left:
@@ -209,10 +227,10 @@ def check_page(browser, base: str, rel: str, axe: str) -> list:
     # Desktop, light theme: axe, CLS, language switching, alternates.
     ctx, page = new_page(browser, base, errors, viewport={"width": 1280, "height": 900}, color_scheme="light")
     # The site is dark by default: the light theme is the reader's stored choice, kept on the
-    # device because this reader ticked "remember on this device" (privacy page).
+    # device because this reader ticked "remember on this device" (privacy page) just now.
     page.add_init_script(
-        "try { localStorage.setItem('npe-remember', '1'); localStorage.setItem('theme', 'light'); }"
-        " catch (e) {}"
+        "try { localStorage.setItem('npe-remember', String(Date.now()));"
+        " localStorage.setItem('theme', 'light'); } catch (e) {}"
     )
     page.goto(f"{base}/{rel}", wait_until="load")
     page.wait_for_timeout(400)

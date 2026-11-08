@@ -11,6 +11,37 @@ Versioning rules for this library:
 
 ## [Unreleased]
 
+### Added
+- Legal notice: independence (no commercial involvement of any third party: no sponsor,
+  advertising, affiliate link, paid content or partnership), and the texts written with AI
+  tools, reviewed by the author, who holds editorial responsibility.
+- Terms of use: an "in short" summary (free use, what needs written permission); linking to
+  the site or showing it in a course is always allowed; proper use and vulnerability reports;
+  the French version prevails.
+- Privacy page: a diagram of what a visit sends and keeps, with its legend and parts list;
+  links to other sites; the versions of the page. Every information page shows its version
+  and links its history.
+- `robots.txt`: the shared `__usage_ai-training` token (IETF individual draft, backed by
+  Google, Microsoft, OpenAI and Anthropic), `Content-Usage: train-ai=n` (IETF aipref) and six
+  more AI training crawlers. `security.txt` also gives an email contact.
+- The 404 page and the root language chooser link the four information pages.
+- `tools/info-pages.py` writes the information pages in the four languages; CI fails if a page
+  differs from it.
+
+### Changed
+- Consent to keep data on the device lasts six months, as the Belgian Data Protection
+  Authority recommends: `npe-remember` holds the date of the consent, and an expired consent
+  deletes what it kept. The footer says so under the switch, with a link to the details.
+- Privacy page: the right to object shown on its own (GDPR art. 21(4)); emails deleted at the
+  latest 12 months after the last exchange; the Belgian rule cited (art. 10/2 of the Act of
+  30 July 2018); the abuse limits named (requests per address, blocklist).
+- Footer: "No advertising, no sponsor".
+
+### Fixed
+- On a phone, a diagram wider than the screen was cut on the right (Ethernet and OSI
+  concepts). It now scrolls inside its frame, which the keyboard can reach (WCAG 1.4.10 and
+  2.1.1), as the accessibility statement says.
+
 ## [0.7.0] - 2026-11-07
 
 ### Added

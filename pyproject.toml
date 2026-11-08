@@ -15,3 +15,5 @@ ignore = [
 [tool.ruff.lint.per-file-ignores]
 # Packet builders take one keyword argument per protocol field; "0.0.0.0" is an OSPF Area ID.
 "tools/*.py" = ["PLR0913", "S104"]
+# The information pages are text: one string per language, a line each.
+"tools/info-pages.py" = ["PLR0913", "S104", "E501"]

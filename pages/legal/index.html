@@ -1,7 +1,7 @@
 <!doctype html>
 <!--
-  Network Protocols Expert: Legal notice (legal). Information page, built from
-  templates/protocol-template.html (shared blocks kept in sync by tools/sync-shared.py).
+  Network Protocols Expert: Legal notice (legal). Information page, written by
+  tools/info-pages.py from templates/protocol-template.html: edit that script, not this file.
 -->
 <html lang="en">
 <head>
@@ -9,10 +9,10 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="color-scheme" content="dark light">
 <title>Legal notice | Network Protocols Expert</title>
-<meta name="description" content="Publisher, contact, hosting, source code and trademarks of the Network Protocols Expert site.">
+<meta name="description" content="Publisher, independence, contact, hosting, writing, source code and trademarks of the Network Protocols Expert site.">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%230369a1'/%3E%3Cpath d='M7 10h18M7 16h12M7 22h15' stroke='%23fff' stroke-width='3' stroke-linecap='round'/%3E%3C/svg%3E">
 <script type="application/json" id="page-meta">
-{"slug": "legal", "name": "Legal notice", "kind": "info", "updated": "2026-11-07", "title": {"fr": "Mentions légales", "en": "Legal notice", "nl": "Wettelijke vermeldingen", "de": "Impressum"}, "description": {"fr": "Éditeur, contact, hébergement, code source et marques du site Network Protocols Expert.", "en": "Publisher, contact, hosting, source code and trademarks of the Network Protocols Expert site.", "nl": "Uitgever, contact, hosting, broncode en merken van de site Network Protocols Expert.", "de": "Herausgeber, Kontakt, Hosting, Quellcode und Marken der Website Network Protocols Expert."}}
+{"slug": "legal", "name": "Legal notice", "kind": "info", "updated": "2026-11-08", "title": {"fr": "Mentions légales", "en": "Legal notice", "nl": "Wettelijke vermeldingen", "de": "Impressum"}, "description": {"fr": "Éditeur, indépendance, contact, hébergement, rédaction, code source et marques du site Network Protocols Expert.", "en": "Publisher, independence, contact, hosting, writing, source code and trademarks of the Network Protocols Expert site.", "nl": "Uitgever, onafhankelijkheid, contact, hosting, redactie, broncode en merken van de site Network Protocols Expert.", "de": "Herausgeber, Unabhängigkeit, Kontakt, Hosting, Redaktion, Quellcode und Marken der Website Network Protocols Expert."}}
 </script>
 <script>
 /* Runs before first paint: theme and language are applied before anything is drawn,
@@ -21,10 +21,13 @@
   var r = document.documentElement;
   r.classList.add("js");
   /* Storage (privacy page): a choice stays in this tab (sessionStorage) unless the reader
-     asked this device to remember it (npe-remember = "1"); then it is kept in localStorage. */
+     asked this device to remember it; then it is kept in localStorage. npe-remember holds the
+     time of that consent, which lasts six months (183 days); "1" is the undated form of v0.7. */
   function get(k) {
-    try { return (localStorage.getItem("npe-remember") === "1" ? localStorage : sessionStorage).getItem(k); }
-    catch (e) { return null; }
+    try {
+      var c = localStorage.getItem("npe-remember");
+      return (c === "1" || Date.now() - c < 15811200000 ? localStorage : sessionStorage).getItem(k);
+    } catch (e) { return null; }
   }
   /* Dark by default; the toggle stores "light" or "dark". */
   r.dataset.theme = get("theme") === "light" ? "light" : "dark";
@@ -245,6 +248,12 @@ button { font: inherit; color: inherit; }
 .callout.warn .label, .callout.warn svg { color: var(--red); }
 .callout.vendor { border-color: var(--orange); background: var(--orange-bg); }
 .callout.vendor .label, .callout.vendor svg { color: var(--orange); }
+.callout.ok { border-color: var(--green); background: var(--green-bg); }
+.callout.ok .label, .callout.ok svg { color: var(--green); }
+/* Two callouts side by side (what is allowed, what needs permission), stacked on a phone. */
+.duo { display: grid; grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr)); gap: 1rem; margin: 1.25rem 0; }
+.duo > .callout { margin: 0; }
+.duo ul { margin: 0.25rem 0 0; padding-left: 1.2rem; }
 
 /* Tables */
 .table-wrap { overflow-x: auto; border: 1px solid var(--line); border-radius: var(--radius); margin: 1.25rem 0; background: var(--surface); box-shadow: var(--shadow-1); }
@@ -260,6 +269,9 @@ th { background: var(--surface-2); font-weight: 650; white-space: nowrap; }
 .diagram > figcaption .t { font-weight: 650; display: block; }
 .diagram > figcaption .s { font-size: 0.875rem; color: var(--muted); }
 .diagram .body { padding: 1.1rem; }
+/* A schematic wider than a phone scrolls inside its frame instead of being cut (WCAG 1.4.10);
+   the library makes such a frame focusable, so the keyboard can scroll it too. */
+.diagram > .body:has(> svg.sch) { overflow-x: auto; }
 .legend { display: flex; flex-wrap: wrap; gap: 0.5rem 1.25rem; margin: 0; padding: 0.8rem 1.1rem; border-top: 1px solid var(--line); background: var(--surface-2); font-size: 0.8125rem; }
 .legend div { display: flex; align-items: center; gap: 0.45rem; }
 .legend dt { display: flex; }
@@ -287,6 +299,8 @@ details.check > div > p { margin: 0; }
 .sw.l-body { background: var(--teal-bg); border-color: var(--teal); border-style: dashed; }
 .sw.l-tlv { background: var(--purple-bg); border-color: var(--purple); border-style: dotted; }
 .sw.l-encap { background: var(--grey-bg); border-color: var(--grey); }
+.sw.l-ok { background: var(--green-bg); border-color: var(--green); }
+.sw.l-err { background: var(--red-bg); border-color: var(--red); border-style: dashed; }
 .sw.fold { background: var(--surface); border-color: var(--muted); border-style: dashed none; border-radius: 0; }
 .sw.rep { background: var(--surface); border-color: var(--muted); border-style: dashed; }
 .sw.hl { background: var(--surface); border-color: var(--accent); outline: 2px solid var(--accent); }
@@ -560,7 +574,9 @@ svg.sch .halo { paint-order: stroke; stroke: var(--surface); stroke-width: 4px; 
 .remember { display: flex; align-items: flex-start; gap: 0.6rem; cursor: pointer; max-width: 40ch; }
 .remember input { width: 1.5rem; height: 1.5rem; margin: 0; flex: none; accent-color: var(--accent); cursor: pointer; }
 .site-footer .remember { margin: 0.9rem 0 0; font-size: 0.8125rem; color: var(--f-fg); }
-html:not(.js) .remember, html:not(.js) [data-forget] { display: none; }
+.site-footer .remember-note { margin: 0.35rem 0 0 2.1rem; max-width: 40ch; }
+.site-footer .remember-note a { text-decoration: underline; text-underline-offset: 3px; }
+html:not(.js) .remember, html:not(.js) .remember-note, html:not(.js) [data-forget] { display: none; }
 .store-status { min-height: 1.5rem; margin: 0.5rem 0 0; font-weight: 600; }
 
 /* ===== Motion & print ================================================= */
@@ -570,14 +586,14 @@ html:not(.js) .remember, html:not(.js) [data-forget] { display: none; }
 @media print {
   :root { color-scheme: light; }
   body { background: #fff; font-size: 10.5pt; }
-  .site-header, .toc, .pager, .skip, .anim-controls, .tour, .remember, [data-forget], .copy, .quiz-q .btn, .lang, .icon-btn, .tpl, .pkt-set > [role="tablist"] { display: none !important; }
+  .site-header, .toc, .pager, .skip, .anim-controls, .tour, .remember, .remember-note, [data-forget], .copy, .quiz-q .btn, .lang, .icon-btn, .tpl, .pkt-set > [role="tablist"] { display: none !important; }
   .layout { display: block; padding: 0; }
   [role="tabpanel"][hidden], .expl[hidden] { display: block !important; }
   .tabs [role="tablist"] { display: none; }
   .diagram, .cmd, .quiz-q, .packet, .dtree > li, table { break-inside: avoid; }
   .sources a[href^="http"]::after { content: " <" attr(href) ">"; font-size: 0.85em; word-break: break-all; }
   .anim .msg.future, .anim [data-s].future { opacity: 1; }
-  .scroll-x, .table-wrap, .wstree, .hexdump, .cmd pre { overflow: visible; }
+  .scroll-x, .table-wrap, .wstree, .hexdump, .cmd pre, .diagram > .body { overflow: visible; }
   .site-footer { background: none; color: inherit; margin-top: 2rem; border-top: 1px solid #999; }
   .site-footer .cols nav { display: none; }
   a { color: inherit; }
@@ -598,8 +614,11 @@ window.NPE = (function () {
   function lang() { return LANGS.indexOf(root.lang) < 0 ? "en" : root.lang; }
   function ui(k) { return UI[lang()][k]; }
   /* Storage: this tab only (sessionStorage), or this device (localStorage) once the reader
-     ticked "remember" (npe-remember = "1"). Nothing leaves the browser. */
-  function box() { try { return localStorage.getItem("npe-remember") === "1" ? localStorage : sessionStorage; } catch (e) { return null; } }
+     ticked "remember" (npe-remember = time of that consent, valid six months, 183 days; "1" is
+     the undated form of v0.7, dated on the next page view). Nothing leaves the browser. */
+  var CONSENT_MS = 15811200000;
+  function kept() { try { var c = localStorage.getItem("npe-remember"); return c === "1" || Date.now() - c < CONSENT_MS; } catch (e) { return false; } }
+  function box() { try { return kept() ? localStorage : sessionStorage; } catch (e) { return null; } }
   function store(k, v) { try { var b = box(); if (!b) return null; if (v === undefined) return b.getItem(k); b.setItem(k, v); } catch (e) { return null; } }
   function esc(s) { return String(s).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); }
   function json(sel) { var n = document.querySelector(sel); return n ? JSON.parse(n.textContent) : null; }
@@ -1170,14 +1189,20 @@ window.NPE = (function () {
 
   /* ---------- Privacy: "remember on this device" switch, "delete this site's data" button ----------
      Unticked (default): preferences live in this tab only, reading progress is not kept.
-     Ticked: preferences move to localStorage and progress is kept. Unticking or deleting
-     removes every key of the site from this browser. */
+     Ticked: preferences move to localStorage and progress is kept, for six months at most (the
+     consent then expires and what it kept is deleted). Unticking or deleting removes every key
+     of the site from this browser. */
   var PREFS = ["lang", "theme", "npe-nav"];
   function ours(k) { return PREFS.indexOf(k) >= 0 || /^npe-/.test(k); }
   function wipe(s) { try { Object.keys(s).filter(ours).forEach(function (k) { s.removeItem(k); }); } catch (e) { /* nothing to delete */ } }
   function remember() {
     var boxes = document.querySelectorAll("input[data-remember]"), status = document.querySelector("[data-store-status]");
-    function on() { try { return localStorage.getItem("npe-remember") === "1"; } catch (e) { return false; } }
+    try {
+      var c = localStorage.getItem("npe-remember");
+      if (c === "1") localStorage.setItem("npe-remember", String(Date.now()));
+      else if (c !== null && !kept()) wipe(localStorage);
+    } catch (e) { /* storage blocked: nothing is kept */ }
+    function on() { return kept(); }
     function paint() { boxes.forEach(function (b) { b.checked = on(); }); }
     function say(k) { if (status) status.textContent = ui(k); }
     boxes.forEach(function (b) {
@@ -1185,7 +1210,7 @@ window.NPE = (function () {
         try {
           if (b.checked) {
             PREFS.forEach(function (k) { var v = sessionStorage.getItem(k); if (v !== null) localStorage.setItem(k, v); });
-            localStorage.setItem("npe-remember", "1");
+            localStorage.setItem("npe-remember", String(Date.now()));
             say("kept");
           } else {
             PREFS.forEach(function (k) { var v = localStorage.getItem(k); if (v !== null) sessionStorage.setItem(k, v); });
@@ -1203,10 +1228,23 @@ window.NPE = (function () {
     onLang(function () { if (status && status.textContent) status.textContent = ""; });
   }
 
+  /* ---------- Wide schematics: a frame that scrolls is reachable with the keyboard ----------
+     (WCAG 2.1.1, axe scrollable-region-focusable), as .table-wrap and animations already are. */
+  function frames() {
+    function mark() {
+      document.querySelectorAll(".diagram > .body").forEach(function (b) {
+        if (b.scrollWidth > b.clientWidth + 1 && !b.hasAttribute("tabindex")) b.tabIndex = 0;
+      });
+    }
+    mark();
+    window.addEventListener("resize", mark);
+  }
+
   /* ---------- Page chrome: language, theme, TOC scroll-spy, copy, print ---------- */
   function chrome() {
     var meta = json("#page-meta");
     remember();
+    frames();
     function setLang(l, user) {
       if (LANGS.indexOf(l) < 0) l = "en";
       root.lang = l;
@@ -1321,8 +1359,8 @@ window.NPE = (function () {
   <header class="hero">
     <p class="eyebrow"><span data-l="fr">Informations légales</span><span data-l="en">Legal information</span><span data-l="nl">Juridische informatie</span><span data-l="de">Rechtliche Hinweise</span></p>
     <h1><span data-l="fr">Mentions légales</span><span data-l="en">Legal notice</span><span data-l="nl">Wettelijke vermeldingen</span><span data-l="de">Impressum</span></h1>
-    <p class="lede"><span data-l="fr">Qui publie ce site, comment joindre l'éditeur et où le site est hébergé.</span><span data-l="en">Who publishes this site, how to reach the publisher and where the site is hosted.</span><span data-l="nl">Wie deze site uitgeeft, hoe u de uitgever bereikt en waar de site gehost wordt.</span><span data-l="de">Wer diese Website herausgibt, wie Sie den Herausgeber erreichen und wo die Website gehostet wird.</span></p>
-    <p class="f-note"><span data-l="fr">Dernière mise à jour : 7 novembre 2026.</span><span data-l="en">Last updated: 7 November 2026.</span><span data-l="nl">Laatst bijgewerkt: 7 november 2026.</span><span data-l="de">Zuletzt aktualisiert: 7. November 2026.</span></p>
+    <p class="lede"><span data-l="fr">Qui publie ce site, qui le finance, comment joindre l'éditeur et où le site est hébergé.</span><span data-l="en">Who publishes this site, who funds it, how to reach the publisher and where the site is hosted.</span><span data-l="nl">Wie deze site uitgeeft, wie ze financiert, hoe u de uitgever bereikt en waar de site gehost wordt.</span><span data-l="de">Wer diese Website herausgibt, wer sie finanziert, wie Sie den Herausgeber erreichen und wo die Website gehostet wird.</span></p>
+    <p class="f-note"><span data-l="fr">Dernière mise à jour : 8 novembre 2026 (version 2). <a href="https://github.com/jeanmichel4121/network-protocols-expert/commits/main/pages/legal/index.html">Versions précédentes</a></span><span data-l="en">Last updated: 8 November 2026 (version 2). <a href="https://github.com/jeanmichel4121/network-protocols-expert/commits/main/pages/legal/index.html">Earlier versions</a></span><span data-l="nl">Laatst bijgewerkt: 8 november 2026 (versie 2). <a href="https://github.com/jeanmichel4121/network-protocols-expert/commits/main/pages/legal/index.html">Eerdere versies</a></span><span data-l="de">Zuletzt aktualisiert: 8. November 2026 (Fassung 2). <a href="https://github.com/jeanmichel4121/network-protocols-expert/commits/main/pages/legal/index.html">Frühere Fassungen</a></span></p>
   </header>
 
   <section class="sec" id="publisher" aria-labelledby="h-publisher">
@@ -1331,23 +1369,32 @@ window.NPE = (function () {
 <dl class="fields"><div><dt><span data-l="fr">Éditeur</span><span data-l="en">Publisher</span><span data-l="nl">Uitgever</span><span data-l="de">Herausgeber</span></dt><dd><span data-l="fr">Jean-Michel Cuvelier, Belgique</span><span data-l="en">Jean-Michel Cuvelier, Belgium</span><span data-l="nl">Jean-Michel Cuvelier, België</span><span data-l="de">Jean-Michel Cuvelier, Belgien</span></dd></div><div><dt><span data-l="fr">Responsable de la publication</span><span data-l="en">Responsible for the content</span><span data-l="nl">Verantwoordelijk voor de inhoud</span><span data-l="de">Verantwortlich für den Inhalt</span></dt><dd><span data-l="fr">Jean-Michel Cuvelier</span><span data-l="en">Jean-Michel Cuvelier</span><span data-l="nl">Jean-Michel Cuvelier</span><span data-l="de">Jean-Michel Cuvelier</span></dd></div><div><dt><span data-l="fr">Contact</span><span data-l="en">Contact</span><span data-l="nl">Contact</span><span data-l="de">Kontakt</span></dt><dd><span data-l="fr"><a href="mailto:jm@cuvelier.tech">jm@cuvelier.tech</a></span><span data-l="en"><a href="mailto:jm@cuvelier.tech">jm@cuvelier.tech</a></span><span data-l="nl"><a href="mailto:jm@cuvelier.tech">jm@cuvelier.tech</a></span><span data-l="de"><a href="mailto:jm@cuvelier.tech">jm@cuvelier.tech</a></span></dd></div><div><dt><span data-l="fr">Site</span><span data-l="en">Site</span><span data-l="nl">Site</span><span data-l="de">Website</span></dt><dd><span data-l="fr">https://learning.cuvelier.tech</span><span data-l="en">https://learning.cuvelier.tech</span><span data-l="nl">https://learning.cuvelier.tech</span><span data-l="de">https://learning.cuvelier.tech</span></dd></div></dl>
   </section>
 
+  <section class="sec" id="independence" aria-labelledby="h-independence">
+    <h2 id="h-independence"><span class="num">2</span><span data-l="fr">Indépendance</span><span data-l="en">Independence</span><span data-l="nl">Onafhankelijkheid</span><span data-l="de">Unabhängigkeit</span></h2>
+<div class="callout ok"><svg aria-hidden="true" fill="none" height="20" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" width="20"><circle cx="12" cy="12" r="9.5"></circle><path d="M7.5 12.5l3 3 6-6.5" stroke-linecap="round" stroke-linejoin="round"></path></svg><div><span class="label"><span data-l="fr">Aucune participation commerciale d'un tiers</span><span data-l="en">No commercial involvement of any third party</span><span data-l="nl">Geen commerciële betrokkenheid van derden</span><span data-l="de">Keine geschäftliche Beteiligung Dritter</span></span>
+<p><span data-l="fr">Pas de sponsor, pas de publicité, pas de lien d'affiliation, pas de contenu payé ou commandé, pas de partenariat. Personne d'autre que l'auteur ne finance le site, et le site ne génère aucun revenu.</span><span data-l="en">No sponsor, no advertising, no affiliate link, no paid or commissioned content, no partnership. Nobody but the author funds the site, and the site earns no revenue.</span><span data-l="nl">Geen sponsor, geen reclame, geen affiliatelinks, geen betaalde of bestelde inhoud, geen partnerschap. Niemand anders dan de auteur financiert de site, en de site brengt geen inkomsten op.</span><span data-l="de">Kein Sponsor, keine Werbung, keine Affiliate-Links, keine bezahlten oder beauftragten Inhalte, keine Partnerschaft. Niemand außer dem Autor finanziert die Website, und sie erzielt keine Einnahmen.</span></p>
+</div></div>
+<p><span data-l="fr">Les constructeurs traités (Cisco, Check Point, F5, Palo Alto Networks, NetScaler, Fortinet) n'ont ni financé, ni commandé, ni relu, ni approuvé le contenu. Ils sont présentés parce qu'on les rencontre souvent dans les réseaux d'entreprise, et leurs produits sont décrits d'après leur documentation publique.</span><span data-l="en">The vendors covered (Cisco, Check Point, F5, Palo Alto Networks, NetScaler, Fortinet) have not funded, commissioned, reviewed or approved the content. They are covered because they are common in enterprise networks, and their products are described from their public documentation.</span><span data-l="nl">De behandelde vendors (Cisco, Check Point, F5, Palo Alto Networks, NetScaler, Fortinet) hebben de inhoud niet gefinancierd, besteld, nagelezen of goedgekeurd. Ze komen aan bod omdat ze vaak in bedrijfsnetwerken voorkomen, en hun producten worden beschreven op basis van hun openbare documentatie.</span><span data-l="de">Die behandelten Hersteller (Cisco, Check Point, F5, Palo Alto Networks, NetScaler, Fortinet) haben den Inhalt weder finanziert noch beauftragt, geprüft oder freigegeben. Sie werden behandelt, weil man sie in Unternehmensnetzen häufig antrifft, und ihre Produkte werden nach ihrer öffentlichen Dokumentation beschrieben.</span></p>
+  </section>
+
   <section class="sec" id="contact" aria-labelledby="h-contact">
-    <h2 id="h-contact"><span class="num">2</span><span data-l="fr">Contact</span><span data-l="en">Contact</span><span data-l="nl">Contact</span><span data-l="de">Kontakt</span></h2>
+    <h2 id="h-contact"><span class="num">3</span><span data-l="fr">Contact</span><span data-l="en">Contact</span><span data-l="nl">Contact</span><span data-l="de">Kontakt</span></h2>
 <p><span data-l="fr">Pour toute question, écrivez à <a href="mailto:jm@cuvelier.tech">jm@cuvelier.tech</a>. Pour signaler une erreur dans une page, vous pouvez aussi ouvrir un ticket public sur <a href="https://github.com/jeanmichel4121/network-protocols-expert/issues/new/choose">GitHub</a> (un compte GitHub est nécessaire). Une faille de sécurité se signale de manière confidentielle, selon le fichier <a href="https://learning.cuvelier.tech/.well-known/security.txt">security.txt</a>.</span><span data-l="en">For any question, write to <a href="mailto:jm@cuvelier.tech">jm@cuvelier.tech</a>. To report an error in a page, you can also open a public issue on <a href="https://github.com/jeanmichel4121/network-protocols-expert/issues/new/choose">GitHub</a> (a GitHub account is needed). A security issue is reported privately, as described in the <a href="https://learning.cuvelier.tech/.well-known/security.txt">security.txt</a> file.</span><span data-l="nl">Voor elke vraag kunt u schrijven naar <a href="mailto:jm@cuvelier.tech">jm@cuvelier.tech</a>. Een fout in een pagina kunt u ook melden met een openbaar ticket op <a href="https://github.com/jeanmichel4121/network-protocols-expert/issues/new/choose">GitHub</a> (daarvoor is een GitHub-account nodig). Een beveiligingsprobleem meldt u vertrouwelijk, zoals beschreven in het bestand <a href="https://learning.cuvelier.tech/.well-known/security.txt">security.txt</a>.</span><span data-l="de">Bei Fragen schreiben Sie an <a href="mailto:jm@cuvelier.tech">jm@cuvelier.tech</a>. Einen Fehler auf einer Seite können Sie auch mit einem öffentlichen Ticket auf <a href="https://github.com/jeanmichel4121/network-protocols-expert/issues/new/choose">GitHub</a> melden (dafür ist ein GitHub-Konto nötig). Eine Sicherheitslücke melden Sie vertraulich, wie in der Datei <a href="https://learning.cuvelier.tech/.well-known/security.txt">security.txt</a> beschrieben.</span></p>
   </section>
 
   <section class="sec" id="hosting" aria-labelledby="h-hosting">
-    <h2 id="h-hosting"><span class="num">3</span><span data-l="fr">Hébergement</span><span data-l="en">Hosting</span><span data-l="nl">Hosting</span><span data-l="de">Hosting</span></h2>
+    <h2 id="h-hosting"><span class="num">4</span><span data-l="fr">Hébergement</span><span data-l="en">Hosting</span><span data-l="nl">Hosting</span><span data-l="de">Hosting</span></h2>
 <p><span data-l="fr">Le site est hébergé par l'éditeur lui-même, sur un serveur situé en Belgique. Les serveurs DNS du domaine cuvelier.tech sont fournis par OVHcloud. Le certificat HTTPS est délivré par Let's Encrypt. Aucun réseau de diffusion de contenu (CDN) ni aucun service tiers n'intervient dans l'affichage des pages.</span><span data-l="en">The site is hosted by the publisher, on a server located in Belgium. The DNS servers of the cuvelier.tech domain are provided by OVHcloud. The HTTPS certificate is issued by Let's Encrypt. No content delivery network (CDN) and no third-party service takes part in displaying the pages.</span><span data-l="nl">De site wordt door de uitgever zelf gehost, op een server in België. De DNS-servers van het domein cuvelier.tech worden geleverd door OVHcloud. Het HTTPS-certificaat wordt uitgegeven door Let's Encrypt. Geen content delivery network (CDN) en geen dienst van derden komt tussen bij het tonen van de pagina's.</span><span data-l="de">Die Website wird vom Herausgeber selbst auf einem Server in Belgien gehostet. Die DNS-Server der Domain cuvelier.tech stellt OVHcloud bereit. Das HTTPS-Zertifikat stellt Let's Encrypt aus. Kein Content Delivery Network (CDN) und kein Drittanbieter ist an der Anzeige der Seiten beteiligt.</span></p>
   </section>
 
   <section class="sec" id="source" aria-labelledby="h-source">
-    <h2 id="h-source"><span class="num">4</span><span data-l="fr">Contenu et code source</span><span data-l="en">Content and source code</span><span data-l="nl">Inhoud en broncode</span><span data-l="de">Inhalt und Quellcode</span></h2>
+    <h2 id="h-source"><span class="num">5</span><span data-l="fr">Rédaction, contenu et code source</span><span data-l="en">Writing, content and source code</span><span data-l="nl">Redactie, inhoud en broncode</span><span data-l="de">Redaktion, Inhalt und Quellcode</span></h2>
+<p><span data-l="fr">Les textes sont rédigés avec l'aide d'outils d'IA, puis relus et vérifiés par l'auteur sur les sources citées. L'auteur en assume la responsabilité éditoriale.</span><span data-l="en">The texts are written with the help of AI tools, then reviewed and checked by the author against the cited sources. The author holds editorial responsibility for them.</span><span data-l="nl">De teksten worden geschreven met hulp van AI-tools en daarna door de auteur nagelezen en getoetst aan de vermelde bronnen. De auteur draagt er de redactionele verantwoordelijkheid voor.</span><span data-l="de">Die Texte werden mit Hilfe von KI-Werkzeugen verfasst und anschließend vom Autor anhand der angegebenen Quellen geprüft. Der Autor trägt dafür die redaktionelle Verantwortung.</span></p>
 <p><span data-l="fr">Le contenu est publié sous licence <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.fr">CC BY-NC-SA 4.0</a> et le code sous licence MIT. Les deux sont consultables dans un <a href="https://github.com/jeanmichel4121/network-protocols-expert">miroir public en lecture seule sur GitHub</a>. Ce que vous pouvez en faire est précisé dans les <a href="../terms/index.html">conditions d&#x27;utilisation</a>.</span><span data-l="en">The content is published under the <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.en">CC BY-NC-SA 4.0</a> licence and the code under the MIT licence. Both can be read in a <a href="https://github.com/jeanmichel4121/network-protocols-expert">public read-only mirror on GitHub</a>. What you may do with them is set out in the <a href="../terms/index.html">terms of use</a>.</span><span data-l="nl">De inhoud wordt gepubliceerd onder de licentie <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.nl">CC BY-NC-SA 4.0</a> en de code onder de MIT-licentie. Beide staan in een <a href="https://github.com/jeanmichel4121/network-protocols-expert">openbare, alleen-lezen mirror op GitHub</a>. Wat u ermee mag doen, staat in de <a href="../terms/index.html">gebruiksvoorwaarden</a>.</span><span data-l="de">Der Inhalt steht unter der Lizenz <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.de">CC BY-NC-SA 4.0</a>, der Code unter der MIT-Lizenz. Beide sind in einem <a href="https://github.com/jeanmichel4121/network-protocols-expert">öffentlichen, schreibgeschützten Spiegel auf GitHub</a> einsehbar. Was Sie damit tun dürfen, regeln die <a href="../terms/index.html">Nutzungsbedingungen</a>.</span></p>
   </section>
 
   <section class="sec" id="trademarks" aria-labelledby="h-trademarks">
-    <h2 id="h-trademarks"><span class="num">5</span><span data-l="fr">Marques</span><span data-l="en">Trademarks</span><span data-l="nl">Merken</span><span data-l="de">Marken</span></h2>
+    <h2 id="h-trademarks"><span class="num">6</span><span data-l="fr">Marques</span><span data-l="en">Trademarks</span><span data-l="nl">Merken</span><span data-l="de">Marken</span></h2>
 <p><span data-l="fr">Cisco, IOS, NX-OS, Check Point, Gaia, F5, BIG-IP, Palo Alto Networks, PAN-OS, NetScaler, Fortinet, FortiGate, FortiOS et Wireshark sont des marques de leurs propriétaires respectifs. Elles ne sont citées que pour désigner les produits décrits. Ce site n'est ni affilié à ces entreprises, ni approuvé, ni financé par elles.</span><span data-l="en">Cisco, IOS, NX-OS, Check Point, Gaia, F5, BIG-IP, Palo Alto Networks, PAN-OS, NetScaler, Fortinet, FortiGate, FortiOS and Wireshark are trademarks of their respective owners. They are named only to identify the products described. This site is not affiliated with, endorsed by or funded by these companies.</span><span data-l="nl">Cisco, IOS, NX-OS, Check Point, Gaia, F5, BIG-IP, Palo Alto Networks, PAN-OS, NetScaler, Fortinet, FortiGate, FortiOS en Wireshark zijn merken van hun respectieve eigenaars. Ze worden alleen genoemd om de beschreven producten aan te duiden. Deze site is niet verbonden met deze bedrijven en wordt niet door hen goedgekeurd of gefinancierd.</span><span data-l="de">Cisco, IOS, NX-OS, Check Point, Gaia, F5, BIG-IP, Palo Alto Networks, PAN-OS, NetScaler, Fortinet, FortiGate, FortiOS und Wireshark sind Marken ihrer jeweiligen Inhaber. Sie werden nur genannt, um die beschriebenen Produkte zu bezeichnen. Diese Website ist mit diesen Unternehmen nicht verbunden und wird von ihnen weder empfohlen noch finanziert.</span></p>
 <p><span data-l="fr">Les icônes de topologie réseau de la page d'accueil sont des icônes officielles de Cisco, utilisées sans modification selon les conditions de Cisco.</span><span data-l="en">The network topology icons of the home page are official Cisco icons, used unaltered under Cisco's terms.</span><span data-l="nl">De netwerktopologie-iconen van de startpagina zijn officiële iconen van Cisco, ongewijzigd gebruikt volgens de voorwaarden van Cisco.</span><span data-l="de">Die Netzwerktopologie-Symbole der Startseite sind offizielle Symbole von Cisco, unverändert nach den Bedingungen von Cisco verwendet.</span></p>
   </section>
@@ -1359,10 +1406,11 @@ window.NPE = (function () {
     <summary id="toc-h"><span data-l="fr">Sur cette page</span><span data-l="en">On this page</span><span data-l="nl">Op deze pagina</span><span data-l="de">Auf dieser Seite</span></summary>
     <ol>
       <li><a href="#publisher"><span class="n">1</span><span data-l="fr">Éditeur</span><span data-l="en">Publisher</span><span data-l="nl">Uitgever</span><span data-l="de">Herausgeber</span></a></li>
-      <li><a href="#contact"><span class="n">2</span><span data-l="fr">Contact</span><span data-l="en">Contact</span><span data-l="nl">Contact</span><span data-l="de">Kontakt</span></a></li>
-      <li><a href="#hosting"><span class="n">3</span><span data-l="fr">Hébergement</span><span data-l="en">Hosting</span><span data-l="nl">Hosting</span><span data-l="de">Hosting</span></a></li>
-      <li><a href="#source"><span class="n">4</span><span data-l="fr">Contenu et code source</span><span data-l="en">Content and source code</span><span data-l="nl">Inhoud en broncode</span><span data-l="de">Inhalt und Quellcode</span></a></li>
-      <li><a href="#trademarks"><span class="n">5</span><span data-l="fr">Marques</span><span data-l="en">Trademarks</span><span data-l="nl">Merken</span><span data-l="de">Marken</span></a></li>
+      <li><a href="#independence"><span class="n">2</span><span data-l="fr">Indépendance</span><span data-l="en">Independence</span><span data-l="nl">Onafhankelijkheid</span><span data-l="de">Unabhängigkeit</span></a></li>
+      <li><a href="#contact"><span class="n">3</span><span data-l="fr">Contact</span><span data-l="en">Contact</span><span data-l="nl">Contact</span><span data-l="de">Kontakt</span></a></li>
+      <li><a href="#hosting"><span class="n">4</span><span data-l="fr">Hébergement</span><span data-l="en">Hosting</span><span data-l="nl">Hosting</span><span data-l="de">Hosting</span></a></li>
+      <li><a href="#source"><span class="n">5</span><span data-l="fr">Rédaction, contenu et code source</span><span data-l="en">Writing, content and source code</span><span data-l="nl">Redactie, inhoud en broncode</span><span data-l="de">Redaktion, Inhalt und Quellcode</span></a></li>
+      <li><a href="#trademarks"><span class="n">6</span><span data-l="fr">Marques</span><span data-l="en">Trademarks</span><span data-l="nl">Merken</span><span data-l="de">Marken</span></a></li>
     </ol>
   </details>
   <script>if (matchMedia("(min-width: 64rem)").matches) document.getElementById("toc").open = true;</script>
@@ -1377,8 +1425,9 @@ window.NPE = (function () {
         <span>Network Protocols Expert</span>
       </a>
       <p><span data-l="fr">Fondé sur les RFC et la documentation officielle des vendeurs.</span><span data-l="en">Based on the RFCs and official vendor documentation.</span><span data-l="nl">Gebaseerd op de RFC's en officiële documentatie van de vendors.</span><span data-l="de">Basierend auf den RFCs und der offiziellen Herstellerdokumentation.</span></p>
-      <p class="f-note"><span data-l="fr">Fonctionne hors ligne. Ni cookie, ni traceur, ni adresse IP conservée.</span><span data-l="en">Works offline. No cookie, no tracker, no IP address kept.</span><span data-l="nl">Werkt offline. Geen cookies, geen trackers, geen IP-adres bewaard.</span><span data-l="de">Funktioniert offline. Keine Cookies, keine Tracker, keine gespeicherte IP-Adresse.</span></p>
+      <p class="f-note"><span data-l="fr">Fonctionne hors ligne. Ni cookie, ni traceur, ni adresse IP conservée. Sans publicité ni sponsor.</span><span data-l="en">Works offline. No cookie, no tracker, no IP address kept. No advertising, no sponsor.</span><span data-l="nl">Werkt offline. Geen cookies, geen trackers, geen IP-adres bewaard. Zonder reclame of sponsor.</span><span data-l="de">Funktioniert offline. Keine Cookies, keine Tracker, keine gespeicherte IP-Adresse. Ohne Werbung und ohne Sponsor.</span></p>
       <label class="remember"><input type="checkbox" data-remember> <span data-l="fr">Mémoriser mes choix et ma progression sur cet appareil</span><span data-l="en">Remember my choices and progress on this device</span><span data-l="nl">Mijn keuzes en voortgang op dit toestel onthouden</span><span data-l="de">Meine Auswahl und meinen Fortschritt auf diesem Gerät speichern</span></label>
+      <p class="f-note remember-note"><span data-l="fr">Accord valable six mois. Décocher la case efface tout.</span><span data-l="en">Consent lasts six months. Unticking the box deletes everything.</span><span data-l="nl">Toestemming geldt zes maanden. Het vakje uitvinken wist alles.</span><span data-l="de">Die Einwilligung gilt sechs Monate. Kreuz entfernen löscht alles.</span> <a href="../privacy/index.html#device"><span data-l="fr">Détails</span><span data-l="en">Details</span><span data-l="nl">Details</span><span data-l="de">Details</span></a></p>
     </div>
     <nav data-aria="footnav" aria-label="Footer">
       <h2><span data-l="fr">Bibliothèque</span><span data-l="en">Library</span><span data-l="nl">Bibliotheek</span><span data-l="de">Bibliothek</span></h2>

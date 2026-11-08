@@ -166,7 +166,7 @@ The site also publishes [`/.well-known/security.txt`](https://learning.cuvelier.
 No cookie, no tracker, no analytics, no third-party resource, and no visitor IP address kept
 (the server setup is in the homelab stack `learning`). Language, theme and the chapter menu
 stay in the browser tab; reading progress is kept on the device only when the reader ticks
-"remember on this device". Details: the [privacy page](https://learning.cuvelier.tech/en/privacy/)
+"remember on this device", for six months at most. Details: the [privacy page](https://learning.cuvelier.tech/en/privacy/)
 and [ADR 0011](docs/adr/0011-privacy-by-design-and-tdm-reservation.md). Legal notice, terms of
 use and accessibility statement are published next to it.
 

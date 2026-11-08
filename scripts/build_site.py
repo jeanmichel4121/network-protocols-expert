@@ -44,15 +44,32 @@ BRAND = "Network Protocols Expert"
 AUTHOR = "Jean-Michel Cuvelier"
 LICENSE_URL = "https://creativecommons.org/licenses/by-nc-sa/4.0/"
 # Training crawlers asked not to collect the site (terms of use, section "Text and data
-# mining"). Each token is the one its operator documents for AI training; search engines
-# (Googlebot, Bingbot, Applebot...) and user-requested fetches are not concerned.
+# mining"): tokens of crawlers that collect for AI training or training datasets, as their
+# operators document them. Search engines (Googlebot, Bingbot, Applebot...) and fetches a
+# person asks for are not concerned. __usage_ai-training is the shared AI training preference
+# token (IETF individual draft draft-kelley-aipref-training-preference-signal), which the *
+# group does not cover.
 AI_TRAINING_BOTS = (
+    "__usage_ai-training",
     "GPTBot",
     "ClaudeBot",
     "Google-Extended",
     "Applebot-Extended",
     "CCBot",
     "Meta-ExternalAgent",
+    "Bytespider",
+    "cohere-training-data-crawler",
+    "AI2Bot",
+    "Ai2Bot-Dolma",
+    "PanguBot",
+    "Webzio-Extended",
+)
+# Consent to keep data on this device (privacy page, ADR 0011) lasts six months, 183 days;
+# "1" is the undated consent of v0.7.0, which the page library dates on the next page view.
+CONSENT_MS = 183 * 86_400_000
+KEPT = (
+    f'(function (c) {{ return c === "1" || Date.now() - c < {CONSENT_MS}; }})'
+    '(localStorage.getItem("npe-remember"))'
 )
 META_RE = re.compile(r'<script type="application/json" id="page-meta">\s*(.*?)\s*</script>', re.S)
 
@@ -159,7 +176,9 @@ def robots() -> str:
     return (
         "# Search engines are welcome. AI training crawlers are not: see the terms of use,\n"
         f"# {SITE}/en/terms/ (text and data mining reservation, also in /.well-known/tdmrep.json).\n"
-        f"{blocked}User-agent: *\nAllow: /\n\nSitemap: {SITE}/sitemap.xml\n"
+        f"{blocked}User-agent: *\nAllow: /\n"
+        "# AI usage preference of the IETF aipref working group (draft-ietf-aipref-attach).\n"
+        f"Content-Usage: train-ai=n\n\nSitemap: {SITE}/sitemap.xml\n"
     )
 
 
@@ -175,6 +194,7 @@ def security_txt() -> str:
     repo = "https://github.com/jeanmichel4121/network-protocols-expert"
     return (
         f"Contact: {repo}/security/advisories/new\n"
+        "Contact: mailto:jm@cuvelier.tech\n"
         f"Expires: {expires.isoformat().replace('+00:00', 'Z')}\n"
         "Preferred-Languages: fr, en, nl, de\n"
         f"Canonical: {SITE}/.well-known/security.txt\n"
@@ -283,7 +303,7 @@ PIN_SCRIPT = """(function () {
   var pin = document.getElementById("toc-pin"), off = false;
   if (matchMedia("(min-width: 64rem)").matches) document.getElementById("toc").open = true;
   function box() {
-    try { return localStorage.getItem("npe-remember") === "1" ? localStorage : sessionStorage; }
+    try { return __KEPT__ ? localStorage : sessionStorage; }
     catch (e) { return null; }
   }
   try { off = box().getItem("npe-nav") === "off"; } catch (e) {}
@@ -299,7 +319,7 @@ PIN_SCRIPT = """(function () {
     try { box().setItem("npe-nav", off ? "off" : "on"); } catch (e) {}
   });
   nav.addEventListener("mouseleave", function () { root.classList.remove("nav-quiet"); });
-})();"""
+})();""".replace("__KEPT__", KEPT)
 SEP = {"fr": " : ", "en": ": ", "nl": ": ", "de": ": "}
 # What each chapter holds: the card text on the overview and the description of the chapter URL.
 CHAPTER_DESC = {
@@ -636,7 +656,7 @@ def seen_marks(slug: str, here: str, name: str, labels: dict) -> str:
         "<script>(function () {\n"
         "  try {\n"
         f'    var key = "npe-seen:{slug}", here = "{here}", store = localStorage;\n'
-        '    if (store.getItem("npe-remember") !== "1") return;\n'
+        f"    if (!{KEPT}) return;\n"
         '    var seen = JSON.parse(store.getItem(key) || "[]");\n'
         "    if (here) {\n"
         "      if (seen.indexOf(here) < 0) { seen.push(here); store.setItem(key, JSON.stringify(seen)); }\n"
@@ -666,7 +686,7 @@ def resume_link() -> str:
         f'<p class="resume" id="resume" hidden>{spans(WORDS["resume"])} <a></a></p>\n'
         "<script>(function () {\n"
         "  try {\n"
-        '    if (localStorage.getItem("npe-remember") !== "1") return;\n'
+        f"    if (!{KEPT}) return;\n"
         '    var last = JSON.parse(localStorage.getItem("npe-last") || "null");\n'
         '    var box = document.getElementById("resume");\n'
         "    if (!last || !/^[a-z0-9-]+$/.test(last.slug) || !/^[a-z0-9-]+$/.test(last.ch)) return;\n"
@@ -816,6 +836,41 @@ def shared_blocks(home: str) -> dict:
     }
 
 
+# The information pages, as the footer of every other page names them.
+INFO_PAGES = {
+    "legal": dict(
+        zip(LANGS, ("Mentions légales", "Legal notice", "Wettelijke vermeldingen", "Impressum"), strict=True)
+    ),
+    "terms": dict(
+        zip(
+            LANGS,
+            ("Conditions d'utilisation", "Terms of use", "Gebruiksvoorwaarden", "Nutzungsbedingungen"),
+            strict=True,
+        )
+    ),
+    "privacy": dict(zip(LANGS, ("Vie privée", "Privacy", "Privacy", "Datenschutz"), strict=True)),
+    "accessibility": dict(
+        zip(LANGS, ("Accessibilité", "Accessibility", "Toegankelijkheid", "Barrierefreiheit"), strict=True)
+    ),
+}
+INFO_CSS = """.legal { list-style: none; display: flex; flex-wrap: wrap; justify-content: center;
+  gap: 0.25rem 1.25rem; padding: 0; margin: 0; font-size: 0.875rem; }
+.legal a { display: inline-block; min-height: 24px; padding: 0.15rem 0; color: var(--muted); }"""
+
+
+def info_links(langs: tuple) -> str:
+    """The pages without the site footer (root chooser, 404) still link the information pages."""
+    lists = []
+    for lang in langs:
+        attr = f' data-l="{lang}"' if len(langs) > 1 else ""
+        items = "".join(
+            f'<li><a href="/{lang}/{slug}/" hreflang="{lang}">{html.escape(names[lang])}</a></li>'
+            for slug, names in INFO_PAGES.items()
+        )
+        lists.append(f'<ul class="legal"{attr}>{items}</ul>')
+    return f'<nav aria-label="Legal">{"".join(lists)}</nav>'
+
+
 def chooser(blocks: dict) -> str:
     """Root page (x-default): sends a returning visitor to their language, else lists the four."""
     links = "\n".join(
@@ -841,7 +896,7 @@ def chooser(blocks: dict) -> str:
 (function () {{
   var l = null;
   try {{
-    var keep = localStorage.getItem("npe-remember") === "1";
+    var keep = {KEPT};
     l = (keep ? localStorage : sessionStorage).getItem("lang");
   }} catch (e) {{}}
   if (!l) l = (navigator.language || "en").slice(0, 2).toLowerCase();
@@ -860,6 +915,9 @@ def chooser(blocks: dict) -> str:
   border-radius: var(--radius); background: var(--surface); text-decoration: none; color: var(--fg); }}
 .choose a:hover {{ border-color: var(--accent); }}
 .choose a span {{ color: var(--muted); font: 600 0.8125rem var(--mono); }}
+.choose .legal a {{ display: inline-block; padding: 0.15rem 0; border: 0; background: none;
+  color: var(--muted); }}
+{INFO_CSS}
 </style>
 </head>
 <body>
@@ -868,6 +926,7 @@ def chooser(blocks: dict) -> str:
   <ul>
 {links}
   </ul>
+  {info_links(("en",))}
 </main>
 </body>
 </html>
@@ -909,6 +968,7 @@ def not_found(blocks: dict) -> str:
 .nf {{ min-height: 100dvh; display: grid; place-content: center; gap: 1rem;
   padding: 2rem 1rem; text-align: center; }}
 .nf .code {{ font: 700 clamp(4rem, 12vw, 7rem)/1 var(--mono); color: var(--accent); }}
+{INFO_CSS}
 </style>
 </head>
 <body>
@@ -916,6 +976,7 @@ def not_found(blocks: dict) -> str:
   <p class="code" aria-hidden="true">404</p>
   <h1>{L("Page introuvable", "Page not found", "Pagina niet gevonden", "Seite nicht gefunden")}</h1>
   <p><a href="/">{back}</a></p>
+  {info_links(LANGS)}
 </main>
 </body>
 </html>

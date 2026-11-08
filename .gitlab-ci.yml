@@ -130,6 +130,7 @@ test:pages-static:
   needs: []
   script:
     - python3 scripts/check_pages.py
+    - python3 tools/info-pages.py --check
 
 # ---------------------------------------------------------------- security
 security:secrets:

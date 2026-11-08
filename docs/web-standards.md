@@ -171,9 +171,11 @@ explanations shown, source URLs printed after each source.
 ## 11. Privacy, licence and rights
 
 - Legal pages in `pages/<slug>/index.html` (legal notice, terms of use, privacy,
-  accessibility), built from the template and published at `/<lang>/<slug>/`; every page
-  links them from the footer. They state facts that live elsewhere: keep them true in the
-  same change (ADR 0010, ADR 0011).
+  accessibility), written by `tools/info-pages.py` from the template (CI checks they match)
+  and published at `/<lang>/<slug>/`; every page links them from the footer. Each one shows
+  its date and version number and links its history, as the Belgian Data Protection
+  Authority asks for a cookie policy [R6]. They state facts that live elsewhere: keep them
+  true in the same change (ADR 0010, ADR 0011).
 - No cookie, no tracker, no third-party resource (CSP `default-src 'self'`,
   `connect-src 'none'`) [R1]. No visitor IP is written: Traefik writes no access log for the
   `learning` router and nginx logs without the client address (homelab stack `learning`,
@@ -181,14 +183,20 @@ explanations shown, source URLs printed after each source.
 - Browser storage [R2]: a choice (language, theme, chapter menu) stays in the tab
   (`sessionStorage`), which the ePrivacy rule allows for an interface preference kept for
   the session; reading progress and longer storage need consent, the "remember on this
-  device" switch (`npe-remember`, unticked by default). Unticking or "delete" removes every
-  key of the site.
+  device" switch (`npe-remember`, unticked by default, holds the time of the consent).
+  Consent lasts six months, the period the Belgian Data Protection Authority deems
+  reasonable [R6]; after that the next page view deletes what it kept. Unticking or "delete"
+  removes every key of the site. The Belgian rule is art. 10/2 of the Act of 30 July 2018,
+  which took over art. 129 of the electronic communications Act.
 - Content under CC BY-NC-SA 4.0 [R3]; commercial use on written permission. Text and data
   mining is reserved under Directive (EU) 2019/790 art. 4(3) and the Belgian Code of economic
   law art. XI.190, 20° [R4], in machine-readable form: `<meta name="tdm-reservation"
   content="1">` on every page and `/.well-known/tdmrep.json` (TDMRep [R5]), plus
-  `robots.txt` rules for the documented AI training crawlers (GPTBot, ClaudeBot,
-  Google-Extended, Applebot-Extended, CCBot, Meta-ExternalAgent).
+  `robots.txt` rules for the AI training crawlers (GPTBot, ClaudeBot, Google-Extended,
+  Applebot-Extended, CCBot, Meta-ExternalAgent, Bytespider, cohere-training-data-crawler,
+  AI2Bot, Ai2Bot-Dolma, PanguBot, Webzio-Extended), the shared `__usage_ai-training` token
+  (IETF individual draft, backed by Google, Microsoft, OpenAI and Anthropic) and
+  `Content-Usage: train-ai=n` (IETF aipref working group draft) [R7].
 
 ## Sources
 
@@ -216,3 +224,5 @@ explanations shown, source URLs printed after each source.
 - [R3] Creative Commons BY-NC-SA 4.0 legal code. https://creativecommons.org/licenses/by-nc-sa/4.0/legalcode.en
 - [R4] Directive (EU) 2019/790 art. 4(3) and recital 18; Belgian law of 19 June 2022, art. 13 (Code of economic law art. XI.190, 20°); Regulation (EU) 2024/1689 art. 53(1)(c). https://eur-lex.europa.eu/eli/dir/2019/790/oj
 - [R5] W3C TDM Reservation Protocol (TDMRep), community group final report, 2024-05-10. https://www.w3.org/community/reports/tdmrep/CG-FINAL-tdmrep-20240510/
+- [R6] Belgian Data Protection Authority: Check-list cookies (consent preferences kept six months, policy dated and versioned; art. 10/2 of the Act of 30 July 2018 covers local storage). https://www.autoriteprotectiondonnees.be/publications/checklist-cookies.pdf
+- [R7] IETF: draft-kelley-aipref-training-preference-signal-00 (2026-10-30) and draft-ietf-aipref-attach-05 (2026-08-18). https://datatracker.ietf.org/doc/draft-kelley-aipref-training-preference-signal/ and https://datatracker.ietf.org/doc/draft-ietf-aipref-attach/
