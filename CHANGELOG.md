@@ -11,6 +11,8 @@ Versioning rules for this library:
 
 ## [Unreleased]
 
+## [0.8.0] - 2026-11-08
+
 ### Added
 - Legal notice: independence (no commercial involvement of any third party: no sponsor,
   advertising, affiliate link, paid content or partnership), and the texts written with AI
@@ -346,7 +348,8 @@ tooling, the CI pipeline and the public site.
   as Cisco's terms require), laid out left to right under the headline; CI checks the embedded
   scene matches the generator.
 
-[Unreleased]: https://github.com/jeanmichel4121/network-protocols-expert/compare/v0.7.0...main
+[Unreleased]: https://github.com/jeanmichel4121/network-protocols-expert/compare/v0.8.0...main
+[0.8.0]: https://github.com/jeanmichel4121/network-protocols-expert/compare/v0.7.0...v0.8.0
 [0.7.0]: https://github.com/jeanmichel4121/network-protocols-expert/compare/v0.6.0...v0.7.0
 [0.6.0]: https://github.com/jeanmichel4121/network-protocols-expert/compare/v0.5.0...v0.6.0
 [0.5.0]: https://github.com/jeanmichel4121/network-protocols-expert/compare/v0.4.0...v0.5.0
