@@ -11,6 +11,8 @@ Versioning rules for this library:
 
 ## [Unreleased]
 
+## [0.9.0] - 2026-11-12
+
 ### Added
 - Template: layers view of a frame (`data-view="layers"`: bit diagram coloured by OSI layer,
   layer strip, detail panel), flowchart (`ol.flow`), documented sample outputs
@@ -370,7 +372,8 @@ tooling, the CI pipeline and the public site.
   as Cisco's terms require), laid out left to right under the headline; CI checks the embedded
   scene matches the generator.
 
-[Unreleased]: https://github.com/jeanmichel4121/network-protocols-expert/compare/v0.8.0...main
+[Unreleased]: https://github.com/jeanmichel4121/network-protocols-expert/compare/v0.9.0...main
+[0.9.0]: https://github.com/jeanmichel4121/network-protocols-expert/compare/v0.8.0...v0.9.0
 [0.8.0]: https://github.com/jeanmichel4121/network-protocols-expert/compare/v0.7.0...v0.8.0
 [0.7.0]: https://github.com/jeanmichel4121/network-protocols-expert/compare/v0.6.0...v0.7.0
 [0.6.0]: https://github.com/jeanmichel4121/network-protocols-expert/compare/v0.5.0...v0.6.0
