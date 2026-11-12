@@ -11,6 +11,28 @@ Versioning rules for this library:
 
 ## [Unreleased]
 
+### Added
+- Template: layers view of a frame (`data-view="layers"`: bit diagram coloured by OSI layer,
+  layer strip, detail panel), flowchart (`ol.flow`), documented sample outputs
+  (`details.outs`) and an icon sprite for page diagrams (`tools/page-icons.py`, checked in
+  CI); Cisco icons `pc` and `workgroup-switch` (ADR 0012).
+- OSI and TCP/IP: an HTTP request frame (`osi-http`) with its payload read layer by layer,
+  the DNS payload detailed, a switch in the encapsulation animation, an end-to-end HTTP
+  journey (client, switch, two routers, firewall, load balancer, server) showing what each
+  device reads and rewrites, expected outputs under the verification commands of the six
+  vendors, a layer 1 to 7 troubleshooting flowchart.
+
+### Changed
+- OSI and TCP/IP: the frames of chapter 2 keep the layers view only; the Wireshark tree, hex
+  dump, guided tour and field list are read on the Ethernet and IPv4 pages. The "next layer"
+  field, the DNS journey and "what changes at each hop" are redrawn with topology icons and
+  a table tied to the diagram. The fault table marks its key words. The quiz is rewritten
+  (17 questions). Sources renumbered (103).
+
+### Removed
+- OSI and TCP/IP: cross-layer protocols, tunnels, MTU and MSS, and layer interactions leave
+  the "Advanced behaviour" chapter; each gets its own article later.
+
 ## [0.8.0] - 2026-11-08
 
 ### Added

@@ -70,6 +70,8 @@ fill `#page-meta`, replace every `TEMPLATE` block, add the packet samples to
 Preview the published layout with `python3 scripts/build_site.py public`.
 Changed the template's styles, page library, header or footer? Run `python3 tools/sync-shared.py`.
 Changed the home-page drawing? Edit `tools/landing-topology.py`, then run it with `--update index.html`.
+A diagram needs device icons? List them in the page's `<!--ICONS:...-->` marker, then run
+`python3 tools/page-icons.py --update protocols/<slug>/index.html`.
 
 ## Local checks (same as CI)
 

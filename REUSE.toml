@@ -21,9 +21,10 @@ precedence = "override"
 SPDX-FileCopyrightText = "2026 Jean-Michel Cuvelier"
 SPDX-License-Identifier = "CC-BY-NC-SA-4.0"
 
-# The home page and its screenshots embed the unaltered Cisco icons.
+# The home page, its screenshots and the pages whose diagrams use them embed the unaltered
+# Cisco icons.
 [[annotations]]
-path = ["index.html", "docs/assets/**"]
+path = ["index.html", "docs/assets/**", "protocols/osi-tcpip-model/index.html"]
 precedence = "override"
 SPDX-FileCopyrightText = ["2026 Jean-Michel Cuvelier", "Cisco Systems, Inc."]
 SPDX-License-Identifier = "CC-BY-NC-SA-4.0 AND LicenseRef-Cisco-Network-Topology-Icons"

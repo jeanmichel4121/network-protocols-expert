@@ -11,6 +11,7 @@
 - Sample packets: every data-packet JSON block, packet chips line and packet tab list equals
   tools/packet-builder.py output (written in the markup, so the first paint does not shift).
 - Landing topology: the embedded scene equals tools/landing-topology.py output (icons unaltered).
+- Page icons: the icon sprite of a page equals tools/page-icons.py output (icons unaltered).
 - Published protocol pages contain no TEMPLATE placeholder.
 - Information pages (pages/: legal notice, terms, privacy, accessibility) get the same checks.
 Exit code 1 if any page fails.
@@ -65,6 +66,20 @@ def check_topology(text: str, path: pathlib.Path) -> list:
     if topo not in text or flows not in text:
         return [
             f"topology differs from tools/landing-topology.py (run it with --update {path.relative_to(ROOT)})"
+        ]
+    return []
+
+
+def check_icons(text: str, path: pathlib.Path) -> list:
+    """The icon sprite of a page must be exactly what tools/page-icons.py writes (icons unaltered)."""
+    if "<!--ICONS:" not in text:
+        return []
+    spec = importlib.util.spec_from_file_location("page_icons", ROOT / "tools" / "page-icons.py")
+    mod = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+    if mod.rewrite(text) != text:
+        return [
+            f"icon sprite differs from tools/page-icons.py (run it with --update {path.relative_to(ROOT)})"
         ]
     return []
 
@@ -164,6 +179,7 @@ def check(path: pathlib.Path, tpl: str, pb) -> list:
     errs = [msg for rx, msg in EXTERNAL if rx.search(text)]
     errs += check_languages(text) + check_meta(text) + check_figures(text) + check_packets(text, path, pb)
     errs += check_topology(text, path)
+    errs += check_icons(text, path)
     if path != TEMPLATE:
         errs += check_shared(text, tpl)
     if path.parent.parent == ROOT / "protocols" and ("data-tpl" in text or "⟨" in text):

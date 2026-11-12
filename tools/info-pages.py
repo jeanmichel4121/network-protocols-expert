@@ -239,10 +239,10 @@ LEGAL = {
                 "Cisco, IOS, NX-OS, Check Point, Gaia, F5, BIG-IP, Palo Alto Networks, PAN-OS, NetScaler, Fortinet, FortiGate, FortiOS und Wireshark sind Marken ihrer jeweiligen Inhaber. Sie werden nur genannt, um die beschriebenen Produkte zu bezeichnen. Diese Website ist mit diesen Unternehmen nicht verbunden und wird von ihnen weder empfohlen noch finanziert.",
             )
             + P(
-                "Les icônes de topologie réseau de la page d'accueil sont des icônes officielles de Cisco, utilisées sans modification selon les conditions de Cisco.",
-                "The network topology icons of the home page are official Cisco icons, used unaltered under Cisco's terms.",
-                "De netwerktopologie-iconen van de startpagina zijn officiële iconen van Cisco, ongewijzigd gebruikt volgens de voorwaarden van Cisco.",
-                "Die Netzwerktopologie-Symbole der Startseite sind offizielle Symbole von Cisco, unverändert nach den Bedingungen von Cisco verwendet.",
+                "Les icônes de topologie réseau de la page d'accueil et des schémas sont des icônes officielles de Cisco, utilisées sans modification selon les conditions de Cisco.",
+                "The network topology icons of the home page and of the diagrams are official Cisco icons, used unaltered under Cisco's terms.",
+                "De netwerktopologie-iconen van de startpagina en van de schema's zijn officiële iconen van Cisco, ongewijzigd gebruikt volgens de voorwaarden van Cisco.",
+                "Die Netzwerktopologie-Symbole der Startseite und der Diagramme sind offizielle Symbole von Cisco, unverändert nach den Bedingungen von Cisco verwendet.",
             ),
         ),
     ],

@@ -39,6 +39,7 @@ Fortinet NSE 8, F5 Certified Solution Expert, NetScaler Expert; see README.md).
 │   ├── packet-builder.py           # builds sample packets, computes checksums/lengths
 │   ├── sync-shared.py              # copies the template's shared blocks into every page
 │   ├── landing-topology.py         # draws the home-page topology
+│   ├── page-icons.py               # embeds the topology icons a page's diagrams use
 │   ├── info-pages.py               # writes pages/ (4 languages) from the template
 │   └── icons/cisco/                # unaltered Cisco topology icons (own terms)
 ├── scripts/                        # build_site, check_pages, check_site, smoke_test,
@@ -175,7 +176,8 @@ page from `templates/protocol-template.html`; its shared blocks are copied verba
 5. **Advanced behaviour (expert)**: edge cases, interoperability issues, scaling limits,
    security (attacks and protections), tuning, convergence, known RFC ambiguities.
 6. **Multi-vendor configuration and verification** (see "Vendor rules").
-7. **Troubleshooting**: yes/no decision tree ending in verification commands per vendor;
+7. **Troubleshooting**: yes/no decision tree or flowchart (`ol.flow`: yes goes down, no goes
+   to the side) ending in verification commands per vendor;
    table of common faults (symptom, cause, command, expected output, fix).
 8. **Quiz**: at least 15 CCIE-level questions (scenario-based, packet-reading,
    "what breaks if..."), each with explanation and the RFC/vendor reference.
@@ -190,6 +192,10 @@ Every message type of the protocol ALWAYS gets **both** views below, shown toget
 and synchronised: hovering or focusing a field in one view highlights it in the other
 and shows a detail panel (name, offset, size in bits/bytes, allowed values, role,
 RFC section). A packet is never shown with only one of the two.
+One exception (ADR 0012): a page that teaches the layers and owns no message type (today
+`osi-tcpip-model`) shows its frames in the **layers view** (`data-view="layers"`): the bit
+diagram coloured by OSI layer, the layer strip and the detail panel, without tree, hex dump
+or guided tour. It links to the page of each protocol, where the frame has both views.
 1. **RFC-style bit diagram** (mandatory): 32-bit rows, bit ruler 0-31, each field drawn
    at its true width; variable-length and optional fields clearly marked; TLV/sub-TLV
    structures drawn as nested diagrams.
@@ -223,7 +229,8 @@ Platforms covered on every page, in this order:
 6. FortiGate (FortiOS CLI)
 
 - For each vendor: configuration example, verification commands, debug commands
-  (with a warning on production impact), and sample expected output.
+  (with a warning on production impact), and sample expected output (`details.outs`: the
+  output as the vendor documentation prints it, how to read it, its source).
 - **Every command block cites the vendor documentation it comes from**: document title,
   software version, section, URL. No command without a source.
 - State the software version the commands were checked against (e.g. "PAN-OS 11.1",
@@ -260,6 +267,8 @@ Rules:
   explaining every colour, shape, line style, arrow and abbreviation.
 - Labels carry information (field names, values, states, timers), never generic labels.
 - Every arrow has a direction and states what flows (message type, encapsulation).
+- Network devices in topology diagrams use the Cisco topology icons, unaltered, embedded
+  with `python3 tools/page-icons.py --update <page>` (CI fails if the sprite differs).
 - Max about 5 to 7 main elements per diagram; split beyond that. Overview first,
   then details.
 - Consistent colour code across the whole library:

@@ -27,6 +27,7 @@ Standard library only.
 """
 
 import datetime
+import functools
 import html
 import json
 import os
@@ -240,16 +241,29 @@ def localise(text: str, meta: dict, lang: str, path: str, home_href: str) -> str
     body = re.sub(
         r'href="[^"#]*((?:#[^"]*)?)" data-home', lambda m: f'href="{home_href}{m.group(1)}" data-home', body
     )
+
     # A link to another protocol page (../<slug>/index.html in the source) goes to that page's
     # overview in the same language, whatever the depth of the page being built.
-    body = re.sub(
-        r'href="\.\./([a-z0-9-]+)/index\.html((?:#[^"]*)?)"',
-        lambda m: f'href="{home_href}{m.group(1)}/{m.group(2)}"',
-        body,
-    )
+    # A fragment that names a chapter of that page goes to the chapter's own URL (ADR 0009).
+    def other_page(m):
+        slug, frag = m.group(1), m.group(2)
+        if frag[1:] in chapter_ids(slug):
+            return f'href="{home_href}{slug}/{frag[1:]}/"'
+        return f'href="{home_href}{slug}/{frag}"'
+
+    body = re.sub(r'href="\.\./([a-z0-9-]+)/index\.html((?:#[^"]*)?)"', other_page, body)
     sha = os.environ.get("CI_COMMIT_SHA", "local")[:8]
     body = body.replace("<code data-version>local</code>", f"<code data-version>{esc(sha)}</code>")
     return pre + sep + head + sep2 + body
+
+
+@functools.cache
+def chapter_ids(slug: str) -> frozenset:
+    """Section ids of a protocol page: each one is published as a chapter."""
+    src = ROOT / "protocols" / slug / "index.html"
+    if not src.is_file():
+        return frozenset()
+    return frozenset(re.findall(r'<section class="sec" id="([^"]+)"', src.read_text(encoding="utf-8")))
 
 
 def card(meta: dict, slug: str) -> str:

@@ -70,7 +70,15 @@ Component patterns:
   title and the current step). `<title>`/`<desc>` alone are read inconsistently by screen
   readers [A1][A2]. Purely decorative icons get `aria-hidden="true"`.
 - **Packet views**: the Wireshark tree is the text alternative of the bit diagram; the
-  hex dump is supplementary (`aria-hidden`), its content is in the tree.
+  hex dump is supplementary (`aria-hidden`), its content is in the tree. In the layers view
+  (`data-view="layers"`, ADR 0012) there is no tree: the layer strip and the detail panel
+  carry the text, and every field of the diagram is a focusable control with its name.
+- **Flowchart** (`ol.flow`): an ordered list, so the reading order is the order of the
+  questions; "yes" and "no" are written on the edges, never shown by colour alone.
+- **Sample outputs** (`details.outs`): native `<details>`, open by default and always
+  expanded in print; each output names its command, its layer and its source.
+- **Topology icons**: one hidden sprite per page (`tools/page-icons.py`), placed with
+  `<use>` inside the diagram; every icon has a visible text label next to it.
 - **Quiz**: one `<fieldset>` + `<legend>` per question, native radios with `<label>`,
   feedback in a live region; never `aria-hidden` on feedback text [H1].
 - **Tabs**: WAI-ARIA tabs pattern; panels are rendered hidden in HTML (no layout shift)

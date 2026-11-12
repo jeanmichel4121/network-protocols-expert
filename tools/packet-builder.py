@@ -1661,7 +1661,17 @@ def dns_query(ident: int, name: str, qtype: int = 1) -> bytes:
 class LayerFrame(IPv4Frame):
     """A whole frame drawn from its first bit, one colour per layer of the stack."""
 
-    LAYER = {"eth": "encap", "ip": "header", "udp": "tlv", "tcp": "tlv", "dns": "body"}
+    LAYER = {"eth": "encap", "ip": "header", "udp": "tlv", "tcp": "tlv", "dns": "body", "http": "body"}
+    # Protocol name, OSI layer number, id of the field that names the next layer (drawn as the
+    # layer strip above the bit diagram).
+    STACK = {
+        "eth": ("Ethernet II", 2, "ethtype"),
+        "ip": ("IPv4", 3, "proto"),
+        "udp": ("UDP", 4, "dport"),
+        "tcp": ("TCP", 4, "tdport"),
+        "dns": ("DNS", 7, None),
+        "http": ("HTTP", 7, None),
+    }
 
     def udp_header(self, msg):
         sport, dport, length, csum = struct.unpack("!HHHH", msg[:8])
@@ -1704,7 +1714,8 @@ class LayerFrame(IPv4Frame):
         )
         return msg[8:]
 
-    def tcp(self, msg):
+    def tcp(self, msg, rel=(0, 0)):
+        """rel: the relative sequence and acknowledgment numbers Wireshark prints."""
         sport, dport, seq, ack, off_flags, window, csum, urg = struct.unpack("!HHIIHHHH", msg[:20])
         offset, flags = off_flags >> 12, off_flags & 0x0FFF
         t = "tcp"
@@ -1732,7 +1743,7 @@ class LayerFrame(IPv4Frame):
             "Sequence Number (raw)",
             TCP_REF,
             tree=t,
-            ws_pre=[{"label": "Sequence Number: 0    (relative sequence number)", "ws": "tcp.seq"}],
+            ws_pre=[{"label": f"Sequence Number: {rel[0]}    (relative sequence number)", "ws": "tcp.seq"}],
         )
         self.add(
             "tack",
@@ -1744,7 +1755,13 @@ class LayerFrame(IPv4Frame):
             "Acknowledgment number (raw)",
             TCP_REF,
             tree=t,
-            ws_pre=[{"label": "Acknowledgment Number: 0", "ws": "tcp.ack"}],
+            ws_pre=[
+                {
+                    "label": f"Acknowledgment Number: {rel[1]}"
+                    + ("    (relative ack number)" if rel[1] else ""),
+                    "ws": "tcp.ack",
+                }
+            ],
         )
         self.data += msg[12:14]
         self.bitfield(
@@ -1761,7 +1778,8 @@ class LayerFrame(IPv4Frame):
             ws_value=f"{offset * 4} bytes ({offset})",
         )
         names = [n for (_, n, _), k in zip(TCP_FLAGS, range(7, -1, -1), strict=True) if flags >> k & 1]
-        fl = self.group("tflags", f"Flags: 0x{flags:03x} ({', '.join(names)})", "tcp.flags")
+        # Wireshark lists the set flags from the low bit up: (PSH, ACK), (SYN, ACK).
+        fl = self.group("tflags", f"Flags: 0x{flags:03x} ({', '.join(reversed(names))})", "tcp.flags")
         self.bitfield(
             "tres",
             "Rsrvd",
@@ -1841,6 +1859,8 @@ class LayerFrame(IPv4Frame):
             TCP_REF,
             tree=t,
         )
+        if offset == 5:
+            return msg[20:]
         kind, length, mss = struct.unpack("!BBH", msg[20:24])
         ref = "RFC 9293 §3.7.1"
         go = self.group("topts", f"Options: ({offset * 4 - 20} bytes), Maximum segment size", "tcp.options")
@@ -1882,6 +1902,42 @@ class LayerFrame(IPv4Frame):
             tree=t,
             ws_group=gm,
         )
+        return msg[offset * 4 :]
+
+    def http(self, msg):
+        """An HTTP/1.1 request (RFC 9112 §2.1): request line, header lines, empty line. Each field
+        takes its separator (SP or CRLF) so the map tiles the message. osi: the OSI layer whose
+        role the line plays (5 session, 6 presentation, 7 application)."""
+        t = "http"
+        lines = msg.split(b"\r\n")
+        method, uri, version = lines[0].split(b" ")
+        g = self.group("hline", lines[0].decode("ascii") + "\\r\\n")
+        req = (
+            (
+                "hmethod",
+                "Request Method",
+                method + b" ",
+                "http.request.method",
+                "RFC 9112 §3.1, RFC 9110 §9.3.1",
+            ),
+            ("huri", "Request URI", uri + b" ", "http.request.uri", "RFC 9112 §3.2"),
+            ("hver", "Request Version", version + b"\r\n", "http.request.version", "RFC 9112 §2.3"),
+        )
+        for fid, name, raw, ws, ref in req:
+            self.add(
+                fid, name, "body", raw, raw.strip().decode("ascii"), ws, name, ref, tree=t, ws_group=g, osi=7
+            )
+        # header name: field id, Wireshark filter, OSI role, reference
+        known = {
+            "Host": ("hhost", "http.host", 7, "RFC 9110 §7.2"),
+            "Accept-Encoding": ("haccenc", "http.accept_encoding", 6, "RFC 9110 §12.5.3"),
+            "Connection": ("hconn", "http.connection", 5, "RFC 9110 §7.6.1, RFC 9112 §9.3"),
+        }
+        for line in lines[1:-2]:
+            name, value = (x.decode("ascii") for x in line.split(b": ", 1))
+            fid, ws, osi, ref = known[name]
+            self.add(fid, name, "body", line + b"\r\n", value, ws, name, ref, tree=t, osi=osi)
+        self.add("hend", "CRLF", "body", b"\r\n", "\\r\\n", "http", "\\r\\n", "RFC 9112 §2.1", tree=t, osi=7)
 
     def dns(self, msg):
         ident, flags, qd, an, ns, ar = struct.unpack("!HHHHHH", msg[:12])
@@ -1988,10 +2044,28 @@ class LayerFrame(IPv4Frame):
 
     def out(self, sid, message, encapsulation, layers):
         d = super().out(sid, message, encapsulation, layers)
-        for f in d["fields"]:
+        size = {}
+        for f, src in zip(d["fields"], self.fields, strict=True):
             f["layer"] = self.LAYER[f["tree"]]
+            size[f["tree"]] = size.get(f["tree"], 0) + f["bits"]
+            # OSI layer of the field: its protocol's layer, or its own (an HTTP header line that
+            # does the work of the session or presentation layer).
+            f["osi"] = src.get("osi", self.STACK[f["tree"]][1])
         d["protocol"] = "OSI and TCP/IP models"
         d["grid_from"] = 0
+        # One entry per protocol of the frame, in wire order: its size and the field that names
+        # the protocol above it. NPE.packet draws them as the layer strip.
+        d["stack"] = [
+            {
+                "key": k,
+                "name": self.STACK[k][0],
+                "osi": self.STACK[k][1],
+                "layer": self.LAYER[k],
+                "bytes": bits // 8,
+            }
+            | ({"next": self.STACK[k][2]} if self.STACK[k][2] else {})
+            for k, bits in size.items()
+        ]
         return d
 
 
@@ -2037,7 +2111,31 @@ def osi_syn() -> dict:
     return layer_sample("osi-syn", "TCP SYN", pkt, upper)
 
 
-OSI_SAMPLES = {"osi-dns": osi_dns, "osi-syn": osi_syn}
+HTTP_REQUEST = (
+    b"GET / HTTP/1.1\r\nHost: " + DNS_NAME.encode("ascii") + b"\r\n"
+    b"Accept-Encoding: gzip\r\nConnection: keep-alive\r\n\r\n"
+)
+
+
+def osi_http() -> dict:
+    """An HTTP/1.1 GET on an open TCP connection: the first data segment (PSH, ACK), whose
+    payload carries the roles of OSI layers 5 to 7 in its own lines."""
+    isn, peer = 0x2F5A1C00, 0x7A1B3C00  # this segment follows the handshake: both numbers are ISN + 1
+    seg = tcp_segment(IP_HOST, IP_WEB, 49152, 80, isn + 1, peer + 1, 0x018, 64240, data=HTTP_REQUEST)
+    pkt = ipv4_packet(IP_HOST, IP_WEB, 6, seg, ident=0x3C50, df=1)
+
+    def upper(fr, payload, layers):
+        layers["tcp"] = (
+            "Transmission Control Protocol, Src Port: 49152, Dst Port: 80, "
+            f"Seq: 1, Ack: 1, Len: {len(HTTP_REQUEST)}"
+        )
+        layers["http"] = "Hypertext Transfer Protocol"
+        fr.http(fr.tcp(payload, rel=(1, 1)))
+
+    return layer_sample("osi-http", "HTTP GET (TCP)", pkt, upper)
+
+
+OSI_SAMPLES = {"osi-dns": osi_dns, "osi-http": osi_http, "osi-syn": osi_syn}
 
 
 # ----------------------------------------------------------------------------- ARP
@@ -3095,7 +3193,7 @@ def self_test() -> int:
             errors += 1
     errors += ipv4_self_test()
     # OSI samples: IPv4, UDP and TCP checksums verify (the last two over the pseudo-header).
-    for name, proto in (("osi-dns", 17), ("osi-syn", 6)):
+    for name, proto in (("osi-dns", 17), ("osi-http", 6), ("osi-syn", 6)):
         ip = bytes.fromhex(SAMPLES[name]()["hex"].replace(" ", ""))[14:]
         l4 = ip[20:]
         pseudo = ip[12:20] + struct.pack("!BBH", 0, proto, len(l4))
@@ -3230,7 +3328,11 @@ def with_chips(m: re.Match) -> str:
 
     article = CHIPS.sub(line, m.group(0), count=1)
     article = GRID.sub(f'<div class="bitgrid" style="--rows:{grid_rows(s)}"', article, count=1)
-    return PANEL.sub(lambda p: TOUR + p.group(1), article, count=1)
+    # data-view="layers": the frame is read layer by layer (bit diagram, layer strip and detail
+    # panel only), so it gets no field-by-field tour.
+    tag = re.match(r"<article\b[^>]*>", m.group(0).lstrip()) or re.search(r"<article\b[^>]*>", m.group(0))
+    tour = "" if 'data-view="layers"' in tag.group(0) else TOUR
+    return PANEL.sub(lambda p: tour + p.group(1), article, count=1)
 
 
 def grid_rows(sample: dict) -> int:
