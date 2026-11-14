@@ -11,6 +11,8 @@ Versioning rules for this library:
 
 ## [Unreleased]
 
+## [0.10.0] - 2026-11-14
+
 ### Changed
 - Layers view: each protocol header starts on a new 32-bit row of the bit diagram, so the
   IPv4 addresses are no longer split by the 14-byte Ethernet header (`osi-tcpip-model`).
@@ -405,7 +407,8 @@ tooling, the CI pipeline and the public site.
   as Cisco's terms require), laid out left to right under the headline; CI checks the embedded
   scene matches the generator.
 
-[Unreleased]: https://github.com/jeanmichel4121/network-protocols-expert/compare/v0.9.0...main
+[Unreleased]: https://github.com/jeanmichel4121/network-protocols-expert/compare/v0.10.0...main
+[0.10.0]: https://github.com/jeanmichel4121/network-protocols-expert/compare/v0.9.0...v0.10.0
 [0.9.0]: https://github.com/jeanmichel4121/network-protocols-expert/compare/v0.8.0...v0.9.0
 [0.8.0]: https://github.com/jeanmichel4121/network-protocols-expert/compare/v0.7.0...v0.8.0
 [0.7.0]: https://github.com/jeanmichel4121/network-protocols-expert/compare/v0.6.0...v0.7.0
