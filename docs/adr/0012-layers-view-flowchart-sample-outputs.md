@@ -22,6 +22,9 @@ troubleshooting chart that reads like a flowchart.
   layers and owns no message type may use it, and it links to the page of each protocol,
   where the same headers have both mandatory views. Every other page keeps the rule "bit
   diagram and Wireshark tree, always".
+  In that view each protocol header starts on a new 32-bit row (amended 2026-11-14): every
+  field keeps its true width and its offset in the detail panel, and each header reads as in
+  its own RFC instead of being shifted by the 14-byte Ethernet header.
 - **Flowchart** (`ol.flow`). One entry, one question per decision, "yes" always goes down,
   "no" always leaves to the side towards a box that names the causes and sends the reader
   back to the question, one end. It is an ordered list drawn with CSS, not an image: it

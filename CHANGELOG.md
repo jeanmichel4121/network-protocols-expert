@@ -11,6 +11,39 @@ Versioning rules for this library:
 
 ## [Unreleased]
 
+### Changed
+- Layers view: each protocol header starts on a new 32-bit row of the bit diagram, so the
+  IPv4 addresses are no longer split by the 14-byte Ethernet header (`osi-tcpip-model`).
+- Packet views: a click pins the detail of a field (second click or Escape releases it).
+- `osi-tcpip-model`: the values a router rewrites are marked with a thicker glowing outline,
+  an arrow and the old and new value; the table that repeated the capture diagram is removed.
+- `osi-tcpip-model`: lesson 3.3 (TCP opening before the upper layers) removed, the next lessons
+  renumbered; RFC 8446 is now cited in the security table.
+- `osi-tcpip-model`: lesson 3.3 reworked as "Default memories and limits": a log-scale chart of
+  MAC table versus ARP cache lifetimes (IEEE 802.1Q, IOS XE, NX-OS, Linux, FortiOS) showing the
+  unicast-flooding window, and a table of hop and byte limits with their effect.
+- `osi-tcpip-model`: lesson 4.2 (who reads what, who rewrites what) removed, later lessons
+  renumbered.
+- `osi-tcpip-model`: the end-to-end animation of lesson 4.1 shows one step at a time: the
+  frame a device receives next to the frame it sends, with the rewritten fields marked,
+  instead of the six link columns accumulated on one grid.
+- `osi-tcpip-model`: security lesson 4.2 rebuilt around two diagrams (one attack and its
+  protection per layer; what a switch, a router, a layer 4 firewall and a TLS-terminating proxy
+  can read in one HTTPS frame) with a short reference table; sources 108 to 114 added.
+- Template: sub-tabs inside a vendor panel (`div.tabs.sub`, set up with the parent tabs), one
+  per platform; `osi-tcpip-model` uses them to separate Cisco IOS XE and NX-OS.
+- `osi-tcpip-model`: full review to put pictures before prose. Three new diagrams: the X.200
+  terms (service, protocol, SAP, PDU, SDU) on UDP over IPv4 in lesson 1.3; a grid of the layers
+  each device reads to decide (switch, router, stateful firewall, proxy) in lesson 1.5, in
+  place of a paragraph; IEEE 802.3 packet versus frame and the LLC and MAC sublayers in
+  lesson 4.3. The introduction of chapter 2 and two paragraphs of lessons 3.2 and 3.3 are
+  shortened; source 115 (IEEE Std 802.3-2022) added.
+- `osi-tcpip-model`: two more Cisco sub-tabs, Secure Firewall ASA and Secure Firewall Threat
+  Defense (Firepower): verification layer by layer (`show interface`, `show arp`,
+  `show mac-address-table`, `show route`, `ping`, `traceroute`, `ping tcp`, `show conn`,
+  `show asp drop`, `packet-tracer`) with ten documented sample outputs each, and the `capture`
+  commands with their production warning; sources 116 to 135 (Cisco command references) added.
+
 ## [0.9.0] - 2026-11-12
 
 ### Added

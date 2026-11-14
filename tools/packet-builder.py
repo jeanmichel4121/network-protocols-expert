@@ -3339,11 +3339,16 @@ def grid_rows(sample: dict) -> int:
     """Rows the page script draws in the bit diagram (same walk as NPE.packet in the template):
     the page reserves that height, so the diagram does not push the content below it when the
     script fills it in after the first paint."""
-    origin, rows = sample.get("grid_from", 0), set()
+    origin, rows, shift, prev = sample.get("grid_from", 0), set(), 0, None
     for f in sample["fields"]:
         if f["offset"] < origin:
             continue
-        start, left, first, row = f["offset"] - origin, f["bits"], True, 1
+        start, left, first, row = f["offset"] - origin + shift, f["bits"], True, 1
+        # Layers view: each protocol header starts on a new row.
+        if sample.get("stack") and prev and f["layer"] != prev and start % 32:
+            shift += 32 - start % 32
+            start += 32 - start % 32
+        prev = f["layer"]
         while left > 0:
             col = start % 32
             take = min(left, 32 - col)
