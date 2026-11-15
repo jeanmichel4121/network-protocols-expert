@@ -14,6 +14,9 @@ Versioning rules for this library:
 ### Changed
 - Bit diagrams: a field of 16 bits or more shows its name and its value on one line (they
   wrap back to two lines when the cell is too narrow). Template change, propagated to every page.
+- `osi-tcpip-model`: the vendor chapter no longer lists what the documentation consulted does not
+  print or document ("no documented sample output", "not found" notes); the warnings and vendor
+  deviations stay.
 
 ## [0.10.0] - 2026-11-14
 
