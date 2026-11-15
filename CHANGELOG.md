@@ -11,6 +11,8 @@ Versioning rules for this library:
 
 ## [Unreleased]
 
+## [0.11.1] - 2026-11-15
+
 ### Changed
 - `ipv4`: the "not verified or not documented" notes, the empty FortiGate IP options block and
   the "known gaps" list of `sources.md` are removed; warnings and vendor deviations stay.
@@ -439,7 +441,8 @@ tooling, the CI pipeline and the public site.
   as Cisco's terms require), laid out left to right under the headline; CI checks the embedded
   scene matches the generator.
 
-[Unreleased]: https://github.com/jeanmichel4121/network-protocols-expert/compare/v0.11.0...main
+[Unreleased]: https://github.com/jeanmichel4121/network-protocols-expert/compare/v0.11.1...main
+[0.11.1]: https://github.com/jeanmichel4121/network-protocols-expert/compare/v0.11.0...v0.11.1
 [0.11.0]: https://github.com/jeanmichel4121/network-protocols-expert/compare/v0.10.0...v0.11.0
 [0.10.0]: https://github.com/jeanmichel4121/network-protocols-expert/compare/v0.9.0...v0.10.0
 [0.9.0]: https://github.com/jeanmichel4121/network-protocols-expert/compare/v0.8.0...v0.9.0
