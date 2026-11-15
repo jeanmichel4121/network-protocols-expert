@@ -11,6 +11,10 @@ Versioning rules for this library:
 
 ## [Unreleased]
 
+### Changed
+- Bit diagrams: a field of 16 bits or more shows its name and its value on one line (they
+  wrap back to two lines when the cell is too narrow). Template change, propagated to every page.
+
 ## [0.10.0] - 2026-11-14
 
 ### Changed

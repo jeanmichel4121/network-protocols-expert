@@ -358,6 +358,8 @@ details.check > div > p { margin: 0; }
 .bitgrid .bf[style*="span 1;"], .bitgrid .bf[style*="span 2;"] { padding-inline: 1px; }
 .bf .bn { font-weight: 600; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .bf .bv { font-family: var(--mono); font-size: 0.75rem; color: var(--muted); max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+/* A field of 16 bits or more: name and value on one line (they wrap back to two if the cell is too narrow). */
+.bf.wide { flex-direction: row; flex-wrap: wrap; column-gap: 0.75em; }
 .l-header { background: var(--blue-bg); border-top-color: var(--blue); }
 .l-body { background: var(--teal-bg); border-top-color: var(--teal); border-top-style: dashed; }
 .l-tlv { background: var(--purple-bg); border-top-color: var(--purple); border-top-style: dotted; }
@@ -788,7 +790,7 @@ window.NPE = (function () {
           start += more * 32; left -= more * 32; folded = true;
           continue;
         }
-        var cls = "bf l-" + f.layer + (f.repeat ? " rep" : "") + (first ? "" : " cont") + (cut ? " cut" : "");
+        var cls = "bf l-" + f.layer + (f.repeat ? " rep" : "") + (first ? "" : " cont") + (cut ? " cut" : "") + (take >= 16 ? " wide" : "");
         var pos = ' style="grid-column:' + (col + 1) + " / span " + take + ";grid-row:" + (Math.floor(start / 32) + 1) + '"';
         if (first) {
           g += '<button type="button" class="' + cls + '" data-f="' + f.id + '" aria-pressed="false"' + pos + ">" +
@@ -986,7 +988,7 @@ window.NPE = (function () {
         while (left > 0) {
           var col = start % 32, take = Math.min(left, 32 - col);
           var note = f.value !== undefined ? f.value : f["var"] ? ui("var") : f.bits + " " + ui("bits");
-          g += '<div class="bf l-' + f.layer + (f["var"] ? " var" : "") + (first ? "" : " cont") + '" style="grid-column:' + (col + 1) +
+          g += '<div class="bf l-' + f.layer + (f["var"] ? " var" : "") + (first ? "" : " cont") + (take >= 16 ? " wide" : "") + '" style="grid-column:' + (col + 1) +
             " / span " + take + ";grid-row:" + (Math.floor(start / 32) + 1) + '"><span class="bn">' + esc(f.name) + "</span>" +
             (first ? '<span class="bv">' + esc(note) + "</span>" : "") + "</div>";
           start += take; left -= take; first = false;
