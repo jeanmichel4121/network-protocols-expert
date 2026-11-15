@@ -1662,6 +1662,7 @@ class LayerFrame(IPv4Frame):
     """A whole frame drawn from its first bit, one colour per layer of the stack."""
 
     LAYER = {"eth": "encap", "ip": "header", "udp": "tlv", "tcp": "tlv", "dns": "body", "http": "body"}
+    PAIR = {"ethdst", "ethsrc", "src", "dst"}
     # Protocol name, OSI layer number, id of the field that names the next layer (drawn as the
     # layer strip above the bit diagram).
     STACK = {
@@ -2051,6 +2052,9 @@ class LayerFrame(IPv4Frame):
             # OSI layer of the field: its protocol's layer, or its own (an HTTP header line that
             # does the work of the session or presentation layer).
             f["osi"] = src.get("osi", self.STACK[f["tree"]][1])
+            # Destination and source addresses share one row of the diagram (NPE.packet: f.pair).
+            if f["id"] in self.PAIR:
+                f["pair"] = True
         d["protocol"] = "OSI and TCP/IP models"
         d["grid_from"] = 0
         # One entry per protocol of the frame, in wire order: its size and the field that names
@@ -3339,7 +3343,7 @@ def grid_rows(sample: dict) -> int:
     """Rows the page script draws in the bit diagram (same walk as NPE.packet in the template):
     the page reserves that height, so the diagram does not push the content below it when the
     script fills it in after the first paint."""
-    origin, rows, shift, prev = sample.get("grid_from", 0), set(), 0, None
+    origin, rows, shift, prev, pair = sample.get("grid_from", 0), set(), 0, None, None
     for f in sample["fields"]:
         if f["offset"] < origin:
             continue
@@ -3349,6 +3353,18 @@ def grid_rows(sample: dict) -> int:
             shift += 32 - start % 32
             start += 32 - start % 32
         prev = f["layer"]
+        # Address pair: one row for both, then the next field starts on the row below.
+        if f.get("pair"):
+            if pair is None:
+                if start % 32:
+                    shift += 32 - start % 32
+                    start += 32 - start % 32
+                pair = start // 32
+            elif f["offset"] - origin + shift > pair * 32:
+                shift = (pair + 1) * 32 - (f["offset"] - origin + f["bits"])
+                rows.add(pair)
+                pair = None
+            continue
         while left > 0:
             col = start % 32
             take = min(left, 32 - col)

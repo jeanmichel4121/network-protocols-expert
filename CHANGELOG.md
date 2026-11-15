@@ -11,6 +11,14 @@ Versioning rules for this library:
 
 ## [Unreleased]
 
+### Changed
+- `osi-tcpip-model`: in the layers view, the destination and source addresses (MAC, then IPv4)
+  share one row, half each, instead of a MAC address split over three rows; that row is marked
+  out of scale (dashed sides, real size in the field, legend entry). Template and ADR 0012
+  updated.
+- `osi-tcpip-model`: quiz question 2 gives the source address and mask (192.0.2.10/24), so the
+  reader can tell that the destination is in another subnet.
+
 ## [0.11.1] - 2026-11-15
 
 ### Changed

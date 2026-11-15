@@ -25,6 +25,10 @@ troubleshooting chart that reads like a flowchart.
   In that view each protocol header starts on a new 32-bit row (amended 2026-11-14): every
   field keeps its true width and its offset in the detail panel, and each header reads as in
   its own RFC instead of being shifted by the 14-byte Ethernet header.
+  Exception (amended 2026-11-15, owner's request): the destination and source addresses of
+  a header (Ethernet MAC, IPv4) share one row, half each, so a 48-bit MAC address is not
+  split over three rows. That row is out of scale: its side borders are dashed, each field
+  shows its real size, the legend says so, and the detail panel keeps the true offset.
 - **Flowchart** (`ol.flow`). One entry, one question per decision, "yes" always goes down,
   "no" always leaves to the side towards a box that names the causes and sends the reader
   back to the question, one end. It is an ordered list drawn with CSS, not an image: it
