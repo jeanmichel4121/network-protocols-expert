@@ -479,8 +479,8 @@ def eth_phy() -> dict:
     return fr.out(
         "eth-phy",
         "Preamble + SFD",
-        "Physical layer (Reconciliation Sublayer and PHY)",
-        {"phy": "Physical layer: removed by the PHY, never seen by Wireshark"},
+        "IEEE 802.3 packet on the medium (preamble and SFD sent by the MAC)",
+        {"phy": "Preamble and SFD: stripped by the receiving adapter, absent from captures"},
     )
 
 

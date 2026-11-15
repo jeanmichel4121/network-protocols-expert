@@ -17,6 +17,21 @@ Versioning rules for this library:
 - `osi-tcpip-model`: the vendor chapter no longer lists what the documentation consulted does not
   print or document ("no documented sample output", "not found" notes); the warnings and vendor
   deviations stay.
+- `ethernet`: page reviewed in the form of the OSI page. Advanced behaviour is rebuilt as short
+  lessons around seven diagrams (CSMA/CD, MTU measured per platform, padding after tag removal,
+  stomped CRC on a cut-through path, asymmetric routing and unicast flooding, tag changes hop by
+  hop, what a capture does not show).
+- `ethernet`: vendor chapter rewritten with platform sub-tabs for Cisco (IOS XE, NX-OS, IOS XR)
+  and, for every vendor, configuration, verification, debug with its production warning and
+  sample outputs with how to read them and their source; a table compares how each platform
+  counts the MTU.
+- `ethernet`: troubleshooting becomes a six-question flowchart (link, frame integrity, size,
+  VLAN, MAC table, flow control) and a table of eleven common faults with command, expected
+  output and fix.
+- `ethernet`: sources extended (vendor guides, command references and knowledge-base articles
+  per vendor, a new group for advanced behaviour and troubleshooting); `sources.md` mirrors it.
+- `tools/packet-builder.py`: the preamble and SFD sample is described as the IEEE 802.3 packet
+  on the medium, stripped by the receiving adapter.
 
 ## [0.10.0] - 2026-11-14
 
