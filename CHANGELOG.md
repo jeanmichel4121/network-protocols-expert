@@ -12,6 +12,8 @@ Versioning rules for this library:
 ## [Unreleased]
 
 ### Changed
+- `ipv4`: the "not verified or not documented" notes, the empty FortiGate IP options block and
+  the "known gaps" list of `sources.md` are removed; warnings and vendor deviations stay.
 - `icmp`: the vendor chapter no longer says what the public documentation does not print
   (Check Point defaults, Palo Alto `set` keywords, FortiGate limit); facts and sources unchanged.
 - `arp`: the notes about what the guides cited do not document are removed; the PAN-OS command

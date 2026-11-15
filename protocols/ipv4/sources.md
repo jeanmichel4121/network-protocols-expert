@@ -82,7 +82,7 @@ Accessed 25 October and 5 November 2026. Same list and numbering as the Sources 
 69. Check Point: **Gaia Administration Guide, Physical Interfaces** (R81.20, Physical Interfaces). https://sc1.checkpoint.com/documents/R81.20/WebAdminGuides/EN/CP_R81.20_Gaia_AdminGuide/Content/Topics-GAG/Physical-Interfaces.htm
 70. Check Point: **sk61221, MSS Clamping on Security Gateway** (R81.20, Solution). https://support.checkpoint.com/results/sk/sk61221
 71. Check Point: **Performance Tuning Administration Guide, fwaccel dos config** (R81.20, CLI). https://sc1.checkpoint.com/documents/R81.20/WebAdminGuides/EN/CP_R81.20_PerformanceTuning_AdminGuide/Content/Topics-PTG/CLI/fwaccel-dos-config.htm
-72. Check Point: **SmartConsole Online Help, Inspection Settings** (R80.20 (R81.20 page not found), IP Fragments). https://sc1.checkpoint.com/documents/R80.20/SmartConsole_OLH/EN/ForU9eIT_sdQs5yktu-eCg2.htm
+72. Check Point: **SmartConsole Online Help, Inspection Settings** (R80.20, IP Fragments). https://sc1.checkpoint.com/documents/R80.20/SmartConsole_OLH/EN/ForU9eIT_sdQs5yktu-eCg2.htm
 73. Check Point: **CheckMates, Forbidden IP Option (community, not official)** (-, thread). https://community.checkpoint.com/t5/General-Topics/Forbidden-IP-Option/td-p/10115
 74. Check Point: **Performance Tuning AG, Example Outputs of the fwaccel stats Commands** (R81 (R81.20 same command), fwaccel stats). https://sc1.checkpoint.com/documents/R81/WebAdminGuides/EN/CP_R81_PerformanceTuning_AdminGuide/Topics-PTG/CLI/fwaccel-stats-Example-Outputs.htm
 75. Check Point: **Performance Tuning AG, fw monitor** (R81.20, CLI). https://sc1.checkpoint.com/documents/R81.20/WebAdminGuides/EN/CP_R81.20_PerformanceTuning_AdminGuide/Content/Topics-PTG/CLI/fw-monitor.htm
@@ -119,7 +119,7 @@ Accessed 25 October and 5 November 2026. Same list and numbering as the Sources 
 106. Fortinet: **Fortinet Community Technical Tip 97954, fragmented packets per second** (6.2.5 example, diagnose snmp ip frags). https://community.fortinet.com/fortigate-3/technical-tip-how-to-calculate-fragmented-packets-per-second-hitting-a-fortigate-97954
 107. Fortinet: **FortiOS 7.4.6 Administration Guide, Performing a sniffer trace or packet capture** (7.4.6, sniffer). https://docs.fortinet.com/document/fortigate/7.4.6/administration-guide/680228/performing-a-sniffer-trace-or-packet-capture
 108. Fortinet: **FortiOS 7.4.4 Administration Guide, Debugging the packet flow** (7.4.4, debug flow). https://docs.fortinet.com/document/fortigate/7.4.4/administration-guide/54688/debugging-the-packet-flow
-109. Fortinet: **FortiOS 7.4.4 CLI Reference, config firewall DoS-policy (anomaly names not listed)** (7.4.4, DoS-policy). https://docs.fortinet.com/document/fortigate/7.4.4/cli-reference/561707922
+109. Fortinet: **FortiOS 7.4.4 CLI Reference, config firewall DoS-policy** (7.4.4, DoS-policy). https://docs.fortinet.com/document/fortigate/7.4.4/cli-reference/561707922
 110. Palo Alto Networks: **Web Interface Help, Building Blocks for a Custom Packet Capture** (PAN-OS 11.1, capture stages). https://docs.paloaltonetworks.com/ngfw/help/11-1/monitor/monitor-packet-capture/building-blocks-for-a-custom-packet-capture
 111. Palo Alto Networks: **GlobalProtect Administrator's Guide, Troubleshoot Clientless VPN** (set capture stage ... file ...). https://docs.paloaltonetworks.com/globalprotect/administration/globalprotect-clientless-vpn/troubleshoot-clientless-vpn
 112. Cisco: **IP Addresses and Services Configuration Guide for ASR 9000, Implementing Network Stack IPv4 and IPv6** (IOS XR 25.1.x to 25.4.x, TCP MSS Adjustment). https://www.cisco.com/c/en/us/td/docs/routers/asr9000/software/25xx/ip-addresses/configuration/guide/b-ip-addresses-cg-asr9000-25xx/implementing-network-stack-ipv4-and-ipv6.html
@@ -138,12 +138,3 @@ Accessed 25 October and 5 November 2026. Same list and numbering as the Sources 
   `[validation disabled]` and `[Header checksum status: Unverified]` (packet-ip.c, `static bool ip_check_checksum`).
 - `ip.defragment` (Reassemble fragmented IPv4 datagrams): off. Default: on, fragments 1 and 2 then show as Data
   with `[Reassembled IPv4 in frame: 3]` and fragment 3 carries the reassembled UDP datagram (`ip_defragment = true`).
-
-## Known gaps (no readable official source; nothing invented)
-
-- Cisco IOS XE: formal `ip mtu` reference entry, one-line `ping ... df-bit`, `debug ip packet`; IOS XR `show ipv4 traffic` counter names; NX-OS `show ip traffic` sample output.
-- Check Point: `fw ctl zdebug` (sk171943), default drop of IP options (sk93809, community-sourced only).
-- F5: K411/K13637 tcpdump KBs, K13948 PMTUD; `show sys ip-stat` sample output.
-- Palo Alto: CLI leaf names for Zone Protection IP-option drops and the MSS adjustment size.
-- NetScaler: IP-options control; DF option in ping.
-- FortiGate: IP-options handling; DoS anomaly names.
