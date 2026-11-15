@@ -11,6 +11,8 @@ Versioning rules for this library:
 
 ## [Unreleased]
 
+## [0.11.2] - 2026-11-15
+
 ### Changed
 - `osi-tcpip-model`: in the layers view, the destination and source addresses (MAC, then IPv4)
   share one row, half each, instead of a MAC address split over three rows; that row is marked
@@ -449,7 +451,8 @@ tooling, the CI pipeline and the public site.
   as Cisco's terms require), laid out left to right under the headline; CI checks the embedded
   scene matches the generator.
 
-[Unreleased]: https://github.com/jeanmichel4121/network-protocols-expert/compare/v0.11.1...main
+[Unreleased]: https://github.com/jeanmichel4121/network-protocols-expert/compare/v0.11.2...main
+[0.11.2]: https://github.com/jeanmichel4121/network-protocols-expert/compare/v0.11.1...v0.11.2
 [0.11.1]: https://github.com/jeanmichel4121/network-protocols-expert/compare/v0.11.0...v0.11.1
 [0.11.0]: https://github.com/jeanmichel4121/network-protocols-expert/compare/v0.10.0...v0.11.0
 [0.10.0]: https://github.com/jeanmichel4121/network-protocols-expert/compare/v0.9.0...v0.10.0
