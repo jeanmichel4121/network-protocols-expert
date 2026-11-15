@@ -11,6 +11,8 @@ Versioning rules for this library:
 
 ## [Unreleased]
 
+## [0.11.0] - 2026-11-15
+
 ### Changed
 - Bit diagrams: a field of 16 bits or more shows its name and its value on one line (they
   wrap back to two lines when the cell is too narrow). Template change, propagated to every page.
@@ -429,7 +431,8 @@ tooling, the CI pipeline and the public site.
   as Cisco's terms require), laid out left to right under the headline; CI checks the embedded
   scene matches the generator.
 
-[Unreleased]: https://github.com/jeanmichel4121/network-protocols-expert/compare/v0.10.0...main
+[Unreleased]: https://github.com/jeanmichel4121/network-protocols-expert/compare/v0.11.0...main
+[0.11.0]: https://github.com/jeanmichel4121/network-protocols-expert/compare/v0.10.0...v0.11.0
 [0.10.0]: https://github.com/jeanmichel4121/network-protocols-expert/compare/v0.9.0...v0.10.0
 [0.9.0]: https://github.com/jeanmichel4121/network-protocols-expert/compare/v0.8.0...v0.9.0
 [0.8.0]: https://github.com/jeanmichel4121/network-protocols-expert/compare/v0.7.0...v0.8.0
