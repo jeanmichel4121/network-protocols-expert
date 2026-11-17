@@ -11,6 +11,20 @@ Versioning rules for this library:
 
 ## [Unreleased]
 
+### Added
+- Template: layout for small screens (phones); the laptop and desktop view does not change
+  (full-page screenshots identical pixel by pixel at 1024, 1280 and 1440 px). Diagrams fit
+  their frame and open full size with "Enlarge" or a tap; tables wider than the screen
+  become one card per row; frames that scroll sideways fade on the side where more content
+  waits; the packet panel says "tap" on touch screens. ADR 0013, `docs/web-standards.md`
+  section 6b.
+
+### Fixed
+- Header on phones: the logo no longer slides under the About link at 360 px, and the page
+  no longer scrolls sideways at 320 px; the smoke test now checks 320 px too.
+- A legend symbol written as text ("- - -") no longer wraps over three lines, and a long
+  identifier in running text no longer widens the page at 320 px.
+
 ## [0.11.2] - 2026-11-15
 
 ### Changed

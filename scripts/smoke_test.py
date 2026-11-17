@@ -9,7 +9,7 @@ Serves the site directory (default: public/) on a local port and, in headless Ch
 - reduced motion: no CSS animation running at load when the user asks for less motion;
 - language pages (/xx/...): the FR/EN/NL/DE buttons switch <html lang> in place and move
   the URL to the matching language; canonical + hreflang (4 + x-default) are consistent;
-- mobile: no horizontal page scroll at 360 px;
+- mobile: no horizontal page scroll at 360 px, nor at 320 px (the width WCAG 1.4.10 uses);
 - privacy: no page writes localStorage without the reader's consent; on the privacy page the
   "remember on this device" switch stores the choice and the delete button removes everything;
 - the root page sends the visitor to a language.
@@ -285,6 +285,11 @@ def check_page(browser, base: str, rel: str, axe: str) -> list:
     overflow = page.evaluate("document.documentElement.scrollWidth - document.documentElement.clientWidth")
     if overflow > 0:
         errors.append(f"horizontal scroll at 360 px ({overflow} px overflow)")
+    # WCAG 1.4.10 measures reflow at 320 CSS px: the same page, narrower.
+    page.set_viewport_size({"width": 320, "height": 780})
+    overflow = page.evaluate("document.documentElement.scrollWidth - document.documentElement.clientWidth")
+    if overflow > 0:
+        errors.append(f"horizontal scroll at 320 px ({overflow} px overflow)")
     ctx.close()
 
     if rel.endswith("/packets/index.html"):

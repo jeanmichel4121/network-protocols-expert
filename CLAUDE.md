@@ -119,8 +119,9 @@ page from `templates/protocol-template.html`; its shared blocks are copied verba
   font, no external image, no network call. The page must open offline by double-click.
 - Vanilla HTML/CSS/JS only (no framework, no build step).
 - Light and dark mode: dark by default, manual toggle to light, choice remembered.
-- Responsive down to 360 px wide, no horizontal page scroll (wide tables/grids scroll
-  inside their own container).
+- Responsive down to 320 px wide, no horizontal page scroll. On small screens diagrams fit
+  their frame and open full size, wide tables become cards, the bit diagram and code scroll
+  inside their own frame (ADR 0013); the laptop view does not change.
 - Browser storage only for per-viewer conveniences (language, theme, reading progress),
   always wrapped in try/catch; the page must work without it. By default a choice stays in
   the tab (`sessionStorage`) and reading progress is not kept; `localStorage` is used only

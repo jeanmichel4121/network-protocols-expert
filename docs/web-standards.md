@@ -58,8 +58,8 @@ theme and at 360 px (tags `wcag2a`, `wcag2aa`, `wcag21a`, `wcag21aa`, `wcag22aa`
 | 2.5.3 Label in Name | A control's accessible name contains its visible text (no `aria-label` that rewords it). **[CI]** |
 | 1.4.3 Contrast | Text ≥ 4.5:1 in both themes (palette tokens are checked by axe in light and dark). **[CI]** |
 | 1.4.1 Use of Color | Colour is always paired with text, a symbol (✓ ✗ ▶) or a line style (solid / dashed / dotted). |
-| 1.4.4 / 1.4.10 Resize, Reflow | Relative units, no horizontal page scroll at 360 px; wide diagrams scroll inside their own container. **[CI]** |
-| 2.1.1 Keyboard (scroll areas) | Every container that can scroll on its own (tables, code blocks, diagrams on small screens) has `tabindex="0"` so keyboard users can scroll it. **[CI]** |
+| 1.4.4 / 1.4.10 Resize, Reflow | Relative units, no horizontal page scroll at 360 px nor at 320 px. Diagrams and data tables may need a two-dimensional layout [W3]: on a phone a diagram fits its frame and opens full size, a wide table becomes cards, the bit diagram and code scroll inside their own frame (section 6b). **[CI]** |
+| 2.1.1 Keyboard (scroll areas) | Every container that can scroll on its own (tables, code blocks, the bit diagram, the full-screen diagram viewer) has `tabindex="0"` so keyboard users can scroll it. **[CI]** |
 | 2.1.1 Keyboard | Every widget works with the keyboard: roving tabindex + arrow keys in the bit diagram, the Wireshark tree and the tabs (WAI-ARIA APG pattern). |
 | 2.4.1 Bypass Blocks | "Skip to content" link. |
 | 3.1.1 / 3.1.2 Language | `<html lang>` follows the switch; translated blocks carry their own `lang`. |
@@ -83,6 +83,14 @@ Component patterns:
   feedback in a live region; never `aria-hidden` on feedback text [H1].
 - **Tabs**: WAI-ARIA tabs pattern; panels are rendered hidden in HTML (no layout shift)
   and shown by `<noscript>` CSS when scripts are off, and all shown in print.
+- **Diagram viewer** (small screens): a native modal `<dialog>` [M3]. The rest of the page is
+  inert; Escape, the Close button and the browser's Back button close it; focus starts on
+  Close and returns to the Enlarge button. The drawing is moved in, not copied, so its ids
+  stay unique and an animation keeps its state.
+- **Table cards** (small screens): the column labels added to each cell are `aria-hidden`
+  (screen readers announce the headers); explicit roles (`table`, `caption`, `rowgroup`,
+  `row`, `columnheader`, `rowheader`, `cell`) keep the table semantics that `display: block`
+  drops in some browsers [M1].
 
 ## 3. Motion
 
@@ -112,7 +120,10 @@ Component patterns:
 - Use features that are Baseline "widely available"; newer "newly available" features
   only as progressive enhancement with a fallback [B1].
 - Used: `:has()`, `color-mix()`, `light-dark()` with `color-scheme` [B2],
-  CSS grid, `clamp()`, `text-wrap: balance|pretty`, `<details>`, `dvh`.
+  CSS grid, `clamp()`, `text-wrap: balance|pretty`, `<details>`, `<dialog>` [M3], `dvh`.
+- Progressive enhancement only: scroll-driven animations (`animation-timeline: scroll()`,
+  Baseline 2026 newly available [M4]) with `@property`, for the fading edge of a frame that
+  scrolls (fallback: a shadow); `text-size-adjust` (ignored outside phones [M5]).
   `light-dark()` follows `color-scheme`, so the manual theme toggle only sets
   `color-scheme` on `<html>` [B2].
 - Not used yet: anchor positioning, `@scope`, cross-document view transitions
@@ -129,6 +140,33 @@ Component patterns:
   highlights the section in view with `IntersectionObserver` (not a scroll handler) and
   its entries are real links that work without JavaScript [D1].
 - Sections 4 to 7 are `<details open>`: collapsible, open by default.
+
+## 6b. Small screens (phones)
+
+The laptop and desktop layout is the reference. Every small-screen rule sits in a media
+query (under 40 rem, 48 rem for diagrams) or behind `(hover: none)`, so a screen of 48 rem
+(768 px) or more renders exactly as before: checked when the rules were added (2026-11-17)
+by comparing full-page screenshots pixel by pixel at 1024, 1280 and 1440 px (ADR 0013).
+
+- **Header**: the logo keeps its size and the controls narrow (language buttons down to
+  32 px, still above the 24 px minimum) so the bar fits 320 px, the width at which WCAG
+  1.4.10 measures reflow [W3]. **[CI]**
+- **Diagrams**: under 48 rem a schematic is drawn at the width of its frame, so the whole
+  drawing is visible. An Enlarge button, or a tap on the drawing, opens it full screen at
+  its own size (one SVG unit per CSS pixel, the size its text was designed for), scrolled
+  with a finger; turning the phone shows more of it. The field list under each diagram
+  carries the same information as text.
+- **Tables**: under 40 rem a table wider than its frame becomes one card per row, each cell
+  headed by its column label, the stacked layout for tables whose rows are independent
+  records [M1]. A table with merged cells keeps scrolling.
+- **Frames that still scroll** (bit diagram, commands, outputs, Wireshark tree, hex dump,
+  vendor tabs): the content fades on the side where more waits, driven by the scroll
+  position; where the browser lacks scroll-driven animations a shadow marks that side
+  (`background-attachment: local`).
+- **Touch**: where the primary input cannot hover (`hover: none` [M2]), the field panel of
+  a packet says "tap" instead of "hover".
+- **Text**: no font inflation when a phone turns to landscape (`text-size-adjust: 100%`
+  [M5]); a long identifier in running text wraps instead of widening the page.
 
 ## 7. Colour and theming
 
@@ -212,6 +250,12 @@ explanations shown, source URLs printed after each source.
 - [S1] Google Search Central: Education Q&A (Quiz) structured data. https://developers.google.com/search/docs/appearance/structured-data/education-qa
 - [W1] W3C: What's New in WCAG 2.2. https://www.w3.org/WAI/standards-guidelines/wcag/new-in-22/
 - [W2] W3C: Understanding SC 2.3.3 Animation from Interactions. https://w3c.github.io/wcag/understanding/animation-from-interactions.html
+- [W3] W3C: Understanding SC 1.4.10 Reflow (WCAG 2.2): 320 CSS px, exception for content that needs a two-dimensional layout (diagrams, data tables). https://www.w3.org/WAI/WCAG22/Understanding/reflow
+- [M1] Chrome for Developers: Responsive tables (scroll container, sticky headers, stacked layout on a narrow width). https://developer.chrome.com/docs/modern-web-guidance/guides/ui-atoms/responsive-table
+- [M2] MDN: `hover` media feature (primary input mechanism). https://developer.mozilla.org/docs/Web/CSS/@media/hover
+- [M3] MDN: `<dialog>`: the Dialog element (modal, Escape, initial focus). https://developer.mozilla.org/docs/Web/HTML/Reference/Elements/dialog
+- [M4] MDN: `scroll()` for `animation-timeline`. https://developer.mozilla.org/docs/Web/CSS/animation-timeline/scroll
+- [M5] MDN: `text-size-adjust`. https://developer.mozilla.org/docs/Web/CSS/text-size-adjust
 - [H1] Harvard Digital Accessibility: Form feedback with live regions. https://accessibility.huit.harvard.edu/technique-form-feedback-live-regions
 - [A1] Smashing Magazine: Accessible SVGs: perfect patterns for screen reader users (2021). https://smashingmagazine.com/2021/05/accessible-svg-patterns-comparison/
 - [A2] data.europa.eu: Accessible SVG and ARIA. https://data.europa.eu/apps/data-visualisation-guide/accessible-svg-and-aria

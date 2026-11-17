@@ -18,3 +18,4 @@ consequences). A new decision gets the next number; a reversed decision is marke
 | [0010](0010-content-licence-noncommercial.md) | Content under CC BY-NC-SA 4.0, commercial use on permission | accepted |
 | [0011](0011-privacy-by-design-and-tdm-reservation.md) | No visitor data kept, storage on consent, text and data mining reserved | accepted |
 | [0012](0012-layers-view-flowchart-sample-outputs.md) | Layers view for the model page, flowchart, documented sample outputs, icons in page diagrams | accepted |
+| [0013](0013-small-screens.md) | Small screens: diagrams open full size, wide tables become cards, laptop view unchanged | accepted |
