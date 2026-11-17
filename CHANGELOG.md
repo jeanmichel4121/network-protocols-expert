@@ -11,6 +11,8 @@ Versioning rules for this library:
 
 ## [Unreleased]
 
+## [0.12.0] - 2026-11-17
+
 ### Added
 - Template: layout for small screens (phones); the laptop and desktop view does not change
   (full-page screenshots identical pixel by pixel at 1024, 1280 and 1440 px). Diagrams fit
@@ -465,7 +467,8 @@ tooling, the CI pipeline and the public site.
   as Cisco's terms require), laid out left to right under the headline; CI checks the embedded
   scene matches the generator.
 
-[Unreleased]: https://github.com/jeanmichel4121/network-protocols-expert/compare/v0.11.2...main
+[Unreleased]: https://github.com/jeanmichel4121/network-protocols-expert/compare/v0.12.0...main
+[0.12.0]: https://github.com/jeanmichel4121/network-protocols-expert/compare/v0.11.2...v0.12.0
 [0.11.2]: https://github.com/jeanmichel4121/network-protocols-expert/compare/v0.11.1...v0.11.2
 [0.11.1]: https://github.com/jeanmichel4121/network-protocols-expert/compare/v0.11.0...v0.11.1
 [0.11.0]: https://github.com/jeanmichel4121/network-protocols-expert/compare/v0.10.0...v0.11.0
